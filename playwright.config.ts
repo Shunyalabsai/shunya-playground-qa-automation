@@ -50,9 +50,15 @@ export default defineConfig({
       },
       testMatch: /playground.*\.spec\.ts/,
       timeout: 120000, // 2 min per UI test (prevents long timeouts from blocking others)
-      retries: 1, // Retry once on failure to handle flaky UI interactions
+      retries: 0, // No retries — failures should fail fast so the daily run fits the 3h cadence
     },
   ],
+
+  /* Cap the entire `playwright test` invocation. Belt-and-suspenders alongside the
+   * shell-level `timeout` wrapper in run-playground-daily.sh — guards against hung
+   * browser processes that ignore per-test timeouts.
+   */
+  globalTimeout: 480000, // 8 min per `playwright test` invocation (each suite call)
 
   /* Global timeout for tests */
   timeout: 600000, // 10 minutes per test (for processing multiple audio files)

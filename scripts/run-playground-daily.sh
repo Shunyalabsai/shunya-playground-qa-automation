@@ -77,7 +77,9 @@ run_test() {
 
   local tmp_out
   tmp_out=$(mktemp)
-  if eval "$cmd" >> "$tmp_out" 2>&1; then
+  # Hard wall-clock cap at 5 min per suite — guards against hung browser processes
+  # that ignore Playwright's internal test/global timeouts.
+  if timeout 300 bash -c "$cmd" >> "$tmp_out" 2>&1; then
     status="pass"
     printf "   ✅ PASS\n" | tee -a "$LOG_FILE"
     PASS=$((PASS + 1))
