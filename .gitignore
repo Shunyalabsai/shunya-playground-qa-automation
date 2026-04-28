@@ -7,3 +7,4 @@ reports/*.json
 .env
 Google_service_account.json
 auth/playground-auth.json
+.daily-run.lock/

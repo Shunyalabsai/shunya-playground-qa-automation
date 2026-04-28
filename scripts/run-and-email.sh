@@ -11,6 +11,21 @@ LOG_DIR="$PROJECT_DIR/logs"
 REPORTS_DIR="$PROJECT_DIR/reports"
 mkdir -p "$LOG_DIR" "$REPORTS_DIR"
 
+# ── Single-run guard ─────────────────────────────────────────────────────────
+# Prevent two concurrent launches (overlapping launchd triggers) from racing.
+LOCK_DIR="$PROJECT_DIR/.daily-run.lock"
+if ! mkdir "$LOCK_DIR" 2>/dev/null; then
+  if [ -f "$LOCK_DIR/pid" ] && kill -0 "$(cat "$LOCK_DIR/pid")" 2>/dev/null; then
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] Skip — run already in progress (PID $(cat "$LOCK_DIR/pid"))."
+    exit 0
+  fi
+  # Stale lock — owner is gone. Take it over.
+  rm -rf "$LOCK_DIR"
+  mkdir "$LOCK_DIR"
+fi
+echo $$ > "$LOCK_DIR/pid"
+trap 'rm -rf "$LOCK_DIR"' EXIT INT TERM
+
 echo "════════════════════════════════════════════════════"
 echo "  Playground Hourly Run — $(date '+%Y-%m-%d %H:%M:%S')"
 echo "════════════════════════════════════════════════════"
