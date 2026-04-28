@@ -79,7 +79,17 @@ run_test() {
   tmp_out=$(mktemp)
   # Hard wall-clock cap at 5 min per suite — guards against hung browser processes
   # that ignore Playwright's internal test/global timeouts.
-  if timeout 300 bash -c "$cmd" >> "$tmp_out" 2>&1; then
+  # macOS doesn't ship GNU `timeout`, so we use a portable background-kill pattern.
+  local cmd_rc
+  ( eval "$cmd" ) >> "$tmp_out" 2>&1 &
+  local cmd_pid=$!
+  ( sleep 300 && kill -TERM "$cmd_pid" 2>/dev/null && sleep 5 && kill -KILL "$cmd_pid" 2>/dev/null ) &
+  local killer_pid=$!
+  wait "$cmd_pid" 2>/dev/null
+  cmd_rc=$?
+  kill "$killer_pid" 2>/dev/null
+  wait "$killer_pid" 2>/dev/null
+  if [ $cmd_rc -eq 0 ]; then
     status="pass"
     printf "   ✅ PASS\n" | tee -a "$LOG_FILE"
     PASS=$((PASS + 1))
