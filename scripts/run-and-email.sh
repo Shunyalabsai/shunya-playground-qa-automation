@@ -24,7 +24,34 @@ if ! mkdir "$LOCK_DIR" 2>/dev/null; then
   mkdir "$LOCK_DIR"
 fi
 echo $$ > "$LOCK_DIR/pid"
-trap 'rm -rf "$LOCK_DIR"' EXIT INT TERM
+
+# ── Wall-clock self-destruct ────────────────────────────────────────────────
+# Hard ceiling on the entire run so a hung suite can never block the next
+# launchd trigger (schedule is every 3h = 180 min). Keep below that.
+RUN_DEADLINE_SECS=9000   # 150 minutes
+PARENT_PID=$$
+(
+  sleep "$RUN_DEADLINE_SECS"
+  echo "[deadline] $RUN_DEADLINE_SECS s exceeded — killing run tree" >&2
+  # Kill orphaned playwright descendants that may have reparented to launchd.
+  pkill -KILL -f "playwright test src/tests/playgroundUI.spec.ts" 2>/dev/null
+  pkill -KILL -f "node_modules/playwright/lib/common/process.js" 2>/dev/null
+  pkill -KILL -P "$PARENT_PID" 2>/dev/null
+  kill -KILL "$PARENT_PID" 2>/dev/null
+) &
+WATCHDOG_PID=$!
+
+cleanup() {
+  kill "$WATCHDOG_PID" 2>/dev/null || true
+  rm -rf "$LOCK_DIR"
+}
+trap cleanup EXIT INT TERM
+
+# ── Orphan sweep ────────────────────────────────────────────────────────────
+# Kill any leftover playwright processes from a prior run that detached and
+# reparented to launchd. They'd otherwise hold browser ports / auth state.
+pkill -KILL -f "playwright test src/tests/playgroundUI.spec.ts" 2>/dev/null || true
+pkill -KILL -f "node_modules/playwright/lib/common/process.js" 2>/dev/null || true
 
 echo "════════════════════════════════════════════════════"
 echo "  Playground Hourly Run — $(date '+%Y-%m-%d %H:%M:%S')"

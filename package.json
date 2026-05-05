@@ -23,6 +23,7 @@
     "test:playground-zero-indic:summary": "playwright test src/tests/playgroundZeroIndic.spec.ts --project=api-tests -g 'Summarisation'",
     "test:playground-zero-indic:keyword-norm": "playwright test src/tests/playgroundZeroIndic.spec.ts --project=api-tests -g 'Keyword Normalisation'",
     "playground:login": "npx ts-node scripts/save-playground-auth.ts",
+    "playground:refresh-auth": "npx ts-node scripts/refresh-playground-auth.ts",
     "test:playground-ui": "playwright test src/tests/playgroundUI.spec.ts --project=playground-ui",
     "test:playground-backend": "playwright test src/tests/playgroundBackend.spec.ts --project=api-tests",
     "test:playground-all": "playwright test src/tests/playgroundUI.spec.ts --project=playground-ui && playwright test src/tests/playgroundBackend.spec.ts --project=api-tests",
@@ -51,6 +52,7 @@
   },
   "dependencies": {
     "@types/nodemailer": "^7.0.11",
+    "imapflow": "^1.3.3",
     "nodemailer": "^8.0.2"
   }
 }

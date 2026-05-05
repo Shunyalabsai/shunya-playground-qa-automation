@@ -75,7 +75,18 @@
       "Bash(pkill -f \"playwright test src/tests/playgroundUI.*Credits\")",
       "Bash(pkill -P 10545)",
       "Bash(kill 10545)",
-      "Bash(pkill -f \"playwright test src/tests/playgroundUI\")"
+      "Bash(pkill -f \"playwright test src/tests/playgroundUI\")",
+      "Bash(awk 'NR>=4238' /Users/unitedwecare/Playground_repo/playground-testing/logs/playground-daily-2026-04-27.log)",
+      "Bash(echo \"exit: $?\")",
+      "Bash(awk 'NR>=4238 && NR<=4250' /Users/unitedwecare/Playground_repo/playground-testing/logs/playground-daily-2026-04-27.log)",
+      "Bash(curl -s \"https://yamini-pal-singh.github.io/playground-testing/playground-runs.json\")",
+      "Bash(bash -n scripts/run-playground-daily.sh)",
+      "Bash(command -v timeout)",
+      "Bash(command -v gtimeout)",
+      "Bash(command -v perl)",
+      "Bash(brew list *)",
+      "Bash(grep -E \"^coreutils$\")",
+      "Bash(bash -c ' *)"
     ],
     "additionalDirectories": [
       "/tmp",

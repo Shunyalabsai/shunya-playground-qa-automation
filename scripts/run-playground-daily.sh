@@ -62,6 +62,20 @@ PASS=0
 FAIL=0
 SUITE_ENTRIES=""
 
+# Recursively send a signal to a PID and all its descendants.
+# Needed because `kill <subshell-pid>` does not reach grandchildren — npm/node
+# children get reparented to launchd (PID 1) and survive as orphans.
+_kill_tree() {
+  local pid=$1 sig=${2:-TERM}
+  local kids
+  kids=$(pgrep -P "$pid" 2>/dev/null) || true
+  local k
+  for k in $kids; do
+    _kill_tree "$k" "$sig"
+  done
+  kill "-$sig" "$pid" 2>/dev/null || true
+}
+
 run_test() {
   local category="$1"
   local name="$2"
@@ -80,13 +94,17 @@ run_test() {
   # Hard wall-clock cap at 5 min per suite — guards against hung browser processes
   # that ignore Playwright's internal test/global timeouts.
   # macOS doesn't ship GNU `timeout`, so we use a portable background-kill pattern.
+  # NOTE: must kill the *entire* descendant tree, not just the eval subshell,
+  # otherwise npm/node grandchildren reparent to launchd and run forever.
   local cmd_rc
   ( eval "$cmd" ) >> "$tmp_out" 2>&1 &
   local cmd_pid=$!
-  ( sleep 300 && kill -TERM "$cmd_pid" 2>/dev/null && sleep 5 && kill -KILL "$cmd_pid" 2>/dev/null ) &
+  ( sleep 300 && _kill_tree "$cmd_pid" TERM && sleep 5 && _kill_tree "$cmd_pid" KILL ) &
   local killer_pid=$!
   wait "$cmd_pid" 2>/dev/null
   cmd_rc=$?
+  # Sweep any descendants the suite spawned, even on success.
+  _kill_tree "$cmd_pid" TERM
   kill "$killer_pid" 2>/dev/null
   wait "$killer_pid" 2>/dev/null
   if [ $cmd_rc -eq 0 ]; then
