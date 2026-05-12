@@ -6257,13 +6257,8 @@ async function runFeatureAndCaptureResponse(
     await featLabel.locator('..').click({ force: true }).catch(() => {});
   }
   await page.waitForTimeout(1000);
-  // Toggling certain features (Translation, Transliteration, etc.) opens a
-  // configuration modal that must be confirmed before the page accepts clicks.
-  const confirmBtn = page.getByRole('button', { name: 'Confirm' });
-  if (await confirmBtn.isVisible({ timeout: 1500 }).catch(() => false)) {
-    await confirmBtn.click();
-    await page.waitForTimeout(500);
-  }
+  // Any modal opened by the toggle (Translation language picker, etc.) is
+  // auto-dismissed by the global locator handler registered in beforeEach.
   await page.locator('input[type="file"]').setInputFiles(audioPath);
   await page.waitForTimeout(3000);
   await page.getByRole('button', { name: 'Run Analysis' }).click();
