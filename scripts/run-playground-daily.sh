@@ -91,15 +91,16 @@ run_test() {
 
   local tmp_out
   tmp_out=$(mktemp)
-  # Hard wall-clock cap at 5 min per suite — guards against hung browser processes
-  # that ignore Playwright's internal test/global timeouts.
+  # Hard wall-clock cap at 18 min per suite — guards against hung browser processes
+  # that ignore Playwright's internal test/global timeouts. Sized to sit above
+  # Playwright's 15-min globalTimeout so Playwright fires first under normal load.
   # macOS doesn't ship GNU `timeout`, so we use a portable background-kill pattern.
   # NOTE: must kill the *entire* descendant tree, not just the eval subshell,
   # otherwise npm/node grandchildren reparent to launchd and run forever.
   local cmd_rc
   ( eval "$cmd" ) >> "$tmp_out" 2>&1 &
   local cmd_pid=$!
-  ( sleep 300 && _kill_tree "$cmd_pid" TERM && sleep 5 && _kill_tree "$cmd_pid" KILL ) &
+  ( sleep 1080 && _kill_tree "$cmd_pid" TERM && sleep 5 && _kill_tree "$cmd_pid" KILL ) &
   local killer_pid=$!
   wait "$cmd_pid" 2>/dev/null
   cmd_rc=$?

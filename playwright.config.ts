@@ -58,7 +58,7 @@ export default defineConfig({
    * shell-level `timeout` wrapper in run-playground-daily.sh — guards against hung
    * browser processes that ignore per-test timeouts.
    */
-  globalTimeout: 480000, // 8 min per `playwright test` invocation (each suite call)
+  globalTimeout: 900000, // 15 min per `playwright test` invocation (each suite call)
 
   /* Global timeout for tests */
   timeout: 600000, // 10 minutes per test (for processing multiple audio files)

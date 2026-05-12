@@ -14,6 +14,16 @@ import * as fs from 'fs';
 
 const PLAYGROUND_URL = 'https://playground.shunyalabs.ai/';
 
+// Some feature toggles open a configuration modal with a Confirm button.
+// Install a locator handler once per page so the modal is auto-dismissed
+// whenever it appears — no per-test changes needed.
+test.beforeEach(async ({ page }) => {
+  const confirmBtn = page.getByRole('button', { name: 'Confirm' });
+  await page.addLocatorHandler(confirmBtn, async () => {
+    await confirmBtn.click({ timeout: 1500 }).catch(() => {});
+  });
+});
+
 // ── Page Load & Layout ──────────────────────────────────────────────────────
 
 test.describe('Playground — Page Load & Layout', () => {
@@ -4090,11 +4100,19 @@ test.describe('Playground — TTS Text Input: Positive Tests', () => {
     expect(maxlen).toBe('10000');
   });
 
-  test('Transliteration active indicator should show for non-English script', async ({ page }) => {
+  test('Transliteration active indicator should show in green for non-English script', async ({ page }) => {
     await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
     await page.getByRole('button', { name: 'Text to Speech' }).click();
     await page.waitForTimeout(1000);
-    await expect(page.getByText(/Transliteration active/)).toBeVisible();
+    const badge = page.getByText(/Transliteration active/);
+    await expect(badge).toBeVisible();
+    const color = await badge.evaluate((el) => (el as any).ownerDocument.defaultView.getComputedStyle(el).color);
+    const m = color.match(/\d+/g);
+    expect(m, `Could not parse color: ${color}`).not.toBeNull();
+    const [r, g, b] = (m as RegExpMatchArray).slice(0, 3).map(Number);
+    expect(g, `Expected green-dominant color, got rgb(${r},${g},${b})`).toBeGreaterThan(r);
+    expect(g, `Expected green-dominant color, got rgb(${r},${g},${b})`).toBeGreaterThan(b);
+    expect(g).toBeGreaterThan(100);
   });
 
   test('clearing textarea should reset counter to 0', async ({ page }) => {
@@ -6239,6 +6257,13 @@ async function runFeatureAndCaptureResponse(
     await featLabel.locator('..').click({ force: true }).catch(() => {});
   }
   await page.waitForTimeout(1000);
+  // Toggling certain features (Translation, Transliteration, etc.) opens a
+  // configuration modal that must be confirmed before the page accepts clicks.
+  const confirmBtn = page.getByRole('button', { name: 'Confirm' });
+  if (await confirmBtn.isVisible({ timeout: 1500 }).catch(() => false)) {
+    await confirmBtn.click();
+    await page.waitForTimeout(500);
+  }
   await page.locator('input[type="file"]').setInputFiles(audioPath);
   await page.waitForTimeout(3000);
   await page.getByRole('button', { name: 'Run Analysis' }).click();
