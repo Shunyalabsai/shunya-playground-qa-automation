@@ -11,8 +11,32 @@ import {
   PLAYGROUND_TIMEOUTS,
 } from '../config/playground.config';
 import * as fs from 'fs';
+import * as path from 'path';
 
 const PLAYGROUND_URL = 'https://playground.shunyalabs.ai/';
+
+/** Repo root (stable even when Playwright is launched with a non-repo cwd). */
+const PLAYGROUND_PROJECT_ROOT = path.resolve(__dirname, '..', '..');
+/** NDJSON debug log — required session path + mirror under `reports/` for visibility. */
+const AGENT_DEBUG_LOG_PATHS = [
+  path.join(PLAYGROUND_PROJECT_ROOT, '.cursor', 'debug-8e4dc2.log'),
+  path.join(PLAYGROUND_PROJECT_ROOT, 'reports', 'debug-8e4dc2.log'),
+];
+function agentDebugLog(entry: Record<string, unknown>): void {
+  const line = JSON.stringify({
+    sessionId: '8e4dc2',
+    timestamp: Date.now(),
+    ...entry,
+  });
+  for (const logPath of AGENT_DEBUG_LOG_PATHS) {
+    try {
+      fs.mkdirSync(path.dirname(logPath), { recursive: true });
+      fs.appendFileSync(logPath, `${line}\n`);
+    } catch {
+      /* ignore */
+    }
+  }
+}
 
 // Some feature toggles open a configuration modal with a Confirm button.
 // Install a locator handler once per page so the modal is auto-dismissed
@@ -6227,10 +6251,39 @@ async function runFeatureAndCaptureResponse(
 ): Promise<{ status: number; body: any; request: string | null }> {
   let capturedResponse: { status: number; body: any } | null = null;
   let capturedRequest: string | null = null;
+  const debugRunId = `initial-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+  const startTs = Date.now();
+
+  // #region agent log
+  agentDebugLog({
+    runId: debugRunId,
+    hypothesisId: 'H4',
+    location: 'src/tests/playgroundUI.spec.ts:runFeatureAndCaptureResponse:start',
+    message: 'Feature run started',
+    data: { featureLabel, audioPath },
+  });
+  // #endregion
 
   page.on('request', (req: any) => {
     if (req.url().includes('/v1/audio/transcriptions') && req.method() === 'POST') {
       try { capturedRequest = req.postData(); } catch {}
+      const postData = capturedRequest || '';
+      const featureToken = featureLabel.toLowerCase().replace(/\s+/g, '_');
+      // #region agent log
+      agentDebugLog({
+        runId: debugRunId,
+        hypothesisId: 'H1',
+        location: 'src/tests/playgroundUI.spec.ts:runFeatureAndCaptureResponse:request',
+        message: 'Captured transcription request',
+        data: {
+          featureLabel,
+          url: req.url(),
+          postDataLength: postData.length,
+          containsExactFeatureToken: postData.toLowerCase().includes(featureToken),
+          containsFeatureLabel: postData.toLowerCase().includes(featureLabel.toLowerCase()),
+        },
+      });
+      // #endregion
     }
   });
   page.on('response', async (res: any) => {
@@ -6238,24 +6291,59 @@ async function runFeatureAndCaptureResponse(
       try {
         const body = await res.json();
         capturedResponse = { status: res.status(), body };
+        // #region agent log
+        agentDebugLog({
+          runId: debugRunId,
+          hypothesisId: 'H2',
+          location: 'src/tests/playgroundUI.spec.ts:runFeatureAndCaptureResponse:response-json',
+          message: 'Captured transcription response JSON',
+          data: {
+            featureLabel,
+            status: res.status(),
+            url: res.url(),
+            topLevelKeys: body && typeof body === 'object' ? Object.keys(body).slice(0, 20) : [],
+            hasNlpAnalysis: !!body?.nlp_analysis,
+            hasAnalysis: !!body?.analysis,
+            hasError: !!body?.error,
+          },
+        });
+        // #endregion
       } catch {
         capturedResponse = { status: res.status(), body: null };
+        // #region agent log
+        agentDebugLog({
+          runId: debugRunId,
+          hypothesisId: 'H2',
+          location: 'src/tests/playgroundUI.spec.ts:runFeatureAndCaptureResponse:response-nonjson',
+          message: 'Captured non-JSON transcription response',
+          data: { featureLabel, status: res.status(), url: res.url() },
+        });
+        // #endregion
       }
     }
   });
 
   await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
-  // Click the toggle parent (label span itself doesn't fire toggle handler)
+  await expect(page.getByText('API Playground')).toBeVisible({ timeout: 20000 });
+
+  // STT + Features panel (same flow as passing tests in "STT Features: Individual Toggles")
+  await page.getByRole('button', { name: 'Speech to Text' }).click({ timeout: 10000 }).catch(() => {});
+  await page.getByRole('button', { name: 'Features' }).click({ timeout: 10000 }).catch(() => {});
+
+  // Match working selectors elsewhere in this file: click the label span directly (XPath wrapper often matches 0 nodes).
   const featLabel = page.locator('span.leading-tight', { hasText: featureLabel }).first();
-  // Try clicking the toggle wrapper (div with cursor-pointer / role)
-  const toggleWrapper = featLabel.locator('xpath=ancestor::*[@role="button" or contains(@class, "cursor-pointer")][1]');
-  const wrapperCount = await toggleWrapper.count();
-  if (wrapperCount > 0) {
-    await toggleWrapper.first().click({ force: true }).catch(() => {});
-  } else {
-    // Fallback: click the parent div of the label
-    await featLabel.locator('..').click({ force: true }).catch(() => {});
-  }
+  await featLabel.waitFor({ state: 'visible', timeout: 15000 });
+  await featLabel.scrollIntoViewIfNeeded();
+  await featLabel.click({ force: true, timeout: 3000 });
+  // #region agent log
+  agentDebugLog({
+    runId: debugRunId,
+    hypothesisId: 'H1',
+    location: 'src/tests/playgroundUI.spec.ts:runFeatureAndCaptureResponse:toggle',
+    message: 'Feature toggle click attempted',
+    data: { featureLabel, strategy: 'leading-tight-direct' },
+  });
+  // #endregion
   await page.waitForTimeout(1000);
   // Any modal opened by the toggle (Translation language picker, etc.) is
   // auto-dismissed by the global locator handler registered in beforeEach.
@@ -6268,6 +6356,22 @@ async function runFeatureAndCaptureResponse(
   while (Date.now() < deadline && !capturedResponse) {
     await page.waitForTimeout(500);
   }
+  // #region agent log
+  agentDebugLog({
+    runId: debugRunId,
+    hypothesisId: 'H3',
+    location: 'src/tests/playgroundUI.spec.ts:runFeatureAndCaptureResponse:return',
+    message: 'Feature run completed',
+    data: {
+      featureLabel,
+      elapsedMs: Date.now() - startTs,
+      hasCapturedRequest: !!capturedRequest,
+      hasCapturedResponse: !!capturedResponse,
+      status: capturedResponse?.status ?? 0,
+      requestPreview: (capturedRequest || '').substring(0, 180),
+    },
+  });
+  // #endregion
   return { status: capturedResponse?.status ?? 0, body: capturedResponse?.body, request: capturedRequest };
 }
 

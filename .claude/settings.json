@@ -86,7 +86,12 @@
       "Bash(command -v perl)",
       "Bash(brew list *)",
       "Bash(grep -E \"^coreutils$\")",
-      "Bash(bash -c ' *)"
+      "Bash(bash -c ' *)",
+      "Bash(awk 'NR>=5232 && NR<=5302' /Users/unitedwecare/Playground_repo/playground-testing/src/tests/playgroundUI.spec.ts)",
+      "Bash(ps -p 5674 -p 94302 -o pid,ppid,etime,command)",
+      "Bash(kill -9 94302)",
+      "Bash(ps -p 5930 -o pid,ppid,etime,command)",
+      "Bash(ps -p 85618 -p 88370 -o pid,etime,command)"
     ],
     "additionalDirectories": [
       "/tmp",

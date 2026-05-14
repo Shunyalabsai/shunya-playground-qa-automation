@@ -4,6 +4,7 @@ test-results/
 logs/*.log
 reports/*.json
 !reports/playground-runs.json
+reports/debug-8e4dc2.log
 .env
 Google_service_account.json
 auth/playground-auth.json

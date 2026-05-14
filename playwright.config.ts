@@ -20,6 +20,7 @@ export default defineConfig({
   workers: 1, // Run sequentially for API tests
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: [
+    ['./scripts/playwright-debug-reporter.ts', {}],
     ['html', { outputFolder: 'playwright-report', open: 'never' }],
     ['list'], // Console reporter
   ],
@@ -38,7 +39,9 @@ export default defineConfig({
   projects: [
     {
       name: 'api-tests',
-      // No browser needed for API tests
+      // Browser UI specs need `storageState` (playground-ui project). Running them here
+      // hits Clerk/Cloudflare unauthenticated and produces false failures (see debug-8e4dc2.log).
+      testIgnore: '**/playgroundUI.spec.ts',
     },
     {
       name: 'playground-ui',
