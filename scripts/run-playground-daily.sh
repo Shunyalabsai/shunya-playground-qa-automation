@@ -144,7 +144,7 @@ echo "" | tee -a "$LOG_FILE"
 echo "── Functional / UI Tests ───────────────────────────" | tee -a "$LOG_FILE"
 
 run_test "Functional UI"  "Page Load & Layout"          "npx playwright test src/tests/playgroundUI.spec.ts --reporter=list --project=playground-ui -g 'Page Load'"
-run_test "Functional UI"  "Credits"                     "npx playwright test src/tests/playgroundUI.spec.ts --reporter=list --project=playground-ui -g 'Credits'"
+run_test "Functional UI"  "Credits"                     "npx playwright test src/tests/playgroundUI.spec.ts --reporter=list --project=playground-ui -g 'Playground — Credits:'"
 run_test "Functional UI"  "Tab Navigation"              "npx playwright test src/tests/playgroundUI.spec.ts --reporter=list --project=playground-ui -g 'Tab Navigation'"
 run_test "Functional UI"  "Model Selection"             "npx playwright test src/tests/playgroundUI.spec.ts --reporter=list --project=playground-ui -g 'Model Selection'"
 run_test "Functional UI"  "Language Selection"          "npx playwright test src/tests/playgroundUI.spec.ts --reporter=list --project=playground-ui -g 'Language Selection'"
@@ -263,7 +263,24 @@ echo "── Generating Playground Report ────────────�
 if npx ts-node scripts/generate-playground-report.ts >> "$LOG_FILE" 2>&1; then
   echo "   ✅ Playground HTML report generated" | tee -a "$LOG_FILE"
 
-  # Push dashboard to GitHub Pages for stakeholder access
+  # Primary dashboard: playground-testing repo → GitHub Pages (yamini-pal-singh.github.io/playground-testing)
+  echo "" | tee -a "$LOG_FILE"
+  echo "── Publishing Dashboard (playground-testing) ───────" | tee -a "$LOG_FILE"
+  if (
+    cd "$PROJECT_DIR"
+    git add reports/Playground-Report.html reports/playground-runs.json 2>/dev/null
+    if git diff --staged --quiet; then
+      echo "   ℹ️  No dashboard changes to commit" | tee -a "$LOG_FILE"
+    else
+      git commit -m "Dashboard update — $DATE $(date '+%H:%M')" && git push origin main
+    fi
+  ) >> "$LOG_FILE" 2>&1; then
+    echo "   ✅ Dashboard published to playground-testing (GitHub Pages)" | tee -a "$LOG_FILE"
+  else
+    echo "   ⚠️  playground-testing dashboard push failed (check git auth)" | tee -a "$LOG_FILE"
+  fi
+
+  # Legacy mirror: asr-testing repo copy for historical archive
   GHPAGES_REPO="$HOME/repos/asr-testing"
   if [ -d "$GHPAGES_REPO/.git" ]; then
     mkdir -p "$GHPAGES_REPO/asr-testing/reports/playground-history"

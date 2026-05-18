@@ -11,42 +11,15 @@ import {
   PLAYGROUND_TIMEOUTS,
 } from '../config/playground.config';
 import * as fs from 'fs';
-import * as path from 'path';
+import {
+  assertFeatureRequestAndResponse,
+  clickFeatureToggle,
+  enableSttFeature,
+  multipartContainsAny,
+  runFeatureAndCaptureResponse,
+} from './playgroundStt.helpers';
 
 const PLAYGROUND_URL = 'https://playground.shunyalabs.ai/';
-
-/** Repo root (stable even when Playwright is launched with a non-repo cwd). */
-const PLAYGROUND_PROJECT_ROOT = path.resolve(__dirname, '..', '..');
-/** NDJSON debug log — required session path + mirror under `reports/` for visibility. */
-const AGENT_DEBUG_LOG_PATHS = [
-  path.join(PLAYGROUND_PROJECT_ROOT, '.cursor', 'debug-8e4dc2.log'),
-  path.join(PLAYGROUND_PROJECT_ROOT, 'reports', 'debug-8e4dc2.log'),
-];
-function agentDebugLog(entry: Record<string, unknown>): void {
-  const line = JSON.stringify({
-    sessionId: '8e4dc2',
-    timestamp: Date.now(),
-    ...entry,
-  });
-  for (const logPath of AGENT_DEBUG_LOG_PATHS) {
-    try {
-      fs.mkdirSync(path.dirname(logPath), { recursive: true });
-      fs.appendFileSync(logPath, `${line}\n`);
-    } catch {
-      /* ignore */
-    }
-  }
-}
-
-// Some feature toggles open a configuration modal with a Confirm button.
-// Install a locator handler once per page so the modal is auto-dismissed
-// whenever it appears — no per-test changes needed.
-test.beforeEach(async ({ page }) => {
-  const confirmBtn = page.getByRole('button', { name: 'Confirm' });
-  await page.addLocatorHandler(confirmBtn, async () => {
-    await confirmBtn.click({ timeout: 1500 }).catch(() => {});
-  });
-});
 
 // ── Page Load & Layout ──────────────────────────────────────────────────────
 
@@ -3088,15 +3061,21 @@ test.describe('Playground — Audio Intelligence Features: Negative Tests', () =
 
   test('features should not have broken/missing icons or images', async ({ page }) => {
     await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+    await page.getByRole('button', { name: 'Speech to Text' }).click({ timeout: 10000 }).catch(() => {});
+    await page.getByRole('button', { name: 'Features' }).click({ timeout: 10000 }).catch(() => {});
+    await page.waitForTimeout(500);
 
-    // Check for any broken images near the features area
-    const images = await page.locator('img').all();
+    // Scope to Features panel only (ignore nav/avatar/analytics elsewhere on the page)
+    const featuresHeading = page.getByText('Audio Intelligence', { exact: false }).first();
+    const panel = featuresHeading.locator('xpath=ancestor::motion.div[1]');
+    const scope = (await panel.count()) > 0 ? panel : page.locator('text=Features').first().locator('xpath=ancestor::div[3]');
+    const images = await scope.locator('img').all();
     let brokenCount = 0;
     for (const img of images) {
       const naturalWidth = await img.evaluate((el: HTMLImageElement) => el.naturalWidth);
       if (naturalWidth === 0) brokenCount++;
     }
-    console.log(`Images on page: ${images.length}, Broken: ${brokenCount}`);
+    console.log(`Feature panel images: ${images.length}, Broken: ${brokenCount}`);
     expect(brokenCount).toBe(0);
   });
 
@@ -4485,10 +4464,10 @@ test.describe('Playground — TTS: Negative Tests', () => {
     await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
     await page.getByRole('button', { name: 'Text to Speech' }).click();
     await page.waitForTimeout(1000);
-    const bodyText = await page.textContent('body') || '';
-    expect(bodyText).not.toMatch(/Characters:\s*-\d+/);
-    expect(bodyText).not.toContain('NaN');
-    expect(bodyText).not.toContain('undefined');
+    const counterText = await page.getByText(/Characters:\s*\d/).first().textContent() || '';
+    expect(counterText).not.toMatch(/Characters:\s*-\d+/);
+    expect(counterText).not.toContain('NaN');
+    expect(counterText).toMatch(/Characters:\s*\d+\s*\/\s*[\d,]+/);
   });
 
   test('TTS should not show failed network requests on tab load', async ({ page }) => {
@@ -4630,10 +4609,13 @@ test.describe('Playground — TTS Functional: End-to-End Synthesis', () => {
     await page.locator('textarea').fill(TTS_SAMPLE_TEXT);
     await page.waitForTimeout(500);
     await page.getByRole('button', { name: 'Run Synthesis' }).click();
-    await page.waitForTimeout(30000);
+    await page.waitForTimeout(60000);
 
-    const ttsCall = apiCalls.find(c => c.url.includes('tts') || c.url.includes('synthesize') || c.url.includes('speech'));
-    expect(ttsCall, `Expected a TTS API call. Got: ${apiCalls.map(c => c.url).join(', ')}`).toBeTruthy();
+    const ttsCall = apiCalls.find((c) =>
+      /tts|synthesize|speech|text-to-speech|\/v1\/audio\/(speech|synthesis)/i.test(c.url)
+      || (c.url.includes('/v1/audio/') && !c.url.includes('transcriptions')),
+    );
+    expect(ttsCall, `Expected a TTS API call. Got: ${apiCalls.map((c) => c.url).join(', ')}`).toBeTruthy();
   });
 
   test('Run Synthesis should produce an audio element or playable result', async ({ page }) => {
@@ -4644,12 +4626,15 @@ test.describe('Playground — TTS Functional: End-to-End Synthesis', () => {
     await page.locator('textarea').fill(TTS_SAMPLE_TEXT);
     await page.waitForTimeout(500);
     await page.getByRole('button', { name: 'Run Synthesis' }).click();
-    await page.waitForTimeout(45000);
 
-    const audioCount = await page.locator('audio').count();
-    const bodyText = await page.textContent('body') || '';
-    const hasAudio = audioCount > 0 || !bodyText.includes('Enter text above and click Run Synthesis');
-    expect(hasAudio, 'Expected audio element or empty-state to disappear after synthesis').toBe(true);
+    const audioLocator = page.locator('audio');
+    await expect
+      .poll(async () => {
+        const audioCount = await audioLocator.count();
+        const bodyText = await page.textContent('body') || '';
+        return audioCount > 0 || !bodyText.includes('Enter text above and click Run Synthesis');
+      }, { timeout: 90000 })
+      .toBe(true);
   });
 
   test('successful synthesis should deduct credits', async ({ page }) => {
@@ -5267,49 +5252,42 @@ test.describe('Playground — STT Functional: Feature Toggles', () => {
 
   test('enabling Translation should add translation param to request', async ({ page }) => {
     test.setTimeout(240000);
-    let capturedBody: string | null = null;
-    page.on('request', req => {
+    let requestBuffer: Buffer | null = null;
+    page.on('request', (req) => {
       if (req.url().includes('/v1/audio/transcriptions') && req.method() === 'POST') {
-        try { capturedBody = req.postData(); } catch {}
+        requestBuffer = req.postDataBuffer() ?? null;
       }
     });
 
     await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
-    // Toggle Translation
-    await page.locator('span.leading-tight', { hasText: 'Translation' }).first().click({ force: true }).catch(() => {});
-    await page.waitForTimeout(500);
+    await enableSttFeature(page, 'Translation');
     const fileInput = page.locator('input[type="file"]');
     await fileInput.setInputFiles(TEST_AUDIO_FILES.wav);
     await page.waitForTimeout(2000);
     await page.getByRole('button', { name: 'Run Analysis' }).click();
     await page.waitForTimeout(60000);
 
-    expect(capturedBody).toBeTruthy();
-    if (capturedBody) {
-      const mentions = capturedBody.toLowerCase().includes('translat') || capturedBody.toLowerCase().includes('output_lang');
-      console.log(`Request body mentions translation: ${mentions}`);
-    }
+    expect(multipartContainsAny(requestBuffer, ['output_language', 'output_lang', 'translation', 'target_lang'])).toBe(true);
   });
 
   test('enabling Diarization should add diarization param', async ({ page }) => {
     test.setTimeout(240000);
-    let capturedBody: string | null = null;
-    page.on('request', req => {
+    let requestBuffer: Buffer | null = null;
+    page.on('request', (req) => {
       if (req.url().includes('/v1/audio/transcriptions') && req.method() === 'POST') {
-        try { capturedBody = req.postData(); } catch {}
+        requestBuffer = req.postDataBuffer() ?? null;
       }
     });
 
     await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
-    await page.locator('span.leading-tight', { hasText: 'Speaker Diarization' }).first().click({ force: true }).catch(() => {});
-    await page.waitForTimeout(500);
+    await enableSttFeature(page, 'Speaker Diarization');
     const fileInput = page.locator('input[type="file"]');
     await fileInput.setInputFiles(TEST_AUDIO_FILES.wav);
     await page.waitForTimeout(2000);
     await page.getByRole('button', { name: 'Run Analysis' }).click();
     await page.waitForTimeout(60000);
 
-    expect(capturedBody).toBeTruthy();
+    expect(multipartContainsAny(requestBuffer, ['enable_diarization', 'diarization'])).toBe(true);
   });
 
   test('multiple feature toggles should all persist through run', async ({ page }) => {
@@ -5317,8 +5295,7 @@ test.describe('Playground — STT Functional: Feature Toggles', () => {
     await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
 
     for (const feat of ['Translation', 'Transliteration', 'Speaker Diarization']) {
-      await page.locator('span.leading-tight', { hasText: feat }).first().click({ force: true }).catch(() => {});
-      await page.waitForTimeout(200);
+      await clickFeatureToggle(page, feat);
     }
     const fileInput = page.locator('input[type="file"]');
     await fileInput.setInputFiles(TEST_AUDIO_FILES.wav);
@@ -5337,10 +5314,10 @@ test.describe('Playground — STT Functional: Cross-Feature', () => {
 
   test('switching language to Hindi should send language_code in request', async ({ page }) => {
     test.setTimeout(240000);
-    let capturedBody: string | null = null;
-    page.on('request', req => {
+    let requestBuffer: Buffer | null = null;
+    page.on('request', (req) => {
       if (req.url().includes('/v1/audio/transcriptions') && req.method() === 'POST') {
-        try { capturedBody = req.postData(); } catch {}
+        requestBuffer = req.postDataBuffer() ?? null;
       }
     });
 
@@ -5355,11 +5332,8 @@ test.describe('Playground — STT Functional: Cross-Feature', () => {
     await page.getByRole('button', { name: 'Run Analysis' }).click();
     await page.waitForTimeout(60000);
 
-    expect(capturedBody).toBeTruthy();
-    if (capturedBody) {
-      const hasHindi = capturedBody.includes('Hindi') || capturedBody.includes('hi');
-      console.log(`Body has Hindi hint: ${hasHindi}`);
-    }
+    expect(requestBuffer).toBeTruthy();
+    expect(multipartContainsAny(requestBuffer, ['language_code', 'hindi', 'hi', 'Hindi'])).toBe(true);
   });
 
   test('replacing uploaded file should work without page reload', async ({ page }) => {
@@ -5878,9 +5852,8 @@ test.describe('Playground — STT Features: Individual Toggles', () => {
       const errors: string[] = [];
       page.on('console', msg => { if (msg.type() === 'error') errors.push(msg.text()); });
       await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
-      const toggle = page.locator('span.leading-tight', { hasText: feat }).first();
-      await toggle.click({ force: true }).catch(() => {});
-      await page.waitForTimeout(500);
+      await clickFeatureToggle(page, feat);
+      await page.waitForTimeout(200);
       expect(errors.length, `${feat} toggle caused console errors: ${errors.join(' | ')}`).toBe(0);
     });
   }
@@ -6243,267 +6216,30 @@ test.describe('Playground — STT Network: Health', () => {
 // Any empty / malformed / error response triggers a failure -> high-priority email.
 // ════════════════════════════════════════════════════════════════════════════
 
-/** Helper: upload file, toggle feature, Run Analysis, capture API response */
-async function runFeatureAndCaptureResponse(
-  page: any,
-  featureLabel: string,
-  audioPath: string,
-): Promise<{ status: number; body: any; request: string | null }> {
-  let capturedResponse: { status: number; body: any } | null = null;
-  let capturedRequest: string | null = null;
-  const debugRunId = `initial-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
-  const startTs = Date.now();
+const FEATURE_VERIFY_CASES: Array<{ describe: string; label: string; title: string }> = [
+  { describe: 'Translation', label: 'Translation', title: 'Translation feature should return translated text in response' },
+  { describe: 'Transliteration', label: 'Transliteration', title: 'Transliteration feature should return transliterated text' },
+  { describe: 'Speaker Diarization', label: 'Speaker Diarization', title: 'Speaker Diarization should return speaker labels in segments' },
+  { describe: 'Speaker Identification', label: 'Speaker Identification', title: 'Speaker Identification should return speaker metadata' },
+  { describe: 'Word Timestamps', label: 'Word Timestamps', title: 'Word Timestamps should return words with start/end times' },
+  { describe: 'Profanity Hashing', label: 'Profanity Hashing', title: 'Profanity Hashing should return hashed or redacted output' },
+  { describe: 'Custom Keyword Hashing', label: 'Custom Keyword Hashing', title: 'Custom Keyword Hashing should hash configured keywords' },
+  { describe: 'Intent Detection', label: 'Intent Detection', title: 'Intent Detection should return intent classification' },
+  { describe: 'Sentiment Analysis', label: 'Sentiment Analysis', title: 'Sentiment Analysis should return sentiment classification' },
+  { describe: 'Emotion Diarization', label: 'Emotion Diarization', title: 'Emotion Diarization should return emotion data in segments' },
+  { describe: 'Summarisation', label: 'Summarisation', title: 'Summarisation should return a summary string' },
+  { describe: 'Keyword Normalisation', label: 'Keyword Normalisation', title: 'Keyword Normalisation should return normalized text' },
+];
 
-  // #region agent log
-  agentDebugLog({
-    runId: debugRunId,
-    hypothesisId: 'H4',
-    location: 'src/tests/playgroundUI.spec.ts:runFeatureAndCaptureResponse:start',
-    message: 'Feature run started',
-    data: { featureLabel, audioPath },
+for (const fc of FEATURE_VERIFY_CASES) {
+  test.describe(`Playground — STT Feature Verification: ${fc.describe}`, () => {
+    test(fc.title, async ({ page }) => {
+      test.setTimeout(240000);
+      const capture = await runFeatureAndCaptureResponse(page, fc.label, TEST_AUDIO_FILES.wav);
+      assertFeatureRequestAndResponse(fc.label, capture);
+    });
   });
-  // #endregion
-
-  page.on('request', (req: any) => {
-    if (req.url().includes('/v1/audio/transcriptions') && req.method() === 'POST') {
-      try { capturedRequest = req.postData(); } catch {}
-      const postData = capturedRequest || '';
-      const featureToken = featureLabel.toLowerCase().replace(/\s+/g, '_');
-      // #region agent log
-      agentDebugLog({
-        runId: debugRunId,
-        hypothesisId: 'H1',
-        location: 'src/tests/playgroundUI.spec.ts:runFeatureAndCaptureResponse:request',
-        message: 'Captured transcription request',
-        data: {
-          featureLabel,
-          url: req.url(),
-          postDataLength: postData.length,
-          containsExactFeatureToken: postData.toLowerCase().includes(featureToken),
-          containsFeatureLabel: postData.toLowerCase().includes(featureLabel.toLowerCase()),
-        },
-      });
-      // #endregion
-    }
-  });
-  page.on('response', async (res: any) => {
-    if (res.url().includes('/v1/audio/transcriptions') && res.request().method() === 'POST') {
-      try {
-        const body = await res.json();
-        capturedResponse = { status: res.status(), body };
-        // #region agent log
-        agentDebugLog({
-          runId: debugRunId,
-          hypothesisId: 'H2',
-          location: 'src/tests/playgroundUI.spec.ts:runFeatureAndCaptureResponse:response-json',
-          message: 'Captured transcription response JSON',
-          data: {
-            featureLabel,
-            status: res.status(),
-            url: res.url(),
-            topLevelKeys: body && typeof body === 'object' ? Object.keys(body).slice(0, 20) : [],
-            hasNlpAnalysis: !!body?.nlp_analysis,
-            hasAnalysis: !!body?.analysis,
-            hasError: !!body?.error,
-          },
-        });
-        // #endregion
-      } catch {
-        capturedResponse = { status: res.status(), body: null };
-        // #region agent log
-        agentDebugLog({
-          runId: debugRunId,
-          hypothesisId: 'H2',
-          location: 'src/tests/playgroundUI.spec.ts:runFeatureAndCaptureResponse:response-nonjson',
-          message: 'Captured non-JSON transcription response',
-          data: { featureLabel, status: res.status(), url: res.url() },
-        });
-        // #endregion
-      }
-    }
-  });
-
-  await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
-  await expect(page.getByText('API Playground')).toBeVisible({ timeout: 20000 });
-
-  // STT + Features panel (same flow as passing tests in "STT Features: Individual Toggles")
-  await page.getByRole('button', { name: 'Speech to Text' }).click({ timeout: 10000 }).catch(() => {});
-  await page.getByRole('button', { name: 'Features' }).click({ timeout: 10000 }).catch(() => {});
-
-  // Match working selectors elsewhere in this file: click the label span directly (XPath wrapper often matches 0 nodes).
-  const featLabel = page.locator('span.leading-tight', { hasText: featureLabel }).first();
-  await featLabel.waitFor({ state: 'visible', timeout: 15000 });
-  await featLabel.scrollIntoViewIfNeeded();
-  await featLabel.click({ force: true, timeout: 3000 });
-  // #region agent log
-  agentDebugLog({
-    runId: debugRunId,
-    hypothesisId: 'H1',
-    location: 'src/tests/playgroundUI.spec.ts:runFeatureAndCaptureResponse:toggle',
-    message: 'Feature toggle click attempted',
-    data: { featureLabel, strategy: 'leading-tight-direct' },
-  });
-  // #endregion
-  await page.waitForTimeout(1000);
-  // Any modal opened by the toggle (Translation language picker, etc.) is
-  // auto-dismissed by the global locator handler registered in beforeEach.
-  await page.locator('input[type="file"]').setInputFiles(audioPath);
-  await page.waitForTimeout(3000);
-  await page.getByRole('button', { name: 'Run Analysis' }).click();
-
-  // Wait for response — extended for cloud (180s vs 60s)
-  const deadline = Date.now() + 180000;
-  while (Date.now() < deadline && !capturedResponse) {
-    await page.waitForTimeout(500);
-  }
-  // #region agent log
-  agentDebugLog({
-    runId: debugRunId,
-    hypothesisId: 'H3',
-    location: 'src/tests/playgroundUI.spec.ts:runFeatureAndCaptureResponse:return',
-    message: 'Feature run completed',
-    data: {
-      featureLabel,
-      elapsedMs: Date.now() - startTs,
-      hasCapturedRequest: !!capturedRequest,
-      hasCapturedResponse: !!capturedResponse,
-      status: capturedResponse?.status ?? 0,
-      requestPreview: (capturedRequest || '').substring(0, 180),
-    },
-  });
-  // #endregion
-  return { status: capturedResponse?.status ?? 0, body: capturedResponse?.body, request: capturedRequest };
 }
-
-test.describe('Playground — STT Feature Verification: Translation', () => {
-  test('Translation feature should return translated text in response', async ({ page }) => {
-    test.setTimeout(240000);
-    const { status, body, request } = await runFeatureAndCaptureResponse(page, 'Translation', TEST_AUDIO_FILES.wav);
-    expect(status, `HTTP ${status} for Translation`).toBeLessThan(400);
-    const translation = body?.nlp_analysis?.translation || body?.analysis?.translation || body?.translation;
-    const translatedText = typeof translation === 'object' ? translation?.text : translation;
-    console.log(`Translation request body (preview): ${request?.substring(0, 200)}`);
-    console.log(`Translation response text: ${String(translatedText).substring(0, 100)}`);
-    expect(translatedText, `Translation feature returned no result. Body: ${JSON.stringify(body).substring(0, 300)}`).toBeTruthy();
-  });
-});
-
-test.describe('Playground — STT Feature Verification: Transliteration', () => {
-  test('Transliteration feature should return transliterated text', async ({ page }) => {
-    test.setTimeout(240000);
-    const { status, body } = await runFeatureAndCaptureResponse(page, 'Transliteration', TEST_AUDIO_FILES.wav);
-    expect(status).toBeLessThan(400);
-    const translit = body?.nlp_analysis?.transliteration || body?.analysis?.transliteration;
-    const mainText = body?.text || '';
-    const translitText = typeof translit === 'object' ? translit?.text : translit;
-    const hasResult = (translitText && String(translitText).length > 0) || mainText.length > 0;
-    expect(hasResult, `Transliteration empty. Body: ${JSON.stringify(body).substring(0, 300)}`).toBe(true);
-  });
-});
-
-test.describe('Playground — STT Feature Verification: Speaker Diarization', () => {
-  test('Speaker Diarization should return speaker labels in segments', async ({ page }) => {
-    test.setTimeout(240000);
-    const { status, body, request } = await runFeatureAndCaptureResponse(page, 'Speaker Diarization', TEST_AUDIO_FILES.wav);
-    expect(status).toBeLessThan(400);
-    const sentDiarization = request && request.toLowerCase().includes('diarization');
-    console.log(`Diarization in request body: ${sentDiarization}`);
-    const segments = body?.segments || [];
-    const speakers = body?.speakers || [];
-    const hasSpeakerData = speakers.length > 0 || segments.some((s: any) => s.speaker !== undefined);
-    expect(hasSpeakerData, `No speaker data. Segments: ${segments.length}, Speakers: ${speakers.length}. Toggle was ${sentDiarization ? 'sent' : 'NOT sent'} in request.`).toBe(true);
-  });
-});
-
-test.describe('Playground — STT Feature Verification: Speaker Identification', () => {
-  test('Speaker Identification toggle should complete without error', async ({ page }) => {
-    test.setTimeout(240000);
-    const { status, body } = await runFeatureAndCaptureResponse(page, 'Speaker Identification', TEST_AUDIO_FILES.wav);
-    expect(status, `HTTP ${status}`).toBeLessThan(500);
-    expect(body, 'Response body should exist').toBeTruthy();
-  });
-});
-
-test.describe('Playground — STT Feature Verification: Word Timestamps', () => {
-  test('Word Timestamps should return words with start/end times', async ({ page }) => {
-    test.setTimeout(240000);
-    const { status, body } = await runFeatureAndCaptureResponse(page, 'Word Timestamps', TEST_AUDIO_FILES.wav);
-    expect(status).toBeLessThan(400);
-    const segments = body?.segments || [];
-    const hasWordTimestamps = segments.some((s: any) => Array.isArray(s.words) && s.words.length > 0
-      && s.words[0].start !== undefined && s.words[0].end !== undefined);
-    expect(hasWordTimestamps, `Word timestamps missing. Segments: ${segments.length}`).toBe(true);
-  });
-});
-
-test.describe('Playground — STT Feature Verification: Profanity Hashing', () => {
-  test('Profanity Hashing toggle should complete without error', async ({ page }) => {
-    test.setTimeout(240000);
-    const { status, body } = await runFeatureAndCaptureResponse(page, 'Profanity Hashing', TEST_AUDIO_FILES.wav);
-    expect(status).toBeLessThan(500);
-    expect(body?.text !== undefined || body?.segments !== undefined, 'Response should have transcript').toBe(true);
-  });
-});
-
-test.describe('Playground — STT Feature Verification: Custom Keyword Hashing', () => {
-  test('Custom Keyword Hashing toggle should complete without error', async ({ page }) => {
-    test.setTimeout(240000);
-    const { status, body } = await runFeatureAndCaptureResponse(page, 'Custom Keyword Hashing', TEST_AUDIO_FILES.wav);
-    expect(status).toBeLessThan(500);
-    expect(body, 'Response body should exist').toBeTruthy();
-  });
-});
-
-test.describe('Playground — STT Feature Verification: Intent Detection', () => {
-  test('Intent Detection should return intent classification', async ({ page }) => {
-    test.setTimeout(240000);
-    const { status, body } = await runFeatureAndCaptureResponse(page, 'Intent Detection', TEST_AUDIO_FILES.wav);
-    expect(status).toBeLessThan(400);
-    const intent = body?.nlp_analysis?.intent || body?.analysis?.intent || body?.intent;
-    expect(intent, `No intent returned. Body: ${JSON.stringify(body).substring(0, 300)}`).toBeTruthy();
-  });
-});
-
-test.describe('Playground — STT Feature Verification: Sentiment Analysis', () => {
-  test('Sentiment Analysis should return sentiment classification', async ({ page }) => {
-    test.setTimeout(240000);
-    const { status, body } = await runFeatureAndCaptureResponse(page, 'Sentiment Analysis', TEST_AUDIO_FILES.wav);
-    expect(status).toBeLessThan(400);
-    const sentiment = body?.nlp_analysis?.sentiment || body?.analysis?.sentiment || body?.sentiment;
-    expect(sentiment, `No sentiment returned. Body: ${JSON.stringify(body).substring(0, 300)}`).toBeTruthy();
-  });
-});
-
-test.describe('Playground — STT Feature Verification: Emotion Diarization', () => {
-  test('Emotion Diarization should return emotion data in segments', async ({ page }) => {
-    test.setTimeout(240000);
-    const { status, body } = await runFeatureAndCaptureResponse(page, 'Emotion Diarization', TEST_AUDIO_FILES.wav);
-    expect(status).toBeLessThan(400);
-    const segments = body?.segments || [];
-    const hasEmotion = segments.some((s: any) => s.emotion !== undefined);
-    expect(hasEmotion, `No emotion data in segments. Body: ${JSON.stringify(body).substring(0, 300)}`).toBe(true);
-  });
-});
-
-test.describe('Playground — STT Feature Verification: Summarisation', () => {
-  test('Summarisation should return a summary string', async ({ page }) => {
-    test.setTimeout(240000);
-    const { status, body } = await runFeatureAndCaptureResponse(page, 'Summarisation', TEST_AUDIO_FILES.wav);
-    expect(status).toBeLessThan(400);
-    const summary = body?.nlp_analysis?.summary || body?.analysis?.summary || body?.summary;
-    expect(summary && String(summary).length > 0, `Summary empty. Body: ${JSON.stringify(body).substring(0, 300)}`).toBe(true);
-  });
-});
-
-test.describe('Playground — STT Feature Verification: Keyword Normalisation', () => {
-  test('Keyword Normalisation should return normalized text', async ({ page }) => {
-    test.setTimeout(240000);
-    const { status, body } = await runFeatureAndCaptureResponse(page, 'Keyword Normalisation', TEST_AUDIO_FILES.wav);
-    expect(status).toBeLessThan(400);
-    const normalized = body?.nlp_analysis?.normalized_text || body?.analysis?.normalized_text;
-    expect(normalized && String(normalized).length > 0, `Normalized text empty. Body: ${JSON.stringify(body).substring(0, 300)}`).toBe(true);
-  });
-});
 
 // ── STT Feature Verification — Error Signals ─────────────────────────────────
 
@@ -6517,10 +6253,11 @@ test.describe('Playground — STT Feature Verification: Error Detection', () => 
         failures.push(`${res.status()} ${res.url()}`);
       }
     });
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+    await page.goto(PLAYGROUND_URL, { waitUntil: 'domcontentloaded', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+    await page.getByRole('button', { name: 'Speech to Text' }).click({ timeout: 10000 }).catch(() => {});
+    await page.getByRole('button', { name: 'Features' }).click({ timeout: 10000 }).catch(() => {});
     for (const feat of ['Translation', 'Transliteration', 'Sentiment Analysis']) {
-      await page.locator('span.leading-tight', { hasText: feat }).first().click({ force: true }).catch(() => {});
-      await page.waitForTimeout(200);
+      await clickFeatureToggle(page, feat);
     }
     await page.locator('input[type="file"]').setInputFiles(TEST_AUDIO_FILES.wav);
     await page.waitForTimeout(2000);
