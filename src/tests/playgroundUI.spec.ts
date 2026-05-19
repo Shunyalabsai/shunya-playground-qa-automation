@@ -5734,9 +5734,23 @@ test.describe('Playground — STT Configuration: Field Behavior', () => {
 
   test('Transcription Mode field should show Prerecorded value', async ({ page }) => {
     await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
-    const transcField = page.locator('input, textbox').filter({ has: page.locator(':text("Prerecorded")') }).or(page.getByRole('textbox').filter({ hasText: /Prerecorded/ }));
-    const bodyText = await page.textContent('body') || '';
-    expect(bodyText).toContain('Prerecorded');
+    await expect(page.locator('label', { hasText: 'Transcription Mode' })).toBeVisible();
+    // Prerecorded is shown in a readonly input — textContent('body') does NOT include input values.
+    const prerecordedInput = page.locator('input[value="Prerecorded"], input[value="prerecorded"]').first();
+    const byLabel = page
+      .locator('label', { hasText: 'Transcription Mode' })
+      .locator('..')
+      .locator('input, [role="textbox"]')
+      .first();
+    const hasInputValue = (await prerecordedInput.count()) > 0;
+    const labelFieldValue = hasInputValue
+      ? await prerecordedInput.inputValue()
+      : await byLabel.inputValue().catch(() => '');
+    const visibleText = await page.getByText('Prerecorded', { exact: true }).isVisible().catch(() => false);
+    expect(
+      hasInputValue || /prerecorded/i.test(labelFieldValue) || visibleText,
+      `Prerecorded not found (input count: ${await prerecordedInput.count()}, label field: "${labelFieldValue}")`,
+    ).toBe(true);
   });
 
   test('Transcription Mode should not be editable by typing', async ({ page }) => {
