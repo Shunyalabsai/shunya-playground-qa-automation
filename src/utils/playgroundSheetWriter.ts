@@ -73,13 +73,14 @@ async function getSheetsClient(): Promise<sheets_v4.Sheets> {
       );
     }
   } else if (GOOGLE_SHEETS_CONFIG.clientEmail && GOOGLE_SHEETS_CONFIG.privateKey) {
-    // Use individual credentials
-    auth = new google.auth.JWT(
+    // JWT is the client — no getClient() (unlike GoogleAuth)
+    const jwtAuth = new google.auth.JWT(
       GOOGLE_SHEETS_CONFIG.clientEmail,
       undefined,
       GOOGLE_SHEETS_CONFIG.privateKey,
-      ['https://www.googleapis.com/auth/spreadsheets']
+      ['https://www.googleapis.com/auth/spreadsheets'],
     );
+    return google.sheets({ version: 'v4', auth: jwtAuth });
   } else {
     throw new Error(
       'Google Sheets credentials not configured. Please set GOOGLE_SERVICE_ACCOUNT_JSON or GOOGLE_CLIENT_EMAIL and GOOGLE_PRIVATE_KEY in .env'
@@ -87,8 +88,7 @@ async function getSheetsClient(): Promise<sheets_v4.Sheets> {
   }
 
   const client = await auth.getClient();
-  const sheets = google.sheets({ version: 'v4', auth: client as any });
-  return sheets;
+  return google.sheets({ version: 'v4', auth: client as Parameters<typeof google.sheets>[0]['auth'] });
 }
 
 // ── Helpers ─────────────────────────────────────────────────────────────────

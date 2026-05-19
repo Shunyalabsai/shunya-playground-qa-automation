@@ -28,6 +28,8 @@
     "test:playground-backend": "playwright test src/tests/playgroundBackend.spec.ts --project=api-tests",
     "test:playground-all": "playwright test src/tests/playgroundUI.spec.ts --project=playground-ui && playwright test src/tests/playgroundBackend.spec.ts --project=api-tests",
     "test:playground-daily": "bash scripts/run-playground-daily.sh",
+    "test:playground-daily:status": "bash scripts/playground-daily-status.sh",
+    "test:playground-daily:stop": "bash scripts/playground-daily-stop.sh",
     "report:playground": "npx ts-node scripts/generate-playground-report.ts",
     "report:playground:open": "npx ts-node scripts/generate-playground-report.ts && open reports/Playground-Report.html",
     "email:playground": "npx ts-node scripts/send-playground-email.ts",
