@@ -33,6 +33,8 @@
     "report:playground": "npx ts-node scripts/generate-playground-report.ts",
     "report:playground:open": "npx ts-node scripts/generate-playground-report.ts && open reports/Playground-Report.html",
     "email:playground": "npx ts-node scripts/send-playground-email.ts",
+    "email:playground:daily": "bash scripts/send-playground-daily-email.sh",
+    "email:playground:install": "bash scripts/install-playground-daily-email.sh",
     "sheet:master": "npx ts-node scripts/write-master-test-sheet.ts"
   },
   "keywords": [

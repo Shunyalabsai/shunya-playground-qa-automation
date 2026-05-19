@@ -95,14 +95,10 @@ git commit -m "Dashboard update — $DATE $(date '+%H:%M')" 2>/dev/null
 git push origin main 2>&1
 echo "   ✅ Dashboard published"
 
-# ── Step 5: Email only on failure ──
+# Email: once daily at 8 PM — not after each 3-hourly run
 echo ""
-if [ "$SUITE_FAILED" -gt 0 ]; then
-  echo "── ❌ $SUITE_FAILED suite(s) failed — Sending Email ──"
-  npx ts-node scripts/send-playground-email.ts 2>&1
-else
-  echo "── ✅ All $SUITE_PASSED/$SUITE_TOTAL suites passed — No email needed ──"
-fi
+echo "── Email ────────────────────────────────────────"
+echo "   ℹ️  Skipped (daily digest at 8 PM: npm run email:playground:daily)"
 
 echo ""
 echo "════════════════════════════════════════════════════"

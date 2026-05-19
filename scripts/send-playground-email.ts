@@ -62,6 +62,16 @@ interface CategoryGroup {
 
 // ── Load Summary Data ────────────────────────────────────────────────────────
 
+function parseRecipients(raw: string | undefined): string {
+  if (!raw?.trim()) return '';
+  return raw
+    .split(/[,\n;]+/)
+    .map((e) => e.replace(/#.*$/, '').trim())
+    .filter((e) => e.includes('@'))
+    .join(', ');
+}
+
+/** Newest completed run (per-run JSON preferred over daily summary overwrite). */
 function loadLatestSummary(): PlaygroundSummary {
   const reportsDir = path.resolve(__dirname, '..', 'reports');
 
@@ -70,21 +80,39 @@ function loadLatestSummary(): PlaygroundSummary {
     process.exit(1);
   }
 
-  const files = fs.readdirSync(reportsDir)
-    .filter(f => f.startsWith('playground-summary-') && f.endsWith('.json'))
-    .sort()
-    .reverse();
+  const candidates: { file: string; summary: PlaygroundSummary }[] = [];
 
-  if (files.length === 0) {
-    console.error('❌ No playground-summary-*.json files found in', reportsDir);
+  for (const file of fs.readdirSync(reportsDir)) {
+    const isRun = file.startsWith('playground-run-') && file.endsWith('.json');
+    const isSummary = file.startsWith('playground-summary-') && file.endsWith('.json');
+    if (!isRun && !isSummary) continue;
+    try {
+      const summary = JSON.parse(
+        fs.readFileSync(path.join(reportsDir, file), 'utf-8'),
+      ) as PlaygroundSummary;
+      if (summary.runDate && typeof summary.totalSuites === 'number') {
+        candidates.push({ file, summary });
+      }
+    } catch {
+      console.warn(`Skipping invalid report file: ${file}`);
+    }
+  }
+
+  if (candidates.length === 0) {
+    console.error('❌ No playground-run-*.json or playground-summary-*.json found in', reportsDir);
     process.exit(1);
   }
 
-  const latestFile = path.join(reportsDir, files[0]);
-  console.log(`📂 Reading summary: ${latestFile}`);
+  candidates.sort((a, b) => {
+    const keyA = a.summary.endTimestamp || a.summary.runTimestamp || a.summary.runDate;
+    const keyB = b.summary.endTimestamp || b.summary.runTimestamp || b.summary.runDate;
+    return keyB.localeCompare(keyA);
+  });
 
-  const raw = fs.readFileSync(latestFile, 'utf-8');
-  return JSON.parse(raw) as PlaygroundSummary;
+  const { file, summary } = candidates[0];
+  console.log(`📂 Reading latest run: ${path.join(reportsDir, file)}`);
+  console.log(`   ${summary.runTimestamp} → ${summary.endTimestamp || '—'} | ${summary.passed}/${summary.totalSuites} passed`);
+  return summary;
 }
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
@@ -429,11 +457,13 @@ async function sendEmail() {
 
   const statusEmoji = passRate >= 95 ? '\u{1F7E2}' : passRate >= 80 ? '\u{1F7E1}' : '\u{1F534}';
 
-  const recipients = process.env.REPORT_EMAIL_TO;
+  const recipients = parseRecipients(process.env.REPORT_EMAIL_TO);
   if (!recipients) {
-    console.error('❌ REPORT_EMAIL_TO is not set in .env');
+    console.error('❌ REPORT_EMAIL_TO is not set in .env (comma-separated addresses)');
     process.exit(1);
   }
+  const recipientCount = recipients.split(',').length;
+  console.log(`📧 Recipients (${recipientCount}): ${recipients}`);
 
   // Attach the full HTML dashboard report if it exists
   const reportPath = path.resolve(__dirname, '..', 'reports', 'Playground-Report.html');
@@ -446,6 +476,7 @@ async function sendEmail() {
     });
   }
 
+  const dailyTag = process.env.PLAYGROUND_DAILY_EMAIL === '1' ? '[Daily] ' : '';
   const priorityPrefix = failed > 0 ? '[HIGH PRIORITY] ' : '';
   const headers: Record<string, string> = {};
   if (failed > 0) {
@@ -457,7 +488,7 @@ async function sendEmail() {
   const mailOptions = {
     from: process.env.REPORT_EMAIL_FROM || smtpAuth.user,
     to: recipients,
-    subject: `${priorityPrefix}${statusEmoji} Playground QC — ${passRate}% Pass Rate (${passed}/${totalSuites}) — ${dateDisplay}`,
+    subject: `${dailyTag}${priorityPrefix}${statusEmoji} Playground QC — ${passRate}% Pass Rate (${passed}/${totalSuites}) — ${dateDisplay}`,
     html: buildEmailHTML(summary),
     attachments,
     headers,

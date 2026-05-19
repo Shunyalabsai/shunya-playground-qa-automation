@@ -303,17 +303,10 @@ else
   echo "   ⚠️  Report generation failed" | tee -a "$LOG_FILE"
 fi
 
-# ════════════════════════════════════════════════════════════════
-# SEND EMAIL REPORT
-# ════════════════════════════════════════════════════════════════
+# Email: once daily at 8 PM — not after each run (see send-playground-daily-email.sh)
 echo "" | tee -a "$LOG_FILE"
-echo "── Sending Email Report ────────────────────────────" | tee -a "$LOG_FILE"
-
-if npx ts-node scripts/send-playground-email.ts >> "$LOG_FILE" 2>&1; then
-  echo "   ✅ Email report sent" | tee -a "$LOG_FILE"
-else
-  echo "   ⚠️  Email sending failed" | tee -a "$LOG_FILE"
-fi
+echo "── Email ───────────────────────────────────────────" | tee -a "$LOG_FILE"
+echo "   ℹ️  Skipped (scheduled once daily at 8 PM: npm run email:playground:daily)" | tee -a "$LOG_FILE"
 
 # ════════════════════════════════════════════════════════════════
 # FINAL SUMMARY
