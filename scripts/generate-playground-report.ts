@@ -1,6 +1,7 @@
 /**
  * Playground Report Generator — Stakeholder-Grade HTML Dashboard
- * Reads playground-summary-*.json files and playground-daily-*.log files,
+ * Reads playground-run-*.json (every execution) and playground-summary-*.json (fallback),
+ * plus playground-daily-*.log files,
  * generates a self-contained dark-themed HTML dashboard with embedded test logs.
  */
 
@@ -23,6 +24,7 @@ interface SuiteResult {
 }
 
 interface DailySummary {
+  runId?: string;
   runDate: string;
   runTimestamp: string;
   endTimestamp: string;
@@ -32,24 +34,57 @@ interface DailySummary {
   suites: SuiteResult[];
 }
 
-// ── Load all summary JSON files ─────────────────────────────────────────────
+function parseSummaryFile(filePath: string): DailySummary | null {
+  try {
+    const raw = fs.readFileSync(filePath, 'utf-8');
+    return JSON.parse(raw) as DailySummary;
+  } catch {
+    console.warn(`Skipping invalid file: ${path.basename(filePath)}`);
+    return null;
+  }
+}
 
+/** Load every completed run (newest first). Per-run files are authoritative; daily summary is fallback. */
 function loadAllSummaries(): DailySummary[] {
-  const files = fs.readdirSync(REPORTS_DIR)
+  if (!fs.existsSync(REPORTS_DIR)) return [];
+
+  const byRunId = new Map<string, DailySummary>();
+  const datesWithRunFiles = new Set<string>();
+
+  const runFiles = fs.readdirSync(REPORTS_DIR)
+    .filter(f => f.startsWith('playground-run-') && f.endsWith('.json'))
+    .sort()
+    .reverse();
+
+  for (const file of runFiles) {
+    const summary = parseSummaryFile(path.join(REPORTS_DIR, file));
+    if (!summary?.runDate) continue;
+    datesWithRunFiles.add(summary.runDate);
+    const id = summary.runId || file.replace(/^playground-run-|\.json$/g, '');
+    summary.runId = id;
+    byRunId.set(id, summary);
+  }
+
+  // Legacy: one playground-summary-YYYY-MM-DD.json per day (overwritten each run — skip if we have run files)
+  const summaryFiles = fs.readdirSync(REPORTS_DIR)
     .filter(f => f.startsWith('playground-summary-') && f.endsWith('.json'))
     .sort()
     .reverse();
 
-  const summaries: DailySummary[] = [];
-  for (const file of files) {
-    try {
-      const raw = fs.readFileSync(path.join(REPORTS_DIR, file), 'utf-8');
-      summaries.push(JSON.parse(raw));
-    } catch (e) {
-      console.warn(`Skipping invalid file: ${file}`);
+  for (const file of summaryFiles) {
+    const summary = parseSummaryFile(path.join(REPORTS_DIR, file));
+    if (!summary?.runDate) continue;
+    if (datesWithRunFiles.has(summary.runDate)) continue;
+    const id = summary.runId || `summary-${summary.runDate}`;
+    if (!byRunId.has(id)) {
+      summary.runId = id;
+      byRunId.set(id, summary);
     }
   }
-  return summaries;
+
+  return Array.from(byRunId.values()).sort((a, b) =>
+    (b.runTimestamp || b.runDate).localeCompare(a.runTimestamp || a.runDate),
+  );
 }
 
 // ── Parse log file into per-suite sections ──────────────────────────────────

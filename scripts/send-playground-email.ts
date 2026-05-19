@@ -11,6 +11,27 @@ import * as fs from 'fs';
 
 dotenv.config({ path: path.resolve(__dirname, '..', '.env') });
 
+/** Gmail SMTP: prefer SMTP_*; fall back to GMAIL_* used by OTP refresh. */
+function resolveSmtpAuth(): { user: string; pass: string } {
+  const user = (process.env.SMTP_USER || process.env.GMAIL_USER || '').trim();
+  const pass = (process.env.SMTP_PASS || process.env.GMAIL_APP_PASSWORD || '').replace(/\s+/g, '');
+  if (!user || !pass) {
+    console.error(
+      '❌ SMTP credentials missing. Set SMTP_USER + SMTP_PASS in .env, or reuse GMAIL_USER + GMAIL_APP_PASSWORD (16-char Google App Password, not your Gmail login password).'
+    );
+    process.exit(1);
+  }
+  return { user, pass };
+}
+
+function formatSmtpError(error: { message?: string; code?: string; responseCode?: number }): string {
+  const msg = error.message || String(error);
+  if (msg.includes('535') || msg.includes('BadCredentials') || error.responseCode === 535) {
+    return `${msg}\n   → Gmail rejected the password. Use an App Password: https://myaccount.google.com/apppasswords (2FA required). Put it in SMTP_PASS or GMAIL_APP_PASSWORD with no spaces.`;
+  }
+  return msg;
+}
+
 // ── Interfaces ───────────────────────────────────────────────────────────────
 
 interface SuiteResult {
@@ -398,14 +419,12 @@ async function sendEmail() {
   const passRate = totalSuites > 0 ? Math.round((passed / totalSuites) * 100) : 0;
   const dateDisplay = formatDate(runDate);
 
+  const smtpAuth = resolveSmtpAuth();
   const transporter = nodemailer.createTransport({
     host: process.env.SMTP_HOST || 'smtp.gmail.com',
-    port: parseInt(process.env.SMTP_PORT || '587'),
+    port: parseInt(process.env.SMTP_PORT || '587', 10),
     secure: false,
-    auth: {
-      user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASS,
-    },
+    auth: smtpAuth,
   });
 
   const statusEmoji = passRate >= 95 ? '\u{1F7E2}' : passRate >= 80 ? '\u{1F7E1}' : '\u{1F534}';
@@ -436,7 +455,7 @@ async function sendEmail() {
   }
 
   const mailOptions = {
-    from: process.env.REPORT_EMAIL_FROM || process.env.SMTP_USER,
+    from: process.env.REPORT_EMAIL_FROM || smtpAuth.user,
     to: recipients,
     subject: `${priorityPrefix}${statusEmoji} Playground QC — ${passRate}% Pass Rate (${passed}/${totalSuites}) — ${dateDisplay}`,
     html: buildEmailHTML(summary),
@@ -456,7 +475,7 @@ async function sendEmail() {
       return;
     } catch (error: any) {
       lastError = error;
-      console.error(`❌ Email attempt ${attempt}/${MAX_ATTEMPTS} failed: ${error.message}`);
+      console.error(`❌ Email attempt ${attempt}/${MAX_ATTEMPTS} failed: ${formatSmtpError(error)}`);
       if (attempt < MAX_ATTEMPTS) {
         console.log(`⏳ Retrying in ${BACKOFF_MS / 1000}s...`);
         await new Promise(resolve => setTimeout(resolve, BACKOFF_MS));
@@ -464,7 +483,7 @@ async function sendEmail() {
     }
   }
 
-  console.error(`❌ All ${MAX_ATTEMPTS} email attempts failed. Last error: ${lastError?.message}`);
+  console.error(`❌ All ${MAX_ATTEMPTS} email attempts failed. Last error: ${formatSmtpError(lastError || {})}`);
   process.exit(1);
 }
 
