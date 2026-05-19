@@ -1,116 +1,116 @@
 [
   {
-    "runId": "2026-05-19T10-50-24",
+    "runId": "2026-05-19T12-47-30",
     "runDate": "2026-05-19",
-    "runTimestamp": "2026-05-19 09:34:12",
+    "runTimestamp": "2026-05-19 11:30:05",
     "total": 60,
-    "passed": 54,
-    "failed": 6,
-    "passRate": 90,
+    "passed": 55,
+    "failed": 5,
+    "passRate": 91.7,
     "suites": [
       {
         "category": "Functional UI",
         "name": "Page Load & Layout",
         "status": "pass",
-        "duration_s": 102,
+        "duration_s": 126,
         "failure_reason": ""
       },
       {
         "category": "Functional UI",
         "name": "Credits",
         "status": "pass",
-        "duration_s": 346,
+        "duration_s": 349,
         "failure_reason": ""
       },
       {
         "category": "Functional UI",
         "name": "Tab Navigation",
         "status": "pass",
-        "duration_s": 137,
+        "duration_s": 135,
         "failure_reason": ""
       },
       {
         "category": "Functional UI",
         "name": "Model Selection",
         "status": "pass",
-        "duration_s": 150,
+        "duration_s": 149,
         "failure_reason": ""
       },
       {
         "category": "Functional UI",
         "name": "Language Selection",
         "status": "pass",
-        "duration_s": 136,
+        "duration_s": 131,
         "failure_reason": ""
       },
       {
         "category": "Functional UI",
         "name": "Audio Intelligence Features",
         "status": "pass",
-        "duration_s": 117,
+        "duration_s": 113,
         "failure_reason": ""
       },
       {
         "category": "Functional UI",
         "name": "File Upload",
         "status": "pass",
-        "duration_s": 359,
+        "duration_s": 357,
         "failure_reason": ""
       },
       {
         "category": "Functional UI",
         "name": "Sample Audio Removal",
         "status": "pass",
-        "duration_s": 38,
+        "duration_s": 37,
         "failure_reason": ""
       },
       {
         "category": "Functional UI",
         "name": "Language Dropdown",
         "status": "pass",
-        "duration_s": 131,
+        "duration_s": 121,
         "failure_reason": ""
       },
       {
         "category": "Functional UI",
         "name": "TTS Configuration",
         "status": "pass",
-        "duration_s": 32,
+        "duration_s": 35,
         "failure_reason": ""
       },
       {
         "category": "Functional UI",
         "name": "TTS Text Input",
         "status": "pass",
-        "duration_s": 31,
+        "duration_s": 29,
         "failure_reason": ""
       },
       {
         "category": "Functional UI",
         "name": "TTS Sub-tabs",
         "status": "pass",
-        "duration_s": 16,
+        "duration_s": 17,
         "failure_reason": ""
       },
       {
         "category": "Functional UI",
         "name": "TTS Voice Options",
         "status": "pass",
-        "duration_s": 47,
+        "duration_s": 46,
         "failure_reason": ""
       },
       {
         "category": "Functional UI",
         "name": "TTS Output Options",
         "status": "pass",
-        "duration_s": 20,
+        "duration_s": 18,
         "failure_reason": ""
       },
       {
         "category": "Functional UI",
         "name": "TTS Audio Player",
         "status": "pass",
-        "duration_s": 18,
+        "duration_s": 19,
         "failure_reason": ""
       },
       {
@@ -124,21 +124,21 @@
         "category": "Functional UI",
         "name": "TTS Edge Cases",
         "status": "pass",
-        "duration_s": 38,
+        "duration_s": 41,
         "failure_reason": ""
       },
       {
         "category": "Functional UI",
         "name": "TTS E2E Synthesis",
         "status": "fail",
-        "duration_s": 319,
+        "duration_s": 315,
         "failure_reason": "2 failed"
       },
       {
         "category": "Functional UI",
         "name": "TTS Transliteration",
         "status": "pass",
-        "duration_s": 24,
+        "duration_s": 27,
         "failure_reason": ""
       },
       {
@@ -152,35 +152,35 @@
         "category": "Functional UI",
         "name": "TTS Mode & Format",
         "status": "pass",
-        "duration_s": 25,
+        "duration_s": 29,
         "failure_reason": ""
       },
       {
         "category": "Functional UI",
         "name": "TTS Auth & Errors",
         "status": "pass",
-        "duration_s": 57,
+        "duration_s": 56,
         "failure_reason": ""
       },
       {
         "category": "Functional UI",
         "name": "TTS API Payload",
         "status": "pass",
-        "duration_s": 119,
+        "duration_s": 118,
         "failure_reason": ""
       },
       {
         "category": "Functional UI",
         "name": "TTS Multiple Runs",
         "status": "pass",
-        "duration_s": 130,
+        "duration_s": 133,
         "failure_reason": ""
       },
       {
         "category": "Functional UI",
         "name": "TTS Audio Player E2E",
         "status": "pass",
-        "duration_s": 59,
+        "duration_s": 58,
         "failure_reason": ""
       },
       {
@@ -201,14 +201,14 @@
         "category": "Functional UI",
         "name": "STT Feature Toggles",
         "status": "fail",
-        "duration_s": 109,
+        "duration_s": 110,
         "failure_reason": "2 failed"
       },
       {
         "category": "Functional UI",
         "name": "STT Cross-Feature",
         "status": "fail",
-        "duration_s": 141,
+        "duration_s": 148,
         "failure_reason": "1 failed"
       },
       {
@@ -229,7 +229,7 @@
         "category": "Functional UI",
         "name": "Voice Agent Negative",
         "status": "pass",
-        "duration_s": 28,
+        "duration_s": 27,
         "failure_reason": ""
       },
       {
@@ -243,42 +243,42 @@
         "category": "Functional UI",
         "name": "STT Navigation",
         "status": "pass",
-        "duration_s": 16,
+        "duration_s": 14,
         "failure_reason": ""
       },
       {
         "category": "Functional UI",
         "name": "STT Configuration",
-        "status": "fail",
-        "duration_s": 24,
-        "failure_reason": "1 failed"
+        "status": "pass",
+        "duration_s": 25,
+        "failure_reason": ""
       },
       {
         "category": "Functional UI",
         "name": "STT Upload",
         "status": "pass",
-        "duration_s": 22,
+        "duration_s": 26,
         "failure_reason": ""
       },
       {
         "category": "Functional UI",
         "name": "STT Features",
         "status": "pass",
-        "duration_s": 47,
+        "duration_s": 41,
         "failure_reason": ""
       },
       {
         "category": "Functional UI",
         "name": "STT Run Analysis",
         "status": "pass",
-        "duration_s": 63,
+        "duration_s": 69,
         "failure_reason": ""
       },
       {
         "category": "Functional UI",
         "name": "STT Output",
         "status": "pass",
-        "duration_s": 11,
+        "duration_s": 10,
         "failure_reason": ""
       },
       {
@@ -292,63 +292,63 @@
         "category": "Functional UI",
         "name": "STT Accessibility",
         "status": "pass",
-        "duration_s": 10,
+        "duration_s": 9,
         "failure_reason": ""
       },
       {
         "category": "Functional UI",
         "name": "STT Performance",
         "status": "pass",
-        "duration_s": 10,
+        "duration_s": 11,
         "failure_reason": ""
       },
       {
         "category": "Functional UI",
         "name": "STT DOM",
         "status": "pass",
-        "duration_s": 16,
+        "duration_s": 15,
         "failure_reason": ""
       },
       {
         "category": "Functional UI",
         "name": "STT Code Sample",
         "status": "pass",
-        "duration_s": 13,
+        "duration_s": 11,
         "failure_reason": ""
       },
       {
         "category": "Functional UI",
         "name": "STT Responsive",
         "status": "pass",
-        "duration_s": 8,
+        "duration_s": 7,
         "failure_reason": ""
       },
       {
         "category": "Functional UI",
         "name": "STT Network",
         "status": "pass",
-        "duration_s": 16,
+        "duration_s": 17,
         "failure_reason": ""
       },
       {
         "category": "Feature Verify",
         "name": "Translation Result",
         "status": "pass",
-        "duration_s": 35,
+        "duration_s": 41,
         "failure_reason": ""
       },
       {
         "category": "Feature Verify",
         "name": "Transliteration Result",
         "status": "pass",
-        "duration_s": 24,
+        "duration_s": 21,
         "failure_reason": ""
       },
       {
         "category": "Feature Verify",
         "name": "Speaker Diarization Result",
         "status": "pass",
-        "duration_s": 28,
+        "duration_s": 25,
         "failure_reason": ""
       },
       {
@@ -362,70 +362,70 @@
         "category": "Feature Verify",
         "name": "Word Timestamps Result",
         "status": "pass",
-        "duration_s": 40,
+        "duration_s": 48,
         "failure_reason": ""
       },
       {
         "category": "Feature Verify",
         "name": "Profanity Hashing Result",
         "status": "pass",
-        "duration_s": 24,
+        "duration_s": 31,
         "failure_reason": ""
       },
       {
         "category": "Feature Verify",
         "name": "Custom Keyword Hashing Result",
         "status": "pass",
-        "duration_s": 32,
+        "duration_s": 34,
         "failure_reason": ""
       },
       {
         "category": "Feature Verify",
         "name": "Intent Detection Result",
         "status": "pass",
-        "duration_s": 29,
+        "duration_s": 32,
         "failure_reason": ""
       },
       {
         "category": "Feature Verify",
         "name": "Sentiment Analysis Result",
         "status": "pass",
-        "duration_s": 33,
+        "duration_s": 44,
         "failure_reason": ""
       },
       {
         "category": "Feature Verify",
         "name": "Emotion Diarization Result",
         "status": "pass",
-        "duration_s": 27,
+        "duration_s": 25,
         "failure_reason": ""
       },
       {
         "category": "Feature Verify",
         "name": "Summarisation Result",
         "status": "pass",
-        "duration_s": 31,
+        "duration_s": 34,
         "failure_reason": ""
       },
       {
         "category": "Feature Verify",
         "name": "Keyword Normalisation Result",
         "status": "pass",
-        "duration_s": 33,
+        "duration_s": 52,
         "failure_reason": ""
       },
       {
         "category": "Feature Verify",
         "name": "Error Detection",
         "status": "pass",
-        "duration_s": 210,
+        "duration_s": 209,
         "failure_reason": ""
       },
       {
         "category": "Feature Verify",
         "name": "Model Variants",
         "status": "pass",
-        "duration_s": 57,
+        "duration_s": 65,
         "failure_reason": ""
       }
     ]
