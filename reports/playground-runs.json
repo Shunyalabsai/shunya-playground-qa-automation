@@ -3,10 +3,13 @@
     "runId": "2026-05-19T20-43-09",
     "runDate": "2026-05-19",
     "runTimestamp": "2026-05-19 19:27:05",
+    "endTimestamp": "2026-05-19 20:43:09",
+    "timeIST": "7:27 PM",
     "total": 60,
     "passed": 54,
     "failed": 6,
     "passRate": 90,
+    "hadAnyFailure": true,
     "suites": [
       {
         "category": "Functional UI",
@@ -434,10 +437,13 @@
     "runId": "2026-05-19T18-50-05",
     "runDate": "2026-05-19",
     "runTimestamp": "2026-05-19 17:30:05",
+    "endTimestamp": "2026-05-19 18:50:05",
+    "timeIST": "5:30 PM",
     "total": 60,
     "passed": 54,
     "failed": 6,
     "passRate": 90,
+    "hadAnyFailure": true,
     "suites": [
       {
         "category": "Functional UI",
@@ -865,10 +871,13 @@
     "runId": "2026-05-19T15-45-46",
     "runDate": "2026-05-19",
     "runTimestamp": "2026-05-19 14:30:05",
+    "endTimestamp": "2026-05-19 15:45:46",
+    "timeIST": "2:30 PM",
     "total": 60,
     "passed": 55,
     "failed": 5,
     "passRate": 91.7,
+    "hadAnyFailure": true,
     "suites": [
       {
         "category": "Functional UI",
@@ -1296,10 +1305,13 @@
     "runId": "2026-05-19T12-57-30",
     "runDate": "2026-05-19",
     "runTimestamp": "2026-05-19 11:38:44",
+    "endTimestamp": "2026-05-19 12:57:30",
+    "timeIST": "11:38 AM",
     "total": 60,
     "passed": 54,
     "failed": 6,
     "passRate": 90,
+    "hadAnyFailure": true,
     "suites": [
       {
         "category": "Functional UI",
@@ -1727,10 +1739,13 @@
     "runId": "2026-05-19T12-47-30",
     "runDate": "2026-05-19",
     "runTimestamp": "2026-05-19 11:30:05",
+    "endTimestamp": "2026-05-19 12:47:30",
+    "timeIST": "11:30 AM",
     "total": 60,
     "passed": 55,
     "failed": 5,
     "passRate": 91.7,
+    "hadAnyFailure": true,
     "suites": [
       {
         "category": "Functional UI",
@@ -2158,10 +2173,13 @@
     "runId": "2026-05-19T10-50-24",
     "runDate": "2026-05-19",
     "runTimestamp": "2026-05-19 09:34:12",
+    "endTimestamp": "2026-05-19 10:50:24",
+    "timeIST": "9:34 AM",
     "total": 60,
     "passed": 54,
     "failed": 6,
     "passRate": 90,
+    "hadAnyFailure": true,
     "suites": [
       {
         "category": "Functional UI",
@@ -2589,10 +2607,13 @@
     "runId": "2026-05-18T21-46-55",
     "runDate": "2026-05-18",
     "runTimestamp": "2026-05-18 20:30:05",
+    "endTimestamp": "2026-05-18 21:46:55",
+    "timeIST": "8:30 PM",
     "total": 60,
     "passed": 54,
     "failed": 6,
     "passRate": 90,
+    "hadAnyFailure": true,
     "suites": [
       {
         "category": "Functional UI",
@@ -3020,10 +3041,13 @@
     "runId": "2026-05-18T21-38-45",
     "runDate": "2026-05-18",
     "runTimestamp": "2026-05-18 20:25:46",
+    "endTimestamp": "2026-05-18 21:38:45",
+    "timeIST": "8:25 PM",
     "total": 60,
     "passed": 53,
     "failed": 7,
     "passRate": 88.3,
+    "hadAnyFailure": true,
     "suites": [
       {
         "category": "Functional UI",
@@ -3451,10 +3475,13 @@
     "runId": "2026-05-18T17-19-31",
     "runDate": "2026-05-18",
     "runTimestamp": "2026-05-18 14:30:05",
+    "endTimestamp": "2026-05-18 17:19:31",
+    "timeIST": "2:30 PM",
     "total": 60,
     "passed": 33,
     "failed": 27,
     "passRate": 55,
+    "hadAnyFailure": true,
     "suites": [
       {
         "category": "Functional UI",
@@ -3882,10 +3909,13 @@
     "runId": "2026-05-18T16-55-28",
     "runDate": "2026-05-18",
     "runTimestamp": "2026-05-18 13:56:00",
+    "endTimestamp": "2026-05-18 16:55:28",
+    "timeIST": "1:56 PM",
     "total": 60,
     "passed": 38,
     "failed": 22,
     "passRate": 63.3,
+    "hadAnyFailure": true,
     "suites": [
       {
         "category": "Functional UI",
@@ -4313,10 +4343,13 @@
     "runId": "2026-05-18T14-12-33",
     "runDate": "2026-05-18",
     "runTimestamp": "2026-05-18 12:47:05",
+    "endTimestamp": "2026-05-18 14:12:33",
+    "timeIST": "12:47 PM",
     "total": 60,
     "passed": 39,
     "failed": 21,
     "passRate": 65,
+    "hadAnyFailure": true,
     "suites": [
       {
         "category": "Functional UI",
@@ -4744,10 +4777,13 @@
     "runId": "2026-05-18T12-54-04",
     "runDate": "2026-05-18",
     "runTimestamp": "2026-05-18 12:41:49",
+    "endTimestamp": "2026-05-18 12:54:04",
+    "timeIST": "12:41 PM",
     "total": 60,
     "passed": 0,
     "failed": 60,
     "passRate": 0,
+    "hadAnyFailure": true,
     "suites": [
       {
         "category": "Functional UI",
@@ -5175,10 +5211,13 @@
     "runId": "2026-05-18T11-46-05",
     "runDate": "2026-05-18",
     "runTimestamp": "2026-05-18 10:13:09",
+    "endTimestamp": "2026-05-18 11:46:05",
+    "timeIST": "10:13 AM",
     "total": 60,
     "passed": 41,
     "failed": 19,
     "passRate": 68.3,
+    "hadAnyFailure": true,
     "suites": [
       {
         "category": "Functional UI",
@@ -5606,10 +5645,13 @@
     "runId": "2026-05-18T08-29-58",
     "runDate": "2026-05-17",
     "runTimestamp": "2026-05-17 05:30:14",
+    "endTimestamp": "2026-05-18 08:29:58",
+    "timeIST": "5:30 AM",
     "total": 60,
     "passed": 0,
     "failed": 60,
     "passRate": 0,
+    "hadAnyFailure": true,
     "suites": [
       {
         "category": "Functional UI",
@@ -6037,10 +6079,13 @@
     "runId": "2026-05-16T05-25-09",
     "runDate": "2026-05-15",
     "runTimestamp": "2026-05-15 14:30:05",
+    "endTimestamp": "2026-05-16 05:25:09",
+    "timeIST": "2:30 PM",
     "total": 60,
     "passed": 0,
     "failed": 60,
     "passRate": 0,
+    "hadAnyFailure": true,
     "suites": [
       {
         "category": "Functional UI",
@@ -6468,10 +6513,13 @@
     "runId": "2026-05-15T12-30-51",
     "runDate": "2026-05-14",
     "runTimestamp": "2026-05-14 15:51:29",
+    "endTimestamp": "2026-05-15 12:30:51",
+    "timeIST": "3:51 PM",
     "total": 60,
     "passed": 1,
     "failed": 59,
     "passRate": 1.7,
+    "hadAnyFailure": true,
     "suites": [
       {
         "category": "Functional UI",
@@ -6899,10 +6947,13 @@
     "runId": "2026-05-12T15-13-36",
     "runDate": "2026-05-12",
     "runTimestamp": "2026-05-12 13:58:35",
+    "endTimestamp": "2026-05-12 15:13:36",
+    "timeIST": "1:58 PM",
     "total": 60,
     "passed": 44,
     "failed": 16,
     "passRate": 73.3,
+    "hadAnyFailure": true,
     "suites": [
       {
         "category": "Functional UI",
@@ -7330,10 +7381,13 @@
     "runId": "2026-05-12T13-33-14",
     "runDate": "2026-05-12",
     "runTimestamp": "2026-05-12 11:54:51",
+    "endTimestamp": "2026-05-12 13:33:14",
+    "timeIST": "11:54 AM",
     "total": 60,
     "passed": 41,
     "failed": 19,
     "passRate": 68.3,
+    "hadAnyFailure": true,
     "suites": [
       {
         "category": "Functional UI",
@@ -7761,10 +7815,13 @@
     "runId": "2026-05-12T10-40-16",
     "runDate": "2026-05-11",
     "runTimestamp": "2026-05-11 17:30:05",
+    "endTimestamp": "2026-05-12 10:40:16",
+    "timeIST": "5:30 PM",
     "total": 60,
     "passed": 26,
     "failed": 34,
     "passRate": 43.3,
+    "hadAnyFailure": true,
     "suites": [
       {
         "category": "Functional UI",
@@ -8192,10 +8249,13 @@
     "runId": "2026-05-11T16-13-11",
     "runDate": "2026-05-11",
     "runTimestamp": "2026-05-11 14:30:02",
+    "endTimestamp": "2026-05-11 16:13:11",
+    "timeIST": "2:30 PM",
     "total": 60,
     "passed": 41,
     "failed": 19,
     "passRate": 68.3,
+    "hadAnyFailure": true,
     "suites": [
       {
         "category": "Functional UI",
@@ -8623,10 +8683,13 @@
     "runId": "2026-05-09T12-10-00",
     "runDate": "2026-05-08",
     "runTimestamp": "2026-05-08 14:30:02",
+    "endTimestamp": "2026-05-09 12:10:00",
+    "timeIST": "2:30 PM",
     "total": 60,
     "passed": 19,
     "failed": 41,
     "passRate": 31.7,
+    "hadAnyFailure": true,
     "suites": [
       {
         "category": "Functional UI",
@@ -9054,10 +9117,13 @@
     "runId": "2026-05-07T03-46-37",
     "runDate": "2026-05-06",
     "runTimestamp": "2026-05-06 20:30:01",
+    "endTimestamp": "2026-05-07 03:46:37",
+    "timeIST": "8:30 PM",
     "total": 60,
     "passed": 37,
     "failed": 23,
     "passRate": 61.7,
+    "hadAnyFailure": true,
     "suites": [
       {
         "category": "Functional UI",
@@ -9485,10 +9551,13 @@
     "runId": "2026-05-06T19-52-50",
     "runDate": "2026-05-06",
     "runTimestamp": "2026-05-06 17:30:05",
+    "endTimestamp": "2026-05-06 19:52:50",
+    "timeIST": "5:30 PM",
     "total": 60,
     "passed": 37,
     "failed": 23,
     "passRate": 61.7,
+    "hadAnyFailure": true,
     "suites": [
       {
         "category": "Functional UI",
@@ -9916,10 +9985,13 @@
     "runId": "2026-05-06T16-16-39",
     "runDate": "2026-05-06",
     "runTimestamp": "2026-05-06 14:30:10",
+    "endTimestamp": "2026-05-06 16:16:39",
+    "timeIST": "2:30 PM",
     "total": 60,
     "passed": 36,
     "failed": 24,
     "passRate": 60,
+    "hadAnyFailure": true,
     "suites": [
       {
         "category": "Functional UI",
@@ -10347,10 +10419,13 @@
     "runId": "2026-05-04T18-07-05",
     "runDate": "2026-05-04",
     "runTimestamp": "2026-05-04 14:30:05",
+    "endTimestamp": "2026-05-04 18:07:05",
+    "timeIST": "2:30 PM",
     "total": 60,
     "passed": 34,
     "failed": 26,
     "passRate": 56.7,
+    "hadAnyFailure": true,
     "suites": [
       {
         "category": "Functional UI",
@@ -10778,10 +10853,13 @@
     "runId": "2026-05-02T05-54-59",
     "runDate": "2026-05-01",
     "runTimestamp": "2026-05-01 15:07:34",
+    "endTimestamp": "2026-05-02 05:54:59",
+    "timeIST": "3:07 PM",
     "total": 60,
     "passed": 28,
     "failed": 32,
     "passRate": 46.7,
+    "hadAnyFailure": true,
     "suites": [
       {
         "category": "Functional UI",
@@ -11209,10 +11287,13 @@
     "runId": "2026-05-01T12-20-33",
     "runDate": "2026-04-30",
     "runTimestamp": "2026-04-30 23:30:05",
+    "endTimestamp": "2026-05-01 12:20:33",
+    "timeIST": "11:30 PM",
     "total": 60,
     "passed": 29,
     "failed": 31,
     "passRate": 48.3,
+    "hadAnyFailure": true,
     "suites": [
       {
         "category": "Functional UI",
@@ -11640,10 +11721,13 @@
     "runId": "2026-04-30T20-35-01",
     "runDate": "2026-04-30",
     "runTimestamp": "2026-04-30 17:30:28",
+    "endTimestamp": "2026-04-30 20:35:01",
+    "timeIST": "5:30 PM",
     "total": 60,
     "passed": 34,
     "failed": 26,
     "passRate": 56.7,
+    "hadAnyFailure": true,
     "suites": [
       {
         "category": "Functional UI",
@@ -12071,10 +12155,13 @@
     "runId": "2026-04-30T17-07-55",
     "runDate": "2026-04-30",
     "runTimestamp": "2026-04-30 14:30:05",
+    "endTimestamp": "2026-04-30 17:07:55",
+    "timeIST": "2:30 PM",
     "total": 60,
     "passed": 35,
     "failed": 25,
     "passRate": 58.3,
+    "hadAnyFailure": true,
     "suites": [
       {
         "category": "Functional UI",
@@ -12502,10 +12589,13 @@
     "runId": "2026-04-29T19-47-45",
     "runDate": "2026-04-29",
     "runTimestamp": "2026-04-29 17:30:31",
+    "endTimestamp": "2026-04-29 19:47:45",
+    "timeIST": "5:30 PM",
     "total": 60,
     "passed": 35,
     "failed": 25,
     "passRate": 58.3,
+    "hadAnyFailure": true,
     "suites": [
       {
         "category": "Functional UI",
@@ -12933,10 +13023,13 @@
     "runId": "2026-04-29T16-39-27",
     "runDate": "2026-04-29",
     "runTimestamp": "2026-04-29 14:30:05",
+    "endTimestamp": "2026-04-29 16:39:27",
+    "timeIST": "2:30 PM",
     "total": 60,
     "passed": 38,
     "failed": 22,
     "passRate": 63.3,
+    "hadAnyFailure": true,
     "suites": [
       {
         "category": "Functional UI",
@@ -13364,10 +13457,13 @@
     "runId": "2026-04-29T12-20-24",
     "runDate": "2026-04-29",
     "runTimestamp": "2026-04-29 00:14:24",
+    "endTimestamp": "2026-04-29 12:20:24",
+    "timeIST": "12:14 AM",
     "total": 60,
     "passed": 28,
     "failed": 32,
     "passRate": 46.7,
+    "hadAnyFailure": true,
     "suites": [
       {
         "category": "Functional UI",
@@ -13795,10 +13891,13 @@
     "runId": "2026-04-28T22-43-10",
     "runDate": "2026-04-28",
     "runTimestamp": "2026-04-28 21:07:19",
+    "endTimestamp": "2026-04-28 22:43:10",
+    "timeIST": "9:07 PM",
     "total": 60,
     "passed": 39,
     "failed": 21,
     "passRate": 65,
+    "hadAnyFailure": true,
     "suites": [
       {
         "category": "Functional UI",
@@ -14226,10 +14325,13 @@
     "runId": "2026-04-28T12-34-52",
     "runDate": "2026-04-27",
     "runTimestamp": "2026-04-27 20:40:29",
+    "endTimestamp": "2026-04-28 12:34:52",
+    "timeIST": "8:40 PM",
     "total": 60,
     "passed": 40,
     "failed": 20,
     "passRate": 66.7,
+    "hadAnyFailure": true,
     "suites": [
       {
         "category": "Functional UI",
@@ -14657,10 +14759,13 @@
     "runId": "2026-04-27T11-32-44",
     "runDate": "2026-04-25",
     "runTimestamp": "2026-04-25 16:51:17",
+    "endTimestamp": "2026-04-27 11:32:44",
+    "timeIST": "4:51 PM",
     "total": 60,
     "passed": 37,
     "failed": 23,
     "passRate": 61.7,
+    "hadAnyFailure": true,
     "suites": [
       {
         "category": "Functional UI",
@@ -15088,10 +15193,13 @@
     "runId": "2026-04-27T11-28-33",
     "runDate": "2026-04-24",
     "runTimestamp": "2026-04-24 20:36:34",
+    "endTimestamp": "2026-04-27 11:28:33",
+    "timeIST": "8:36 PM",
     "total": 60,
     "passed": 33,
     "failed": 27,
     "passRate": 55,
+    "hadAnyFailure": true,
     "suites": [
       {
         "category": "Functional UI",
@@ -15519,10 +15627,13 @@
     "runId": "2026-04-24T19-03-27",
     "runDate": "2026-04-24",
     "runTimestamp": "2026-04-24 16:00:05",
+    "endTimestamp": "2026-04-24 19:03:27",
+    "timeIST": "4:00 PM",
     "total": 60,
     "passed": 41,
     "failed": 19,
     "passRate": 68.3,
+    "hadAnyFailure": true,
     "suites": [
       {
         "category": "Functional UI",
@@ -15950,10 +16061,13 @@
     "runId": "2026-04-24T18-29-46",
     "runDate": "2026-04-24",
     "runTimestamp": "2026-04-24 14:30:05",
+    "endTimestamp": "2026-04-24 18:29:46",
+    "timeIST": "2:30 PM",
     "total": 60,
     "passed": 41,
     "failed": 19,
     "passRate": 68.3,
+    "hadAnyFailure": true,
     "suites": [
       {
         "category": "Functional UI",
@@ -16381,10 +16495,13 @@
     "runId": "2026-04-24T13-45-13",
     "runDate": "2026-04-23",
     "runTimestamp": "2026-04-23 20:43:45",
+    "endTimestamp": "2026-04-24 13:45:13",
+    "timeIST": "8:43 PM",
     "total": 60,
     "passed": 32,
     "failed": 28,
     "passRate": 53.3,
+    "hadAnyFailure": true,
     "suites": [
       {
         "category": "Functional UI",
@@ -16812,10 +16929,13 @@
     "runId": "2026-04-23T19-49-50",
     "runDate": "2026-04-23",
     "runTimestamp": "2026-04-23 16:10:36",
+    "endTimestamp": "2026-04-23 19:49:50",
+    "timeIST": "4:10 PM",
     "total": 60,
     "passed": 39,
     "failed": 21,
     "passRate": 65,
+    "hadAnyFailure": true,
     "suites": [
       {
         "category": "Functional UI",
@@ -17243,10 +17363,13 @@
     "runId": "2026-04-23T19-35-28",
     "runDate": "2026-04-23",
     "runTimestamp": "2026-04-23 14:30:05",
+    "endTimestamp": "2026-04-23 19:35:28",
+    "timeIST": "2:30 PM",
     "total": 60,
     "passed": 38,
     "failed": 22,
     "passRate": 63.3,
+    "hadAnyFailure": true,
     "suites": [
       {
         "category": "Functional UI",
@@ -17674,10 +17797,13 @@
     "runId": "2026-04-23T16-17-59",
     "runDate": "2026-04-23",
     "runTimestamp": "2026-04-23 12:51:13",
+    "endTimestamp": "2026-04-23 16:17:59",
+    "timeIST": "12:51 PM",
     "total": 60,
     "passed": 38,
     "failed": 22,
     "passRate": 63.3,
+    "hadAnyFailure": true,
     "suites": [
       {
         "category": "Functional UI",
@@ -18105,10 +18231,13 @@
     "runId": "2026-04-23T04-17-05",
     "runDate": "2026-04-22",
     "runTimestamp": "2026-04-22 16:04:49",
+    "endTimestamp": "2026-04-23 04:17:05",
+    "timeIST": "4:04 PM",
     "total": 60,
     "passed": 38,
     "failed": 22,
     "passRate": 63.3,
+    "hadAnyFailure": true,
     "suites": [
       {
         "category": "Functional UI",
@@ -18536,10 +18665,13 @@
     "runId": "2026-04-22T19-39-44",
     "runDate": "2026-04-22",
     "runTimestamp": "2026-04-22 14:30:05",
+    "endTimestamp": "2026-04-22 19:39:44",
+    "timeIST": "2:30 PM",
     "total": 60,
     "passed": 37,
     "failed": 23,
     "passRate": 61.7,
+    "hadAnyFailure": true,
     "suites": [
       {
         "category": "Functional UI",
@@ -18967,10 +19099,13 @@
     "runId": "2026-04-22T19-07-50",
     "runDate": "2026-04-22",
     "runTimestamp": "2026-04-22 14:24:50",
+    "endTimestamp": "2026-04-22 19:07:50",
+    "timeIST": "2:24 PM",
     "total": 60,
     "passed": 41,
     "failed": 19,
     "passRate": 68.3,
+    "hadAnyFailure": true,
     "suites": [
       {
         "category": "Functional UI",
@@ -19398,10 +19533,13 @@
     "runId": "2026-04-22T14-09-02",
     "runDate": "2026-04-22",
     "runTimestamp": "2026-04-22 11:32:18",
+    "endTimestamp": "2026-04-22 14:09:02",
+    "timeIST": "11:32 AM",
     "total": 60,
     "passed": 35,
     "failed": 25,
     "passRate": 58.3,
+    "hadAnyFailure": true,
     "suites": [
       {
         "category": "Functional UI",
@@ -19829,10 +19967,13 @@
     "runId": "summary-2026-04-21",
     "runDate": "2026-04-21",
     "runTimestamp": "2026-04-21 21:30:05",
+    "endTimestamp": "2026-04-21 23:33:06",
+    "timeIST": "9:30 PM",
     "total": 60,
     "passed": 40,
     "failed": 20,
     "passRate": 66.7,
+    "hadAnyFailure": true,
     "suites": [
       {
         "category": "Functional UI",
@@ -20260,10 +20401,13 @@
     "runId": "summary-2026-04-20",
     "runDate": "2026-04-20",
     "runTimestamp": "2026-04-20 19:43:50",
+    "endTimestamp": "2026-04-21 08:52:19",
+    "timeIST": "7:43 PM",
     "total": 9,
     "passed": 0,
     "failed": 9,
     "passRate": 0,
+    "hadAnyFailure": true,
     "suites": [
       {
         "category": "Functional UI",
@@ -20334,10 +20478,13 @@
     "runId": "summary-2026-04-17",
     "runDate": "2026-04-17",
     "runTimestamp": "2026-04-17 15:00:00",
+    "endTimestamp": "2026-04-17 15:27:00",
+    "timeIST": "3:00 PM",
     "total": 9,
     "passed": 8,
     "failed": 1,
     "passRate": 88.9,
+    "hadAnyFailure": true,
     "suites": [
       {
         "category": "Functional UI",
