@@ -2,9 +2,11 @@ node_modules/
 playwright-report/
 test-results/
 logs/*.log
+logs/run-*/
 logs/.playground-email-sent-*
 reports/*.json
 !reports/playground-runs.json
+!reports/playground-today-summary.json
 reports/debug-8e4dc2.log
 .env
 Google_service_account.json

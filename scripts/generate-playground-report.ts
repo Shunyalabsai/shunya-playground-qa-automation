@@ -12,6 +12,8 @@ const REPORTS_DIR = path.resolve(__dirname, '..', 'reports');
 const LOGS_DIR = path.resolve(__dirname, '..', 'logs');
 const OUTPUT_HTML = path.resolve(REPORTS_DIR, 'Playground-Report.html');
 const OUTPUT_RUNS_JSON = path.resolve(REPORTS_DIR, 'playground-runs.json');
+const OUTPUT_TODAY_SUMMARY_JSON = path.resolve(REPORTS_DIR, 'playground-today-summary.json');
+const IST = 'Asia/Kolkata';
 
 // ── Interfaces ──────────────────────────────────────────────────────────────
 
@@ -87,16 +89,14 @@ function loadAllSummaries(): DailySummary[] {
   );
 }
 
-// ── Parse log file into per-suite sections ──────────────────────────────────
+// ── Parse log file into per-run, per-suite sections ─────────────────────────
 
-function parseLogFile(logPath: string): Map<string, string> {
+const RUN_START_RE = /^\s*Playground Daily Test Run — (\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})/;
+const RUN_SUMMARY_RE = /^\s*PLAYGROUND DAILY SUMMARY —/;
+
+/** Extract suite blocks from one run's log lines (does not overwrite duplicate names). */
+function parseSuiteSections(lines: string[]): Map<string, string> {
   const result = new Map<string, string>();
-  if (!fs.existsSync(logPath)) return result;
-
-  const content = fs.readFileSync(logPath, 'utf-8');
-  const lines = content.split('\n');
-
-  // Pattern: [Category] ▶  Suite Name  (but NOT [1/280] style lines)
   const suiteHeaderRe = /^\[([^\]]+)\]\s*▶\s\s(.+)$/;
   const numberedLineRe = /^\[\d+\/\d+\]/;
 
@@ -116,30 +116,106 @@ function parseLogFile(logPath: string): Map<string, string> {
     const start = sections[idx].startLine;
     const end = idx + 1 < sections.length ? sections[idx + 1].startLine : lines.length;
     const sectionLines = lines.slice(start, end);
-    result.set(sections[idx].name, sectionLines.join('\n'));
+    const name = sections[idx].name;
+    // Keep first occurrence per run (scheduled order); avoids later stray headers in interleaved logs.
+    if (!result.has(name)) {
+      result.set(name, sectionLines.join('\n'));
+    }
   }
 
   return result;
 }
 
-// ── Load all log data keyed by runDate ──────────────────────────────────────
+/** Split a daily log into runs keyed by runTimestamp (matches summary JSON). */
+function parseDailyLogFile(logPath: string): Map<string, Map<string, string>> {
+  const byRun = new Map<string, Map<string, string>>();
+  if (!fs.existsSync(logPath)) return byRun;
 
-function loadAllLogs(): Map<string, Map<string, string>> {
-  const allLogs = new Map<string, Map<string, string>>();
-  if (!fs.existsSync(LOGS_DIR)) return allLogs;
+  const lines = fs.readFileSync(logPath, 'utf-8').split('\n');
+  let runStart = -1;
+  let runTimestamp = '';
 
-  const files = fs.readdirSync(LOGS_DIR)
-    .filter(f => f.startsWith('playground-daily-') && f.endsWith('.log'))
-    .sort()
-    .reverse();
+  const flushRun = (endLine: number) => {
+    if (runStart < 0 || !runTimestamp) return;
+    byRun.set(runTimestamp, parseSuiteSections(lines.slice(runStart, endLine)));
+    runStart = -1;
+    runTimestamp = '';
+  };
 
-  for (const file of files) {
-    const dateMatch = file.match(/playground-daily-(\d{4}-\d{2}-\d{2})\.log/);
-    if (dateMatch) {
-      allLogs.set(dateMatch[1], parseLogFile(path.join(LOGS_DIR, file)));
+  for (let i = 0; i < lines.length; i++) {
+    const startMatch = RUN_START_RE.exec(lines[i]);
+    if (startMatch) {
+      flushRun(i);
+      runTimestamp = startMatch[1];
+      runStart = i;
+      continue;
+    }
+    if (runStart >= 0 && RUN_SUMMARY_RE.test(lines[i])) {
+      flushRun(i);
     }
   }
-  return allLogs;
+  if (runStart >= 0) {
+    flushRun(lines.length);
+  }
+
+  return byRun;
+}
+
+function suiteLogFilePath(runId: string, suiteName: string): string {
+  const safe = suiteName.replace(/[ /:]/g, '_');
+  return path.join(LOGS_DIR, `run-${runId}`, `${safe}.log`);
+}
+
+/** Authoritative per-suite logs written by run-playground-daily.sh (no interleaving). */
+function loadRunSuiteLogs(runId: string, summary: DailySummary): Map<string, string> | null {
+  const dir = path.join(LOGS_DIR, `run-${runId}`);
+  if (!fs.existsSync(dir)) return null;
+
+  const suites = new Map<string, string>();
+  for (const suite of summary.suites) {
+    const filePath = suiteLogFilePath(runId, suite.name);
+    if (fs.existsSync(filePath)) {
+      suites.set(suite.name, fs.readFileSync(filePath, 'utf-8'));
+    }
+  }
+  return suites.size > 0 ? suites : null;
+}
+
+// ── Load logs keyed by runId (per-run suite files, then daily log fallback) ───
+
+function loadAllLogs(summaries: DailySummary[]): Map<string, Map<string, string>> {
+  const byRunId = new Map<string, Map<string, string>>();
+  if (!fs.existsSync(LOGS_DIR)) return byRunId;
+
+  const byTimestamp = new Map<string, Map<string, string>>();
+
+  for (const file of fs.readdirSync(LOGS_DIR)
+    .filter(f => f.startsWith('playground-daily-') && f.endsWith('.log'))) {
+    const parsed = parseDailyLogFile(path.join(LOGS_DIR, file));
+    for (const [ts, suites] of parsed.entries()) {
+      byTimestamp.set(ts, suites);
+    }
+  }
+
+  for (const s of summaries) {
+    const runId = s.runId || s.runTimestamp;
+    if (!runId) continue;
+
+    const dirFiles = loadRunSuiteLogs(runId, s);
+    if (dirFiles) {
+      byRunId.set(runId, dirFiles);
+      continue;
+    }
+
+    if (s.runTimestamp) {
+      const suites = byTimestamp.get(s.runTimestamp);
+      if (suites) {
+        byRunId.set(runId, suites);
+      }
+    }
+  }
+
+  return byRunId;
 }
 
 // ── Helpers ─────────────────────────────────────────────────────────────────
@@ -152,6 +228,70 @@ function fmtDuration(s: number): string {
 
 function passRate(passed: number, total: number): number {
   return total === 0 ? 0 : Math.round((passed / total) * 100);
+}
+
+/** Parse "YYYY-MM-DD HH:mm:ss" as local wall time (not UTC). */
+function parseRunTimestamp(ts: string | undefined): Date | null {
+  if (!ts?.trim()) return null;
+  const d = new Date(ts.trim().replace(' ', 'T'));
+  return Number.isNaN(d.getTime()) ? null : d;
+}
+
+function formatRunTimeIST(ts: string | undefined): string {
+  const d = parseRunTimestamp(ts);
+  if (!d) return '—';
+  return d.toLocaleTimeString('en-US', {
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true,
+    timeZone: IST,
+  });
+}
+
+/** Aggregated stats for one calendar day — used by daily digest emails (e.g. Saira bot). */
+function buildTodayEmailSummary(summaries: DailySummary[], dateStr: string) {
+  const todayRuns = summaries
+    .filter((r) => r.runDate === dateStr)
+    .sort((a, b) => (a.runTimestamp || '').localeCompare(b.runTimestamp || ''));
+
+  const totalRuns = todayRuns.length;
+  const runsWithAnyFailure = todayRuns.filter((r) => (r.failed ?? 0) > 0).length;
+  const runsFullyFailed = todayRuns.filter(
+    (r) => r.totalSuites > 0 && (r.passed ?? 0) === 0,
+  ).length;
+  const totalSuiteExecutions = todayRuns.reduce((s, r) => s + (r.totalSuites ?? 0), 0);
+  const passedSuites = todayRuns.reduce((s, r) => s + (r.passed ?? 0), 0);
+  const failedSuites = todayRuns.reduce((s, r) => s + (r.failed ?? 0), 0);
+  const passRate =
+    totalSuiteExecutions > 0
+      ? Math.round((passedSuites / totalSuiteExecutions) * 1000) / 10
+      : 0;
+
+  return {
+    date: dateStr,
+    generatedAt: new Date().toLocaleString('en-IN', { timeZone: IST }),
+    dashboardUrl: process.env.REPORT_BASE_URL
+      ? `${process.env.REPORT_BASE_URL}/Playground-Report.html`
+      : 'https://yamini-pal-singh.github.io/playground-testing/Playground-Report.html',
+    totalRuns,
+    /** Runs where at least one suite failed (NOT the same as failed suite count). */
+    runsWithAnyFailure,
+    runsFullyFailed,
+    totalSuiteExecutions,
+    passedSuites,
+    failedSuites,
+    passRatePercent: passRate,
+    /** Actual start time per run — do NOT use runDate + fixed 05:30. */
+    runTimings: todayRuns.map((r) => ({
+      runId: (r as DailySummary & { runId?: string }).runId || '',
+      runTimestamp: r.runTimestamp,
+      endTimestamp: r.endTimestamp,
+      timeIST: formatRunTimeIST(r.runTimestamp),
+      passed: r.passed,
+      failed: r.failed,
+      totalSuites: r.totalSuites,
+    })),
+  };
 }
 
 function escapeHtml(str: string): string {
@@ -172,12 +312,12 @@ function generateHTML(summaries: DailySummary[], allLogs: Map<string, Map<string
 <h1 style="opacity:0.5">No Playground reports found</h1></body></html>`;
   }
 
-  // Build per-run log data as JSON-safe object: { runDate: { suiteName: logText } }
+  // Per-run logs: { runId: { suiteName: logText } } — never keyed by calendar date only.
   const logsDataObj: Record<string, Record<string, string>> = {};
-  for (const [date, suiteMap] of allLogs.entries()) {
-    logsDataObj[date] = {};
+  for (const [runId, suiteMap] of allLogs.entries()) {
+    logsDataObj[runId] = {};
     for (const [name, text] of suiteMap.entries()) {
-      logsDataObj[date][name] = text;
+      logsDataObj[runId][name] = text;
     }
   }
 
@@ -488,6 +628,15 @@ function generateHTML(summaries: DailySummary[], allLogs: Map<string, Map<string
       position: relative;
     }
     .log-container.open { display: block; }
+    .log-mismatch {
+      background: rgba(234, 179, 8, 0.12);
+      border: 1px solid rgba(234, 179, 8, 0.35);
+      color: #fde047;
+      padding: 10px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      margin-bottom: 10px;
+    }
     .log-container pre {
       font-family: 'SF Mono', Consolas, 'Liberation Mono', Menlo, monospace;
       font-size: 12px;
@@ -775,6 +924,17 @@ var currentRunIdx = 0;
 var currentSortCol = null;
 var currentSortAsc = true;
 
+function parseRunTs(ts) {
+  if (!ts) return null;
+  var d = new Date(String(ts).trim().replace(' ', 'T'));
+  return isNaN(d.getTime()) ? null : d;
+}
+function formatRunTimeIST(ts) {
+  var d = parseRunTs(ts);
+  if (!d) return '—';
+  return d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true, timeZone: 'Asia/Kolkata' });
+}
+
 // ── Init ──────────────────────────────────────────────────────────────────
 (function init() {
   var sel = document.getElementById('runSelector');
@@ -930,10 +1090,12 @@ function renderTable(s) {
         '<td class="reason-cell">' + (x.failure_reason ? esc(x.failure_reason) : '<span class="no-error">&mdash;</span>') + '</td></tr>';
 
       // Log row
-      var logText = getLogForSuite(s.runDate, x.name);
+      var logText = getLogForSuite(s.runId || s.runTimestamp, x.name);
+      var logBanner = buildLogBanner(x, logText);
       html += '<tr class="log-row"><td colspan="4"><div class="log-container" id="log-' + sid + '">' +
         '<button class="copy-btn" onclick="event.stopPropagation();copyLog(\\'' + sid + '\\')">Copy</button>' +
-        (logText ? '<pre>' + highlightLog(logText) + '</pre>' : '<div class="log-no-data">No logs available</div>') +
+        logBanner +
+        (logText ? '<pre>' + highlightLog(logText) + '</pre>' : '<div class="log-no-data">No log for this run (expand a different run or re-generate the report)</div>') +
         '</div></td></tr>';
       suiteIdx++;
     });
@@ -941,18 +1103,22 @@ function renderTable(s) {
   document.getElementById('resultsBody').innerHTML = html;
 }
 
-function getLogForSuite(runDate, suiteName) {
-  if (!LOGS_DATA[runDate]) return null;
-  // Direct match first
-  if (LOGS_DATA[runDate][suiteName]) return LOGS_DATA[runDate][suiteName];
-  // Fuzzy: try finding a key that ends with the suite name or contains it
-  var keys = Object.keys(LOGS_DATA[runDate]);
-  for (var i = 0; i < keys.length; i++) {
-    if (keys[i].indexOf(suiteName) !== -1 || suiteName.indexOf(keys[i]) !== -1) {
-      return LOGS_DATA[runDate][keys[i]];
-    }
+function getLogForSuite(runKey, suiteName) {
+  if (!runKey || !LOGS_DATA[runKey]) return null;
+  return LOGS_DATA[runKey][suiteName] || null;
+}
+
+function buildLogBanner(suite, logText) {
+  if (!logText) return '';
+  var logOutcome = null;
+  if (/\\n\\s*❌ FAIL\\s*(?:\\n|$)/.test(logText)) logOutcome = 'fail';
+  else if (/\\n\\s*✅ PASS\\s*(?:\\n|$)/.test(logText)) logOutcome = 'pass';
+  if (logOutcome && logOutcome !== suite.status) {
+    return '<div class="log-mismatch">⚠ Log for this run shows ' + logOutcome.toUpperCase() +
+      ' but the recorded result is ' + suite.status.toUpperCase() +
+      '. Showing logs from the same run only — refresh the report if this looks wrong.</div>';
   }
-  return null;
+  return '';
 }
 
 function highlightLog(text) {
@@ -1053,10 +1219,12 @@ function sortTable(col) {
       '<td><span class="badge ' + badgeCls + '">' + x.status.toUpperCase() + '</span></td>' +
       '<td data-sort="' + x.duration_s + '">' + fmtDur(x.duration_s) + '</td>' +
       '<td class="reason-cell">' + (x.failure_reason ? esc(x.failure_reason) : '<span class="no-error">&mdash;</span>') + '</td></tr>';
-    var logText = getLogForSuite(s.runDate, x.name);
+    var logText = getLogForSuite(s.runId || s.runTimestamp, x.name);
+    var logBanner = buildLogBanner(x, logText);
     html += '<tr class="log-row"><td colspan="4"><div class="log-container" id="log-' + sid + '">' +
       '<button class="copy-btn" onclick="event.stopPropagation();copyLog(\\'' + sid + '\\')">Copy</button>' +
-      (logText ? '<pre>' + highlightLog(logText) + '</pre>' : '<div class="log-no-data">No logs available</div>') +
+      logBanner +
+      (logText ? '<pre>' + highlightLog(logText) + '</pre>' : '<div class="log-no-data">No log for this run</div>') +
       '</div></td></tr>';
     idx++;
   });
@@ -1170,13 +1338,15 @@ function renderHistory() {
   var html = '';
   dates.forEach(function(d) {
     var niceDate = new Date(d + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-    var items = byDate[d].sort(function(a, b) { return new Date(b.runTimestamp).getTime() - new Date(a.runTimestamp).getTime(); });
+    var items = byDate[d].sort(function(a, b) {
+      return (parseRunTs(b.runTimestamp) || 0) - (parseRunTs(a.runTimestamp) || 0);
+    });
     html += '<div style="margin-bottom:32px"><h3 style="font-size:15px;color:#e5e7eb;margin-bottom:16px;padding-bottom:8px;border-bottom:1px solid #252540;font-weight:600">' + niceDate + '</h3>';
     html += '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px">';
     items.forEach(function(r, i) {
       var pr = r.totalSuites ? Math.round(r.passed / r.totalSuites * 100) : 0;
       var color = pr >= 95 ? '#22c55e' : pr >= 80 ? '#eab308' : '#ef4444';
-      var timeStr = new Date(r.runTimestamp).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+      var timeStr = formatRunTimeIST(r.runTimestamp);
       var shortId = (r.runId || r.runTimestamp).replace(/[^a-z0-9]/gi, '').substring(0, 8);
       var globalIdx = SUMMARIES.indexOf(r);
       html += '<div onclick="event.stopPropagation();openModal(' + globalIdx + ')" style="background:#1a1a2e;border:1px solid #252540;border-radius:10px;padding:16px;cursor:pointer" onmouseover="this.style.borderColor=\\'#6c47ff\\'" onmouseout="this.style.borderColor=\\'#252540\\'">';
@@ -1462,10 +1632,13 @@ function buildRunsJson(summaries: DailySummary[]): any[] {
       runId: (s as any).runId || '',
       runDate: s.runDate,
       runTimestamp: s.runTimestamp,
+      endTimestamp: s.endTimestamp,
+      timeIST: formatRunTimeIST(s.runTimestamp),
       total,
       passed: s.passed,
       failed: s.failed,
       passRate: rate,
+      hadAnyFailure: (s.failed ?? 0) > 0,
       suites: s.suites,
     };
   });
@@ -1473,7 +1646,7 @@ function buildRunsJson(summaries: DailySummary[]): any[] {
 
 function main() {
   const summaries = loadAllSummaries();
-  const allLogs = loadAllLogs();
+  const allLogs = loadAllLogs(summaries);
   const html = generateHTML(summaries, allLogs);
 
   if (!fs.existsSync(REPORTS_DIR)) {
@@ -1490,6 +1663,14 @@ function main() {
   fs.writeFileSync(OUTPUT_RUNS_JSON, JSON.stringify(runs, null, 2), 'utf-8');
   console.log(`Playground runs JSON written: ${OUTPUT_RUNS_JSON}`);
   console.log(`   ${runs.length} run(s) listed`);
+
+  const todayStr = new Date().toLocaleDateString('en-CA', { timeZone: IST });
+  const todaySummary = buildTodayEmailSummary(summaries, todayStr);
+  fs.writeFileSync(OUTPUT_TODAY_SUMMARY_JSON, JSON.stringify(todaySummary, null, 2), 'utf-8');
+  console.log(`Playground today summary written: ${OUTPUT_TODAY_SUMMARY_JSON}`);
+  console.log(
+    `   ${todaySummary.date}: ${todaySummary.totalRuns} run(s), ${todaySummary.runsWithAnyFailure} with failures, ${todaySummary.passRatePercent}% pass (${todaySummary.passedSuites}/${todaySummary.totalSuiteExecutions} suites)`,
+  );
 }
 
 main();

@@ -24,10 +24,28 @@ LOG_FILE="$LOG_DIR/playground-daily-$DATE.log"
 SUMMARY_JSON="$REPORTS_DIR/playground-summary-$DATE.json"
 mkdir -p "$LOG_DIR" "$REPORTS_DIR"
 
+# ── Single-run guard (shared with run-and-email.sh) ─────────────────────────
+LOCK_DIR="$PROJECT_DIR/.daily-run.lock"
+if ! mkdir "$LOCK_DIR" 2>/dev/null; then
+  if [ -f "$LOCK_DIR/pid" ] && kill -0 "$(cat "$LOCK_DIR/pid")" 2>/dev/null; then
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] Skip — playground daily already running (PID $(cat "$LOCK_DIR/pid"))."
+    exit 0
+  fi
+  rm -rf "$LOCK_DIR"
+  mkdir "$LOCK_DIR"
+fi
+echo $$ > "$LOCK_DIR/pid"
+_release_lock() { rm -rf "$LOCK_DIR"; }
+trap _release_lock EXIT
+
 TIMESTAMP="$(date '+%Y-%m-%d %H:%M:%S')"
+RUN_ID="$(date '+%Y-%m-%dT%H-%M-%S')"
+RUN_SUITE_LOG_DIR="$LOG_DIR/run-$RUN_ID"
+mkdir -p "$RUN_SUITE_LOG_DIR"
 
 echo "════════════════════════════════════════════════════════════"  | tee -a "$LOG_FILE"
 echo "  Playground Daily Test Run — $TIMESTAMP"                     | tee -a "$LOG_FILE"
+echo "  runId: $RUN_ID"                                              | tee -a "$LOG_FILE"
 echo "════════════════════════════════════════════════════════════"  | tee -a "$LOG_FILE"
 
 # ── Load node/npm (needed when running from cron with no interactive shell) ──
@@ -108,16 +126,30 @@ run_test() {
   _kill_tree "$cmd_pid" TERM
   kill "$killer_pid" 2>/dev/null
   wait "$killer_pid" 2>/dev/null
+  local suite_log="$RUN_SUITE_LOG_DIR/$(printf '%s' "$name" | tr ' /:' '___').log"
+  {
+    printf '[%s] ▶  %s\n' "$category" "$name"
+    cat "$tmp_out"
+  } > "$suite_log"
+
   if [ $cmd_rc -eq 0 ]; then
     status="pass"
     printf "   ✅ PASS\n" | tee -a "$LOG_FILE"
+    printf '   ✅ PASS\n' >> "$suite_log"
     PASS=$((PASS + 1))
   else
     status="fail"
     printf "   ❌ FAIL\n" | tee -a "$LOG_FILE"
+    printf '   ❌ FAIL\n' >> "$suite_log"
     FAIL=$((FAIL + 1))
     local reason
     reason=$(grep -oE "[0-9]+ (failed|test case)" "$tmp_out" | tail -1)
+    if [ -z "$reason" ]; then
+      reason=$(grep -oE "[0-9]+ did not run" "$tmp_out" | tail -1)
+    fi
+    if [ -z "$reason" ] && grep -q "Timed out waiting 900s" "$tmp_out"; then
+      reason="Playwright suite timeout (15m)"
+    fi
     if [ -z "$reason" ]; then
       reason=$(grep -m1 "Error:\|❌\|FAIL\|Timeout" "$tmp_out" | sed 's/^[[:space:]]*//' | cut -c1-120)
     fi
@@ -210,7 +242,6 @@ run_test "Feature Verify" "Model Variants"               "npx playwright test sr
 # WRITE DAILY SUMMARY JSON
 # ════════════════════════════════════════════════════════════════
 END_TIMESTAMP="$(date '+%Y-%m-%d %H:%M:%S')"
-RUN_ID="$(date '+%Y-%m-%dT%H-%M-%S')"
 RUN_JSON="$REPORTS_DIR/playground-run-$RUN_ID.json"
 
 SUMMARY_BODY=$(cat <<EOF
