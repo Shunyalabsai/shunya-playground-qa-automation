@@ -45,11 +45,11 @@ export PATH="/usr/local/bin:$HOME/.nvm/versions/node/$(ls "$HOME/.nvm/versions/n
 
   echo ""
   echo "── Regenerating dashboard (latest runs) ──"
-  npx ts-node scripts/generate-playground-report.ts
+  npx tsx scripts/generate-playground-report.ts
 
   echo ""
   echo "── Sending email to all REPORT_EMAIL_TO recipients ──"
-  PLAYGROUND_DAILY_EMAIL=1 npx ts-node scripts/send-playground-email.ts
+  PLAYGROUND_DAILY_EMAIL=1 npx tsx scripts/send-playground-email.ts
 
   touch "$SENT_STAMP"
   echo ""

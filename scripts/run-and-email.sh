@@ -11,19 +11,8 @@ LOG_DIR="$PROJECT_DIR/logs"
 REPORTS_DIR="$PROJECT_DIR/reports"
 mkdir -p "$LOG_DIR" "$REPORTS_DIR"
 
-# ── Single-run guard ─────────────────────────────────────────────────────────
-# Prevent two concurrent launches (overlapping launchd triggers) from racing.
-LOCK_DIR="$PROJECT_DIR/.daily-run.lock"
-if ! mkdir "$LOCK_DIR" 2>/dev/null; then
-  if [ -f "$LOCK_DIR/pid" ] && kill -0 "$(cat "$LOCK_DIR/pid")" 2>/dev/null; then
-    echo "[$(date '+%Y-%m-%d %H:%M:%S')] Skip — run already in progress (PID $(cat "$LOCK_DIR/pid"))."
-    exit 0
-  fi
-  # Stale lock — owner is gone. Take it over.
-  rm -rf "$LOCK_DIR"
-  mkdir "$LOCK_DIR"
-fi
-echo $$ > "$LOCK_DIR/pid"
+# Lock lives in run-playground-daily.sh only (this wrapper must not take the lock
+# or the child exits immediately and scheduled runs report 0/60 suites).
 
 # ── Wall-clock self-destruct ────────────────────────────────────────────────
 # Hard ceiling on the entire run so a hung suite can never block the next
@@ -43,7 +32,6 @@ WATCHDOG_PID=$!
 
 cleanup() {
   kill "$WATCHDOG_PID" 2>/dev/null || true
-  rm -rf "$LOCK_DIR"
 }
 trap cleanup EXIT INT TERM
 
@@ -85,15 +73,29 @@ fi
 # ── Step 3: Generate HTML report ──
 echo ""
 echo "── Generating Report ────────────────────────────"
-npx ts-node scripts/generate-playground-report.ts 2>&1
+npx tsx scripts/generate-playground-report.ts 2>&1
 
 # ── Step 4: Push dashboard to GitHub Pages ──
 echo ""
 echo "── Publishing Dashboard ─────────────────────────"
-git add reports/Playground-Report.html reports/playground-runs.json 2>/dev/null
-git commit -m "Dashboard update — $DATE $(date '+%H:%M')" 2>/dev/null
-git push origin main 2>&1
-echo "   ✅ Dashboard published"
+publish_dashboard() {
+  git add reports/Playground-Report.html reports/playground-runs.json reports/playground-today-summary.json 2>/dev/null || true
+  if ! git diff --staged --quiet 2>/dev/null; then
+    git commit -m "Dashboard update — $DATE $(date '+%H:%M')" || return 1
+  else
+    echo "   ℹ️  No new dashboard files to commit (will push existing commits if any)"
+  fi
+  if git push origin main; then
+    echo "   ✅ Dashboard pushed to GitHub — Pages will update in ~1–2 min"
+    echo "   🔗 https://yamini-pal-singh.github.io/playground-testing/Playground-Report.html"
+    return 0
+  fi
+  echo "   ❌ git push failed — live dashboard will NOT update until push succeeds"
+  echo "   💡 This Mac is logged into GitHub as: $(git config user.name 2>/dev/null || echo unknown) <$(git config user.email 2>/dev/null || echo unknown)>"
+  echo "   💡 Push manually as yamini-pal-singh: cd $PROJECT_DIR && git push origin main"
+  return 1
+}
+publish_dashboard || true
 
 # Email: once daily at 8 PM — not after each 3-hourly run
 echo ""

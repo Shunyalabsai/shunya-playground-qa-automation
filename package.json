@@ -35,6 +35,7 @@
     "email:playground": "npx ts-node scripts/send-playground-email.ts",
     "email:playground:daily": "bash scripts/send-playground-daily-email.sh",
     "email:playground:install": "bash scripts/install-playground-daily-email.sh",
+    "schedule:playground:install": "bash scripts/install-playground-schedule.sh",
     "sheet:master": "npx ts-node scripts/write-master-test-sheet.ts"
   },
   "keywords": [

@@ -7,6 +7,7 @@ on:
     paths:
       - 'reports/Playground-Report.html'
       - 'reports/playground-runs.json'
+      - 'reports/playground-today-summary.json'
       - '.github/workflows/deploy-dashboard.yml'
   workflow_dispatch:
 
@@ -34,6 +35,8 @@ jobs:
           cp reports/Playground-Report.html pages-output/reports/Playground-Report.html
           cp reports/playground-runs.json pages-output/playground-runs.json
           cp reports/playground-runs.json pages-output/reports/playground-runs.json
+          cp reports/playground-today-summary.json pages-output/playground-today-summary.json
+          cp reports/playground-today-summary.json pages-output/reports/playground-today-summary.json
 
       - name: Setup Pages
         uses: actions/configure-pages@v4

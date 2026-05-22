@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.shunyalabs.playground-testing</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>/bin/bash</string>
+        <string>REPLACE_PROJECT_DIR/scripts/run-and-email.sh</string>
+    </array>
+
+    <key>WorkingDirectory</key>
+    <string>REPLACE_PROJECT_DIR</string>
+
+    <!-- Every 3 hours at :30 (8 runs/day), local time -->
+    <key>StartCalendarInterval</key>
+    <array>
+        <dict><key>Hour</key><integer>2</integer><key>Minute</key><integer>30</integer></dict>
+        <dict><key>Hour</key><integer>5</integer><key>Minute</key><integer>30</integer></dict>
+        <dict><key>Hour</key><integer>8</integer><key>Minute</key><integer>30</integer></dict>
+        <dict><key>Hour</key><integer>11</integer><key>Minute</key><integer>30</integer></dict>
+        <dict><key>Hour</key><integer>14</integer><key>Minute</key><integer>30</integer></dict>
+        <dict><key>Hour</key><integer>17</integer><key>Minute</key><integer>30</integer></dict>
+        <dict><key>Hour</key><integer>20</integer><key>Minute</key><integer>30</integer></dict>
+        <dict><key>Hour</key><integer>23</integer><key>Minute</key><integer>30</integer></dict>
+    </array>
+
+    <key>StandardOutPath</key>
+    <string>REPLACE_PROJECT_DIR/logs/launchd-playground.log</string>
+    <key>StandardErrorPath</key>
+    <string>REPLACE_PROJECT_DIR/logs/launchd-playground-error.log</string>
+
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>PATH</key>
+        <string>/usr/local/bin:/usr/bin:/bin:/opt/homebrew/bin</string>
+        <key>HOME</key>
+        <string>REPLACE_HOME</string>
+    </dict>
+
+    <key>KeepAlive</key>
+    <false/>
+    <key>RunAtLoad</key>
+    <false/>
+</dict>
+</plist>

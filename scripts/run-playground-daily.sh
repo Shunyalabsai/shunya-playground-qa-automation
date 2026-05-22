@@ -28,7 +28,7 @@ mkdir -p "$LOG_DIR" "$REPORTS_DIR"
 LOCK_DIR="$PROJECT_DIR/.daily-run.lock"
 if ! mkdir "$LOCK_DIR" 2>/dev/null; then
   if [ -f "$LOCK_DIR/pid" ] && kill -0 "$(cat "$LOCK_DIR/pid")" 2>/dev/null; then
-    echo "[$(date '+%Y-%m-%d %H:%M:%S')] Skip — playground daily already running (PID $(cat "$LOCK_DIR/pid"))."
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] Skip — playground daily already running (PID $(cat "$LOCK_DIR/pid"))." | tee -a "$LOG_FILE"
     exit 0
   fi
   rm -rf "$LOCK_DIR"
@@ -173,7 +173,7 @@ run_test() {
 # SECTION 1: FUNCTIONAL / UI TESTS (run first)
 # ════════════════════════════════════════════════════════════════
 echo "" | tee -a "$LOG_FILE"
-echo "── Functional / UI Tests ───────────────────────────" | tee -a "$LOG_FILE"
+echo "-- Functional / UI Tests --------------------------------" | tee -a "$LOG_FILE"
 
 run_test "Functional UI"  "Page Load & Layout"          "npx playwright test src/tests/playgroundUI.spec.ts --reporter=list --project=playground-ui -g 'Page Load'"
 run_test "Functional UI"  "Credits"                     "npx playwright test src/tests/playgroundUI.spec.ts --reporter=list --project=playground-ui -g 'Playground — Credits:'"
@@ -291,25 +291,29 @@ fi
 echo "" | tee -a "$LOG_FILE"
 echo "── Generating Playground Report ────────────────────" | tee -a "$LOG_FILE"
 
-if npx ts-node scripts/generate-playground-report.ts >> "$LOG_FILE" 2>&1; then
+if npx tsx scripts/generate-playground-report.ts >> "$LOG_FILE" 2>&1; then
   echo "   ✅ Playground HTML report generated" | tee -a "$LOG_FILE"
 
   # Primary dashboard: playground-testing repo → GitHub Pages (yamini-pal-singh.github.io/playground-testing)
   echo "" | tee -a "$LOG_FILE"
   echo "── Publishing Dashboard (playground-testing) ───────" | tee -a "$LOG_FILE"
-  if (
+  (
     cd "$PROJECT_DIR"
-    git add reports/Playground-Report.html reports/playground-runs.json 2>/dev/null
+    git add reports/Playground-Report.html reports/playground-runs.json reports/playground-today-summary.json 2>/dev/null || true
     if git diff --staged --quiet; then
-      echo "   ℹ️  No dashboard changes to commit" | tee -a "$LOG_FILE"
+      echo "   ℹ️  No new dashboard files to commit (will push existing commits if any)" | tee -a "$LOG_FILE"
     else
-      git commit -m "Dashboard update — $DATE $(date '+%H:%M')" && git push origin main
+      git commit -m "Dashboard update — $DATE $(date '+%H:%M')" | tee -a "$LOG_FILE"
     fi
-  ) >> "$LOG_FILE" 2>&1; then
-    echo "   ✅ Dashboard published to playground-testing (GitHub Pages)" | tee -a "$LOG_FILE"
-  else
-    echo "   ⚠️  playground-testing dashboard push failed (check git auth)" | tee -a "$LOG_FILE"
-  fi
+    if git push origin main 2>&1 | tee -a "$LOG_FILE"; then
+      echo "   ✅ Dashboard pushed to GitHub — Pages will update in ~1–2 min" | tee -a "$LOG_FILE"
+      echo "   🔗 https://yamini-pal-singh.github.io/playground-testing/Playground-Report.html" | tee -a "$LOG_FILE"
+    else
+      echo "   ❌ git push failed — live dashboard NOT updated (check GitHub auth on this Mac)" | tee -a "$LOG_FILE"
+      echo "   💡 Push as yamini-pal-singh: cd $PROJECT_DIR && git push origin main" | tee -a "$LOG_FILE"
+      exit 1
+    fi
+  ) >> "$LOG_FILE" 2>&1 || echo "   ⚠️  Dashboard publish step failed (see log above)" | tee -a "$LOG_FILE"
 
   # Legacy mirror: asr-testing repo copy for historical archive
   GHPAGES_REPO="$HOME/repos/asr-testing"
