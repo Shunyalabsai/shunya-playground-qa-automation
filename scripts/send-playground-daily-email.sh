@@ -2,7 +2,7 @@
 # ─────────────────────────────────────────────────────────────────────────────
 # Send ONE Playground QC email per calendar day (intended for ~8 PM local).
 #
-# Playground tests run in a daily back-to-back batch without email. Install the launchd job:
+# Playground tests run every 3 hours without email. Install the launchd job:
 #   bash scripts/install-playground-daily-email.sh
 #
 # Manual send (latest run of the day):
@@ -43,30 +43,12 @@ export PATH="/usr/local/bin:$HOME/.nvm/versions/node/$(ls "$HOME/.nvm/versions/n
     exit 0
   fi
 
-  # Today-only quiet mode: no mail until 8 PM (see logs/.email-only-at-8pm-date)
-  QUIET_FILE="$LOG_DIR/.email-only-at-8pm-date"
-  QUIET_SCRIPT="$SCRIPT_DIR/.playground-email-quiet-today"
-  QUIET_DATE=""
-  if [ -f "$QUIET_FILE" ]; then
-    QUIET_DATE="$(tr -d '[:space:]' < "$QUIET_FILE")"
-  elif [ -f "$QUIET_SCRIPT" ]; then
-    QUIET_DATE="$(tr -d '[:space:]' < "$QUIET_SCRIPT")"
-  fi
-  if [ -n "$QUIET_DATE" ] && [ "$QUIET_DATE" = "$DATE" ]; then
-    HOUR="$(date +%H)"
-    if [ "$HOUR" -lt 20 ] && [ "${FORCE:-0}" != "1" ]; then
-      echo "ℹ️  Quiet mode for $DATE — no email until 8 PM digest (REPORT_EMAIL_DAILY_TO only)."
-      echo "   (Remove $QUIET_FILE or $QUIET_SCRIPT to cancel.)"
-      exit 0
-    fi
-  fi
-
   echo ""
   echo "── Regenerating dashboard (latest runs) ──"
   npx tsx scripts/generate-playground-report.ts
 
   echo ""
-  echo "── Sending 8 PM digest (REPORT_EMAIL_DAILY_TO only, not full team list) ──"
+  echo "── Sending email to all REPORT_EMAIL_TO recipients ──"
   PLAYGROUND_DAILY_EMAIL=1 npx tsx scripts/send-playground-email.ts
 
   touch "$SENT_STAMP"

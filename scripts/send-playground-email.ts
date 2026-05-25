@@ -11,63 +11,6 @@ import * as fs from 'fs';
 
 dotenv.config({ path: path.resolve(__dirname, '..', '.env') });
 
-const PROJECT_ROOT = path.resolve(__dirname, '..');
-
-/** Local date YYYY-MM-DD (digest window uses machine local time). */
-function localDateYmd(): string {
-  const d = new Date();
-  const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, '0');
-  const day = String(d.getDate()).padStart(2, '0');
-  return `${y}-${m}-${day}`;
-}
-
-/** When set to today's date, only the 8 PM daily digest may send (REPORT_EMAIL_DAILY_TO). */
-function readQuietUntil8pmDate(): string | null {
-  const fromEnv = (process.env.PLAYGROUND_EMAIL_QUIET_DATE || '').trim();
-  if (fromEnv) return fromEnv;
-
-  const candidates = [
-    path.join(PROJECT_ROOT, 'logs', '.email-only-at-8pm-date'),
-    path.join(PROJECT_ROOT, 'scripts', '.playground-email-quiet-today'),
-  ];
-  for (const file of candidates) {
-    if (!fs.existsSync(file)) continue;
-    const v = fs.readFileSync(file, 'utf8').trim();
-    if (v) return v;
-  }
-  return null;
-}
-
-/** Block ad-hoc / per-run email on quiet days; allow only 8 PM digest (PLAYGROUND_DAILY_EMAIL=1). */
-function assertEmailAllowed(): void {
-  const quietDate = readQuietUntil8pmDate();
-  const today = localDateYmd();
-  if (!quietDate || quietDate !== today) return;
-
-  const isDailyDigest = process.env.PLAYGROUND_DAILY_EMAIL === '1';
-  const force = process.env.FORCE === '1' || process.env.FORCE_EMAIL === '1';
-  const hour = new Date().getHours();
-
-  if (!isDailyDigest) {
-    console.log(
-      `ℹ️  Email suppressed for ${today}: only the 8 PM digest (REPORT_EMAIL_DAILY_TO) is allowed.`,
-    );
-    console.log(
-      '   Remove logs/.email-only-at-8pm-date (or scripts/.playground-email-quiet-today) to allow immediate sends.',
-    );
-    process.exit(0);
-  }
-
-  if (hour < 20 && !force) {
-    console.log(
-      `ℹ️  Daily digest held until 8 PM local (now ${hour}:${String(new Date().getMinutes()).padStart(2, '0')}).`,
-    );
-    console.log('   Scheduled launchd job runs at 20:00, or use FORCE=1 after 8 PM to resend.');
-    process.exit(0);
-  }
-}
-
 /** Gmail SMTP: prefer SMTP_*; fall back to GMAIL_* used by OTP refresh. */
 function resolveSmtpAuth(): { user: string; pass: string } {
   const user = (process.env.SMTP_USER || process.env.GMAIL_USER || '').trim();
@@ -126,44 +69,6 @@ function parseRecipients(raw: string | undefined): string {
     .map((e) => e.replace(/#.*$/, '').trim())
     .filter((e) => e.includes('@'))
     .join(', ');
-}
-
-/**
- * 8 PM digest: REPORT_EMAIL_DAILY_TO only (never the full REPORT_EMAIL_TO list).
- * Ad-hoc / failure sends: REPORT_EMAIL_TO.
- */
-function resolveRecipients(): string {
-  const isDailyDigest = process.env.PLAYGROUND_DAILY_EMAIL === '1';
-
-  if (isDailyDigest) {
-    const daily = parseRecipients(process.env.REPORT_EMAIL_DAILY_TO);
-    if (daily) return daily;
-
-    const owner = parseRecipients(
-      process.env.REPORT_EMAIL_OWNER || process.env.REPORT_EMAIL_FROM,
-    );
-    if (owner) {
-      console.log(
-        'ℹ️  REPORT_EMAIL_DAILY_TO not set — sending 8 PM digest only to REPORT_EMAIL_OWNER / REPORT_EMAIL_FROM.',
-      );
-      return owner;
-    }
-
-    console.error(
-      '❌ 8 PM digest needs recipients. Set REPORT_EMAIL_DAILY_TO in .env (e.g. yamini@unitedwecare.com).',
-    );
-    console.error(
-      '   Do not use REPORT_EMAIL_TO for the daily digest — that list is for optional immediate alerts only.',
-    );
-    process.exit(1);
-  }
-
-  const immediate = parseRecipients(process.env.REPORT_EMAIL_TO);
-  if (!immediate) {
-    console.error('❌ REPORT_EMAIL_TO is not set in .env (comma-separated addresses)');
-    process.exit(1);
-  }
-  return immediate;
 }
 
 /** Newest completed run (per-run JSON preferred over daily summary overwrite). */
@@ -537,8 +442,6 @@ function buildEmailHTML(summary: PlaygroundSummary): string {
 // ── Send Email ───────────────────────────────────────────────────────────────
 
 async function sendEmail() {
-  assertEmailAllowed();
-
   const summary = loadLatestSummary();
   const { totalSuites, passed, failed, runDate } = summary;
   const passRate = totalSuites > 0 ? Math.round((passed / totalSuites) * 100) : 0;
@@ -554,13 +457,13 @@ async function sendEmail() {
 
   const statusEmoji = passRate >= 95 ? '\u{1F7E2}' : passRate >= 80 ? '\u{1F7E1}' : '\u{1F534}';
 
-  const recipients = resolveRecipients();
-  const recipientCount = recipients.split(',').filter(Boolean).length;
-  const listLabel =
-    process.env.PLAYGROUND_DAILY_EMAIL === '1'
-      ? 'REPORT_EMAIL_DAILY_TO (8 PM digest)'
-      : 'REPORT_EMAIL_TO';
-  console.log(`📧 Recipients (${recipientCount}) via ${listLabel}: ${recipients}`);
+  const recipients = parseRecipients(process.env.REPORT_EMAIL_TO);
+  if (!recipients) {
+    console.error('❌ REPORT_EMAIL_TO is not set in .env (comma-separated addresses)');
+    process.exit(1);
+  }
+  const recipientCount = recipients.split(',').length;
+  console.log(`📧 Recipients (${recipientCount}): ${recipients}`);
 
   // Attach the full HTML dashboard report if it exists
   const reportPath = path.resolve(__dirname, '..', 'reports', 'Playground-Report.html');

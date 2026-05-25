@@ -153,7 +153,8 @@ async function submitOtp(page: Page, code: string) {
   const page = await context.newPage();
 
   try {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'networkidle', timeout: 60_000 });
+    await page.goto(PLAYGROUND_URL, { waitUntil: 'domcontentloaded', timeout: 90_000 });
+    await page.waitForLoadState('networkidle', { timeout: 30_000 }).catch(() => {});
 
     // If we're already logged in (a fresh storageState file from elsewhere), skip.
     if (await page.getByText('API Playground').count()) {

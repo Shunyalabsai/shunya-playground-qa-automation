@@ -4,7 +4,8 @@ test-results/
 logs/*.log
 logs/run-*/
 logs/.playground-email-sent-*
-logs/.email-only-at-8pm-date
+.daily-batch.lock/
+.daily-batch-state.json
 reports/*.json
 !reports/playground-runs.json
 !reports/playground-today-summary.json

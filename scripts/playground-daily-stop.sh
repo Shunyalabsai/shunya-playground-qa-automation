@@ -25,19 +25,15 @@ while IFS= read -r pid; do
   PIDS="$PIDS $pid"
   COUNT=$((COUNT + 1))
 done <<EOF
-$(pgrep -f "$PROJECT_DIR/scripts/run-and-email.sh" 2>/dev/null || true)
 $(pgrep -f "$PROJECT_DIR/scripts/run-playground-daily.sh" 2>/dev/null || true)
 EOF
-
-rm -rf "$PROJECT_DIR/.daily-batch.lock" "$PROJECT_DIR/.daily-run.lock" 2>/dev/null || true
-rm -f "$PROJECT_DIR/.daily-batch-state.json" 2>/dev/null || true
 
 if [ "$COUNT" -eq 0 ]; then
   echo "No playground daily runners found for this project."
   exit 0
 fi
 
-echo "Stopping $COUNT daily runner(s) (batch + suite)..."
+echo "Stopping $COUNT daily runner(s)..."
 for pid in $PIDS; do
   echo "  PID $pid"
   _kill_tree "$pid" TERM

@@ -14,14 +14,18 @@
     <key>WorkingDirectory</key>
     <string>REPLACE_PROJECT_DIR</string>
 
-    <!-- Once daily at 02:30 — starts 8 back-to-back full runs (see run-and-email.sh) -->
+    <!-- Every 3 hours at :30 (8 runs/day), local time -->
     <key>StartCalendarInterval</key>
-    <dict>
-        <key>Hour</key>
-        <integer>2</integer>
-        <key>Minute</key>
-        <integer>30</integer>
-    </dict>
+    <array>
+        <dict><key>Hour</key><integer>2</integer><key>Minute</key><integer>30</integer></dict>
+        <dict><key>Hour</key><integer>5</integer><key>Minute</key><integer>30</integer></dict>
+        <dict><key>Hour</key><integer>8</integer><key>Minute</key><integer>30</integer></dict>
+        <dict><key>Hour</key><integer>11</integer><key>Minute</key><integer>30</integer></dict>
+        <dict><key>Hour</key><integer>14</integer><key>Minute</key><integer>30</integer></dict>
+        <dict><key>Hour</key><integer>17</integer><key>Minute</key><integer>30</integer></dict>
+        <dict><key>Hour</key><integer>20</integer><key>Minute</key><integer>30</integer></dict>
+        <dict><key>Hour</key><integer>23</integer><key>Minute</key><integer>30</integer></dict>
+    </array>
 
     <key>StandardOutPath</key>
     <string>REPLACE_PROJECT_DIR/logs/launchd-playground.log</string>

@@ -34,8 +34,6 @@
     "report:playground:open": "npx ts-node scripts/generate-playground-report.ts && open reports/Playground-Report.html",
     "email:playground": "npx ts-node scripts/send-playground-email.ts",
     "email:playground:daily": "bash scripts/send-playground-daily-email.sh",
-    "email:playground:quiet-today": "bash -c 'mkdir -p logs && date +%Y-%m-%d | tee logs/.email-only-at-8pm-date scripts/.playground-email-quiet-today'",
-    "email:playground:unquiet": "bash -c 'rm -f logs/.email-only-at-8pm-date scripts/.playground-email-quiet-today'",
     "email:playground:install": "bash scripts/install-playground-daily-email.sh",
     "schedule:playground:install": "bash scripts/install-playground-schedule.sh",
     "sheet:master": "npx ts-node scripts/write-master-test-sheet.ts"
