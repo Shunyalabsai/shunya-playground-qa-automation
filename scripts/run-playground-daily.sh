@@ -4,7 +4,7 @@
 # Runs BOTH UI and Backend API tests for the Playground, generates reports,
 # writes results to Google Sheet, and saves dated logs.
 #
-# Managed by launchd: com.shunyalabs.playground-testing.plist
+# Managed by launchd batch (8 back-to-back runs/day): com.shunyalabs.playground-testing.plist
 # Project: /Users/unitedwecare/Playground_repo/playground-testing
 #
 # Manual run:
@@ -272,14 +272,16 @@ echo "   ✅ Summary JSON: $SUMMARY_JSON" | tee -a "$LOG_FILE"
 echo "" | tee -a "$LOG_FILE"
 echo "── Writing Suite Summary to Google Sheet ─────────" | tee -a "$LOG_FILE"
 
-if npx ts-node -e "
+export SUMMARY_JSON
+if npx ts-node <<'TS' >> "$LOG_FILE" 2>&1
 const fs = require('fs');
 const { writeDailySummarySheet } = require('./src/utils/playgroundSheetWriter');
-const summary = JSON.parse(fs.readFileSync('$SUMMARY_JSON', 'utf-8'));
+const summary = JSON.parse(fs.readFileSync(process.env.SUMMARY_JSON!, 'utf-8'));
 writeDailySummarySheet(summary.suites, summary.runDate).then(() => {
   console.log('Done');
 }).catch((e: any) => console.error(e.message));
-" >> "$LOG_FILE" 2>&1; then
+TS
+then
   echo "   ✅ Suite summary written to Google Sheet" | tee -a "$LOG_FILE"
 else
   echo "   ⚠️  Suite summary sheet write failed" | tee -a "$LOG_FILE"
@@ -303,7 +305,8 @@ if npx tsx scripts/generate-playground-report.ts >> "$LOG_FILE" 2>&1; then
     if git diff --staged --quiet; then
       echo "   ℹ️  No new dashboard files to commit (will push existing commits if any)" | tee -a "$LOG_FILE"
     else
-      git commit -m "Dashboard update — $DATE $(date '+%H:%M')" | tee -a "$LOG_FILE"
+      COMMIT_MSG="Dashboard update — ${DATE} $(date +%H:%M)"
+      git commit -m "$COMMIT_MSG" | tee -a "$LOG_FILE"
     fi
     if git push origin main 2>&1 | tee -a "$LOG_FILE"; then
       echo "   ✅ Dashboard pushed to GitHub — Pages will update in ~1–2 min" | tee -a "$LOG_FILE"

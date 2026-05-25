@@ -105,7 +105,7 @@ jobs:
           fi
 
       - name: Send email on failure
-        if: always() && steps.stats.outputs.failed != '0'
+        if: always() && steps.stats.outputs.failed != '0' && !hashFiles('scripts/.playground-email-quiet-today')
         run: npx ts-node scripts/send-playground-email.ts
 
       - name: Clean up sensitive files
