@@ -72,7 +72,17 @@ if [ -f "$AUTH_FILE" ]; then
 else
   echo "  ❌ Auth file missing! UI tests will fail." | tee -a "$LOG_FILE"
   echo "  💡 Run: npm run playground:login" | tee -a "$LOG_FILE"
+  exit 1
 fi
+
+# ── Verify session works headless (stops 60-suite run if still on sign-in) ───
+echo "  🔍 Verifying login session…" | tee -a "$LOG_FILE"
+if ! npx ts-node scripts/verify-playground-auth.ts >> "$LOG_FILE" 2>&1; then
+  echo "  ❌ Auth verify failed — UI tests would all fail on sign-in page." | tee -a "$LOG_FILE"
+  echo "  💡 Mac: npm run playground:login  then scp auth/playground-auth.json to this machine" | tee -a "$LOG_FILE"
+  exit 1
+fi
+echo "  ✅ Auth verify passed" | tee -a "$LOG_FILE"
 
 # ── Tracking ──────────────────────────────────────────────────────────────────
 TOTAL=0

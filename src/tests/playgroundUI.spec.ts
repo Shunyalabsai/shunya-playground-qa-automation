@@ -532,7 +532,7 @@ test.describe('Playground — Credits: Positive Tests', () => {
       // Upload a small audio file
       const fileInput = page.locator('input[type="file"]');
       await fileInput.setInputFiles(TEST_AUDIO_FILES.wav);
-      await page.waitForTimeout(2000);
+      await page.waitForTimeout(5000);
 
       // Click Run Analysis
       await page.getByRole('button', { name: 'Run Analysis' }).click();
