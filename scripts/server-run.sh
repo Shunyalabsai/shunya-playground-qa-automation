@@ -1,0 +1,84 @@
+#!/usr/bin/env bash
+# ─────────────────────────────────────────────────────────────
+# server-run.sh
+#
+# Server-side wrapper for run-playground-daily.sh
+# Handles auth refresh automatically before running tests.
+#
+# Install cron:   bash scripts/server-run.sh --install
+# Remove cron:    bash scripts/server-run.sh --uninstall
+# Manual run:     bash scripts/server-run.sh
+#
+# Runs at: 08:30, 11:30, 14:30, 17:30, 20:30, 23:30
+# ─────────────────────────────────────────────────────────────
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
+LOG_DIR="$PROJECT_DIR/logs"
+CRON_LOG="$LOG_DIR/server-cron.log"
+
+# ── Install cron job ─────────────────────────────────────────
+if [ "$1" == "--install" ]; then
+  mkdir -p "$LOG_DIR"
+  CRON_LINE="30 8,11,14,17,20,23 * * * bash $SCRIPT_DIR/server-run.sh >> $CRON_LOG 2>&1"
+  (crontab -l 2>/dev/null | grep -v "server-run.sh"; echo "$CRON_LINE") | crontab -
+  echo "✅ Cron job installed on server!"
+  echo ""
+  echo "   Runs at : 08:30, 11:30, 14:30, 17:30, 20:30, 23:30 (server time)"
+  echo "   Log     : tail -f $CRON_LOG"
+  echo "   Check   : crontab -l"
+  echo "   Remove  : bash $SCRIPT_DIR/server-run.sh --uninstall"
+  echo ""
+  # Show current server time
+  echo "   Server time now: $(date)"
+  echo "   Next run at    : $(date -d 'next hour' '+%Y-%m-%d') 08:30 (if before 08:30)"
+  exit 0
+fi
+
+# ── Remove cron job ──────────────────────────────────────────
+if [ "$1" == "--uninstall" ]; then
+  crontab -l 2>/dev/null | grep -v "server-run.sh" | crontab -
+  echo "✅ Cron job removed from server."
+  exit 0
+fi
+
+# ── Main pipeline ────────────────────────────────────────────
+mkdir -p "$LOG_DIR"
+
+# Load nvm so node/npm work in cron environment
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+
+cd "$PROJECT_DIR" || exit 1
+
+echo ""
+echo "════════════════════════════════════════════════════════"
+echo "  Server run started: $(date)"
+echo "════════════════════════════════════════════════════════"
+
+# ── Step 1: Pull latest code ──────────────────────────────────
+echo ""
+echo "📦 Pulling latest code…"
+git pull origin main 2>&1 || echo "⚠️  git pull failed — continuing with existing code"
+
+# ── Step 2: Auto refresh auth ─────────────────────────────────
+echo ""
+echo "🔐 Refreshing auth automatically…"
+npx ts-node scripts/refresh-auth-auto.ts 2>&1
+AUTH_EXIT=$?
+
+if [ $AUTH_EXIT -ne 0 ]; then
+  echo "❌ Auth refresh failed — aborting. Check GMAIL_APP_PASSWORD in .env"
+  exit 1
+fi
+echo "✅ Auth refreshed"
+
+# ── Step 3: Run the full test pipeline ────────────────────────
+echo ""
+echo "🧪 Starting full test pipeline…"
+bash scripts/run-playground-daily.sh 2>&1
+
+echo ""
+echo "════════════════════════════════════════════════════════"
+echo "  Server run complete: $(date)"
+echo "════════════════════════════════════════════════════════"
