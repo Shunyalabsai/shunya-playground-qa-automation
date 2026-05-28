@@ -58,6 +58,19 @@ echo "════════════════════════�
 
 # ── Step 1: Pull latest code ──────────────────────────────────
 
+# ── Step 2: Strip short-lived Cloudflare cookies ──────────────
+echo ""
+echo "🔐 Preparing auth…"
+python3 -c "
+import json
+with open('auth/playground-auth.json', 'r') as f:
+    data = json.load(f)
+data['cookies'] = [c for c in data['cookies'] if c['name'] not in ['__cf_bm', '_cfuvid']]
+with open('auth/playground-auth.json', 'w') as f:
+    json.dump(data, f, indent=2)
+print(f'Auth ready — {len(data[\"cookies\"])} cookies kept')
+"
+echo "✅ Auth ready"
 
 # ── Step 3: Run the full test pipeline ────────────────────────
 echo ""
