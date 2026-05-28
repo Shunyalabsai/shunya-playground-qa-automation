@@ -57,21 +57,7 @@ echo "  Server run started: $(date)"
 echo "════════════════════════════════════════════════════════"
 
 # ── Step 1: Pull latest code ──────────────────────────────────
-echo ""
-echo "📦 Pulling latest code…"
-git pull origin main 2>&1 || echo "⚠️  git pull failed — continuing with existing code"
 
-# ── Step 2: Auto refresh auth ─────────────────────────────────
-echo ""
-echo "🔐 Refreshing auth automatically…"
-npx ts-node scripts/refresh-auth-auto.ts 2>&1
-AUTH_EXIT=$?
-
-if [ $AUTH_EXIT -ne 0 ]; then
-  echo "❌ Auth refresh failed — aborting. Check GMAIL_APP_PASSWORD in .env"
-  exit 1
-fi
-echo "✅ Auth refreshed"
 
 # ── Step 3: Run the full test pipeline ────────────────────────
 echo ""
