@@ -29,7 +29,7 @@ export async function fetchOtpFromGmail(sentAfter: Date): Promise<string> {
       console.log(`✅ OTP found: ${otp}`);
       return otp;
     }
-    console.log(`   No OTP yet — retrying in ${POLL_INTERVAL_MS / 1000}s…`);
+    console.log(`   No OTP yet — retrying in ${POLL_INTERVAL_MS / 2000}s…`);
     await sleep(POLL_INTERVAL_MS);
   }
 
@@ -49,17 +49,32 @@ function tryFetchOtp(sentAfter: Date): Promise<string | null> {
     });
 
     let found: string | null = null;
+    let timeoutId: NodeJS.Timeout;
+
+    // Set overall timeout for this attempt
+    timeoutId = setTimeout(() => {
+      imap.destroy();
+      resolve(null); // Return null to trigger retry
+    }, 25_000); // 25 second timeout per attempt
 
     imap.once('error', (err: Error) => {
+      clearTimeout(timeoutId);
       imap.destroy();
       reject(new Error(`IMAP error: ${err.message}`));
     });
 
-    imap.once('end', () => resolve(found));
+    imap.once('end', () => {
+      clearTimeout(timeoutId);
+      resolve(found);
+    });
 
     imap.once('ready', () => {
       imap.openBox('INBOX', false, (openErr: Error | null) => {
-        if (openErr) { imap.end(); return reject(openErr); }
+        if (openErr) {
+          clearTimeout(timeoutId);
+          imap.end();
+          return reject(openErr);
+        }
 
         // IMAP SINCE is date-only, so search from start of today
         const since = new Date(sentAfter);
@@ -68,10 +83,19 @@ function tryFetchOtp(sentAfter: Date): Promise<string | null> {
         imap.search(
           [['SINCE', since], ['FROM', 'notifications@shunyalabs.ai']],
           (searchErr: Error | null, uids: number[]) => {
-            if (searchErr || !uids || uids.length === 0) {
+            if (searchErr) {
+              clearTimeout(timeoutId);
+              console.error('   Search error:', searchErr.message);
+              imap.end();
+              return reject(new Error(`IMAP search error: ${searchErr.message}`));
+            }
+            if (!uids || uids.length === 0) {
+              clearTimeout(timeoutId);
+              console.log('   No emails found matching criteria (SINCE + FROM)');
               imap.end();
               return;
             }
+            console.log('   Found', uids.length, 'email(s) matching criteria');
 
             // Fetch ALL matching emails and filter by actual time
             const f = imap.fetch(uids, { bodies: '' });
@@ -81,6 +105,7 @@ function tryFetchOtp(sentAfter: Date): Promise<string | null> {
               msg.on('body', (stream: any) => {
                 simpleParser(stream, (_parseErr: Error | null, parsed: any) => {
                   if (_parseErr) return;
+                  console.log('   📨 Email from:', parsed.from?.text, '| subject:', parsed.subject);
                   // Only consider emails received AFTER sentAfter
                   const emailDate = parsed.date ? new Date(parsed.date) : new Date(0);
                   if (emailDate < sentAfter) return;
@@ -93,6 +118,7 @@ function tryFetchOtp(sentAfter: Date): Promise<string | null> {
             });
 
             f.once('end', () => {
+              clearTimeout(timeoutId);
               imap.end();
               if (candidates.length > 0) {
                 // Pick the most recent OTP
@@ -102,7 +128,11 @@ function tryFetchOtp(sentAfter: Date): Promise<string | null> {
               }
             });
 
-            f.once('error', (fetchErr: Error) => { imap.end(); reject(fetchErr); });
+            f.once('error', (fetchErr: Error) => {
+              clearTimeout(timeoutId);
+              imap.end();
+              reject(fetchErr);
+            });
           }
         );
       });

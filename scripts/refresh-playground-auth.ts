@@ -72,34 +72,93 @@ async function fillEmail(page: Page): Promise<void> {
 
 async function fillOtp(page: Page, code: string): Promise<void> {
   console.log(`→ Filling OTP into page…`);
+  console.log(`   OTP code: `);
+
+  // Take screenshot before filling OTP
+  if (DEBUG) {
+    await page.screenshot({ path: 'auth/otp-before-fill.png' });
+    console.log('   📸 Screenshot saved: auth/otp-before-fill.png');
+  }
 
   // Try single OTP input first
   const singleInput = page.locator(
     'input[name*="otp" i], input[id*="otp" i], input[aria-label*="code" i], input[placeholder*="code" i]'
   ).first();
 
-  if (await singleInput.count()) {
+  const singleCount = await singleInput.count();
+  console.log(`   Single OTP inputs found: ${singleCount}`);
+
+  if (singleCount > 0) {
     await singleInput.waitFor({ state: 'visible', timeout: 15_000 });
+    console.log('   Filling OTP in single input...');
     await singleInput.fill(code);
+    console.log('   ✅ OTP filled in single input');
   } else {
     // 6 individual digit boxes
     const boxes = page.locator('input[maxlength="1"]');
-    await boxes.first().waitFor({ state: 'visible', timeout: 15_000 });
-    const n = await boxes.count();
-    if (n >= 6) {
+    const boxCount = await boxes.count();
+    console.log(`   Individual digit boxes found: ${boxCount}`);
+
+    if (boxCount >= 6) {
+      console.log('   Filling OTP in individual digit boxes...');
       for (let i = 0; i < 6; i++) {
-        await boxes.nth(i).fill(code[i]);
+        const box = boxes.nth(i);
+        await box.waitFor({ state: 'visible', timeout: 5_000 });
+        await box.fill(code[i]);
+        console.log(`   Filled digit ${i + 1}/6: ${code[i]}`);
       }
+      console.log('   ✅ OTP filled in digit boxes');
     } else {
-      throw new Error('Could not find OTP input field on the page.');
+      // Try alternative selectors
+      console.log('   Trying alternative OTP selectors...');
+      
+      // Try Clerk-specific selectors
+      const clerkInputs = page.locator('input[inputmode="numeric"], input[type="text"][maxlength="1"], input[autocomplete="one-time-code"]');
+      const clerkCount = await clerkInputs.count();
+      console.log(`   Clerk-style inputs found: ${clerkCount}`);
+      
+      if (clerkCount >= 6) {
+        for (let i = 0; i < 6; i++) {
+          await clerkInputs.nth(i).fill(code[i]);
+        }
+        console.log('   ✅ OTP filled using Clerk selectors');
+      } else {
+        // Log all input fields for debugging
+        const allInputs = await page.locator('input').all();
+        console.log(`   Total input fields on page: ${allInputs.length}`);
+        for (let i = 0; i < Math.min(allInputs.length, 10); i++) {
+          const input = allInputs[i];
+          const name = await input.getAttribute('name').catch(() => 'no-name');
+          const id = await input.getAttribute('id').catch(() => 'no-id');
+          const type = await input.getAttribute('type').catch(() => 'no-type');
+          const maxlength = await input.getAttribute('maxlength').catch(() => 'no-maxlength');
+          console.log(`   Input ${i}: name=${name}, id=${id}, type=${type}, maxlength=${maxlength}`);
+        }
+        
+        throw new Error(`Could not find OTP input field. Found ${boxCount} digit boxes, ${clerkCount} Clerk inputs.`);
+      }
     }
   }
 
   // Wait for auto-submit, then click verify if needed
-  await sleep(1500);
+  await sleep(2000);
+  
+  // Take screenshot after filling OTP
+  if (DEBUG) {
+    await page.screenshot({ path: 'auth/otp-after-fill.png' });
+    console.log('   📸 Screenshot saved: auth/otp-after-fill.png');
+  }
+  
   const verifyBtn = page.getByRole('button', { name: /verify|continue|confirm/i }).first();
-  if (await verifyBtn.count() && await verifyBtn.isEnabled()) {
+  const btnCount = await verifyBtn.count();
+  const btnEnabled = btnCount > 0 ? await verifyBtn.isEnabled().catch(() => false) : false;
+  console.log(`   Verify button found: ${btnCount}, enabled: ${btnEnabled}`);
+  
+  if (btnCount > 0 && btnEnabled) {
+    console.log('   Clicking verify button...');
     await verifyBtn.click();
+  } else {
+    console.log('   No verify button clicked, waiting for auto-submit...');
   }
 }
 
