@@ -51,9 +51,15 @@ const sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
 // ─── Login steps ──────────────────────────────────────────────────────────────
 
 async function fillEmail(page: Page): Promise<void> {
+  console.log('→ Waiting for Cloudflare challenge to clear…');
+
+  // Wait for the actual email input — not the hidden Cloudflare one
+  const emailInput = page.locator(
+    'input[type="email"], input[name="identifier"], input[autocomplete="email"], input[placeholder*="email" i]'
+  ).first();
+
+  await emailInput.waitFor({ state: 'visible', timeout: 60_000 });
   console.log('→ Filling email…');
-  const emailInput = page.locator('input').first();
-  await emailInput.waitFor({ state: 'visible', timeout: 30_000 });
   await emailInput.fill(PLAYGROUND_EMAIL);
 
   const continueBtn = page.getByRole('button', { name: /continue/i }).first();
