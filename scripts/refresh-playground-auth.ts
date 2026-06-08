@@ -2,36 +2,39 @@
  * refresh-playground-auth.ts
  *
  * Refreshes the Playwright auth session for playground.shunyalabs.ai
+ * Fully automated — reads OTP from Gmail, no human input needed.
  *
  * Flow:
  *   1. Open https://playground.shunyalabs.ai/ → redirects to Clerk sign-in
  *   2. Fill email and click Continue
- *   3. Prompt YOU to type the OTP from your email/phone
+ *   3. Auto-fetch OTP from Gmail via IMAP
  *   4. Fill OTP into the page
  *   5. Wait for successful login
  *   6. Save storageState → auth/playground-auth.json
  *
  * Env vars (from .env):
  *   PLAYGROUND_EMAIL        Email to log in with
+ *   GMAIL_APP_PASSWORD      Gmail App Password (16-char)
  *   PLAYGROUND_LOGIN_DEBUG  Set to "1" to run headed + pause on failure
  *
  * Usage:
+ *   npx ts-node scripts/refresh-playground-auth.ts
  *   PLAYGROUND_LOGIN_DEBUG=1 npx ts-node scripts/refresh-playground-auth.ts
  */
 
 import { chromium, Page } from '@playwright/test';
-import * as readline from 'readline';
 import * as path from 'path';
 import * as fs from 'fs';
 import dotenv from 'dotenv';
+import { fetchOtpFromGmail } from './gmail-otp';
 
 dotenv.config({ path: path.resolve(__dirname, '..', '.env') });
 
-// ─── Config ─────────────────────────────────────────────────────────────────
+// ─── Config ──────────────────────────────────────────────────────────────────
 
-const PLAYGROUND_URL  = 'https://playground.shunyalabs.ai/';
-const AUTH_STATE_PATH = path.resolve(__dirname, '..', 'auth', 'playground-auth.json');
-const DEBUG           = process.env.PLAYGROUND_LOGIN_DEBUG === '1';
+const PLAYGROUND_URL   = 'https://playground.shunyalabs.ai/';
+const AUTH_STATE_PATH  = path.resolve(__dirname, '..', 'auth', 'playground-auth.json');
+const DEBUG            = process.env.PLAYGROUND_LOGIN_DEBUG === '1';
 const PLAYGROUND_EMAIL = requireEnv('PLAYGROUND_EMAIL');
 
 function requireEnv(name: string): string {
@@ -45,22 +48,7 @@ function requireEnv(name: string): string {
 
 const sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
 
-// ─── Ask user to type OTP in terminal ────────────────────────────────────────
-
-function askOtp(): Promise<string> {
-  return new Promise(resolve => {
-    const rl = readline.createInterface({
-      input: process.stdin,
-      output: process.stdout,
-    });
-    rl.question('📬 Enter the OTP from your email: ', answer => {
-      rl.close();
-      resolve(answer.trim());
-    });
-  });
-}
-
-// ─── Login steps ─────────────────────────────────────────────────────────────
+// ─── Login steps ──────────────────────────────────────────────────────────────
 
 async function fillEmail(page: Page): Promise<void> {
   console.log('→ Filling email…');
@@ -114,7 +102,7 @@ async function fillOtp(page: Page, code: string): Promise<void> {
 (async () => {
   fs.mkdirSync(path.dirname(AUTH_STATE_PATH), { recursive: true });
 
-  console.log('🔐 Playground auth refresh');
+  console.log('🔐 Playground auth refresh (automated)');
   console.log(`   Email  : ${PLAYGROUND_EMAIL}`);
   console.log(`   Headed : ${DEBUG}`);
   console.log('');
@@ -137,13 +125,14 @@ async function fillOtp(page: Page, code: string): Promise<void> {
       return;
     }
 
-    // 3. Fill email
+    // 3. Fill email — note the time just before so we only pick up the new OTP email
+    const otpRequestedAt = new Date();
     await fillEmail(page);
 
-    // 4. Ask user for OTP
+    // 4. Auto-fetch OTP from Gmail
     console.log('');
-    console.log('📧 OTP sent to your email. Check your inbox.');
-    const otp = await askOtp();
+    console.log('📧 OTP email requested — fetching from Gmail automatically…');
+    const otp = await fetchOtpFromGmail(otpRequestedAt);
 
     if (!/^\d{6}$/.test(otp)) {
       throw new Error(`Invalid OTP "${otp}" — must be exactly 6 digits.`);
@@ -162,7 +151,7 @@ async function fillOtp(page: Page, code: string): Promise<void> {
     await context.storageState({ path: AUTH_STATE_PATH });
     console.log('');
     console.log(`✅ Auth saved to ${AUTH_STATE_PATH}`);
-    console.log('   You can now run: npx playwright test --project=playground-ui');
+    console.log('   Tests are ready to run.');
 
   } catch (err) {
     console.error('');
