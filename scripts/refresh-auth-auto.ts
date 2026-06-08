@@ -98,10 +98,43 @@ async function fetchOtpFromGmail(sentAfter: Date, timeoutMs = 90_000): Promise<s
   }
 }
 
+async function waitForTurnstile(page: Page): Promise<void> {
+  const turnstileResponse = page.locator('input[name="cf-turnstile-response"]');
+  const count = await turnstileResponse.count();
+  if (count === 0) return; // No Turnstile on this page
+
+  console.log('→ Cloudflare Turnstile detected — waiting for it to be solved…');
+  const deadline = Date.now() + 120_000; // up to 2 minutes
+  while (Date.now() < deadline) {
+    const val = await turnstileResponse.inputValue().catch(() => '');
+    if (val && val.length > 0) {
+      console.log('✅ Turnstile solved.');
+      return;
+    }
+    await sleep(2000);
+  }
+  throw new Error('Turnstile was not solved within timeout.');
+}
+
 async function fillEmail(page: Page): Promise<void> {
   console.log('→ Filling email…');
-  const emailInput = page.locator('input').first();
-  await emailInput.waitFor({ state: 'visible', timeout: 30_000 });
+  await waitForTurnstile(page);
+
+  // Try specific selectors first, fall back to first visible non-hidden input
+  const emailInput = page.locator(
+    'input[type="email"], input[name*="email" i], input[id*="email" i], input[placeholder*="email" i]'
+  ).first();
+
+  const visibleInputs = page.locator('input:visible');
+  const visibleCount = await visibleInputs.count();
+
+  if (visibleCount > 0) {
+    await emailInput.waitFor({ state: 'visible', timeout: 30_000 });
+  } else {
+    // Fallback: wait for any input to become visible (after Turnstile)
+    await page.locator('input').first().waitFor({ state: 'visible', timeout: 30_000 });
+  }
+
   await emailInput.fill(PLAYGROUND_EMAIL);
 
   const continueBtn = page.getByRole('button', { name: /continue/i }).first();

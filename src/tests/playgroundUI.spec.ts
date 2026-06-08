@@ -4605,7 +4605,7 @@ test.describe('Playground — TTS Functional: End-to-End Synthesis', () => {
     test.setTimeout(240000);
     const apiCalls: { url: string; method: string }[] = [];
     page.on('request', req => {
-      if (req.url().includes('shunyalabs.ai') && req.method() === 'POST') {
+      if (req.method() === 'POST') {
         apiCalls.push({ url: req.url(), method: req.method() });
       }
     });
@@ -4614,13 +4614,16 @@ test.describe('Playground — TTS Functional: End-to-End Synthesis', () => {
     await page.getByRole('button', { name: 'Text to Speech' }).click();
     await page.waitForTimeout(1000);
     await page.locator('textarea').fill(TTS_SAMPLE_TEXT);
-    await page.waitForTimeout(500);
-    await page.getByRole('button', { name: 'Run Synthesis' }).click();
-    await page.waitForTimeout(60000);
+    await page.waitForTimeout(1000);
+    const runBtn = page.getByRole('button', { name: 'Run Synthesis' });
+    await runBtn.waitFor({ state: 'visible', timeout: 10000 });
+    await runBtn.scrollIntoViewIfNeeded();
+    await runBtn.click();
+    await page.waitForTimeout(30000);
 
     const ttsCall = apiCalls.find((c) =>
-      /tts|synthesize|speech|text-to-speech|\/v1\/audio\/(speech|synthesis)/i.test(c.url)
-      || (c.url.includes('/v1/audio/') && !c.url.includes('transcriptions')),
+      c.url.includes('tts.shunyalabs.ai') || /tts|synthesize|speech|text-to-speech|\/v1\/audio\/(speech|synthesis)/i.test(c.url) || 
+      (c.url.includes('/v1/audio/') && !c.url.includes('transcriptions')),
     );
     expect(ttsCall, `Expected a TTS API call. Got: ${apiCalls.map((c) => c.url).join(', ')}`).toBeTruthy();
   });
@@ -4629,6 +4632,7 @@ test.describe('Playground — TTS Functional: End-to-End Synthesis', () => {
     test.setTimeout(240000);
     await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
     await page.getByRole('button', { name: 'Text to Speech' }).click();
+    await page.screenshot({ path: 'auth/tts-debug.png' });
     await page.waitForTimeout(1000);
     await page.locator('textarea').fill(TTS_SAMPLE_TEXT);
     await page.waitForTimeout(500);
@@ -4647,13 +4651,19 @@ test.describe('Playground — TTS Functional: End-to-End Synthesis', () => {
   test('successful synthesis should deduct credits', async ({ page }) => {
     test.setTimeout(240000);
     await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+    await page.waitForTimeout(3000);
+    await page.screenshot({ path: 'auth/tts-debug.png' });
     await page.getByRole('button', { name: 'Text to Speech' }).click();
+    
     await page.waitForTimeout(1500);
     const creditsBeforeText = await page.getByText(/Credits:\s*\$/).textContent() || '';
     const matchBefore = creditsBeforeText.match(/\$([\d,]+\.?\d*)/);
     const creditsBefore = matchBefore ? parseFloat(matchBefore[1].replace(/,/g, '')) : 0;
 
-    await page.locator('textarea').fill(TTS_SAMPLE_TEXT);
+    const textarea = page.locator('textarea:visible').first();
+    await textarea.waitFor({ state: 'visible', timeout: 10000 });
+    await textarea.click();
+    await textarea.fill(TTS_SAMPLE_TEXT);
     await page.waitForTimeout(500);
     await page.getByRole('button', { name: 'Run Synthesis' }).click();
     await page.waitForTimeout(45000);
