@@ -22,7 +22,7 @@
  *   PLAYGROUND_LOGIN_DEBUG=1 npx ts-node scripts/refresh-playground-auth.ts
  */
 
-import { chromium, Page } from '@playwright/test';
+import { chromium, Page, Frame } from '@playwright/test';
 import * as path from 'path';
 import * as fs from 'fs';
 import dotenv from 'dotenv';
@@ -72,7 +72,7 @@ async function fillEmail(page: Page): Promise<void> {
 
 async function fillOtp(page: Page, code: string): Promise<void> {
   console.log(`→ Filling OTP into page…`);
-  console.log(`   OTP code: `);
+  console.log(`   OTP code: ${code}`);
 
   // Take screenshot before filling OTP
   if (DEBUG) {
@@ -80,64 +80,56 @@ async function fillOtp(page: Page, code: string): Promise<void> {
     console.log('   📸 Screenshot saved: auth/otp-before-fill.png');
   }
 
-  // Try single OTP input first
-  const singleInput = page.locator(
-    'input[name*="otp" i], input[id*="otp" i], input[aria-label*="code" i], input[placeholder*="code" i]'
-  ).first();
+  // Check for iframes (Clerk often uses iframes for OTP)
+  const frames = page.frames();
+  console.log(`   Total frames on page: ${frames.length}`);
+  for (const frame of frames) {
+    const frameName = frame.name();
+    if (frameName) {
+      console.log(`   Frame: ${frameName}`);
+    }
+  }
 
-  const singleCount = await singleInput.count();
-  console.log(`   Single OTP inputs found: ${singleCount}`);
+  // Try to find OTP inputs in main page or iframes
+  let otpFilled = false;
 
-  if (singleCount > 0) {
-    await singleInput.waitFor({ state: 'visible', timeout: 15_000 });
-    console.log('   Filling OTP in single input...');
-    await singleInput.fill(code);
-    console.log('   ✅ OTP filled in single input');
-  } else {
-    // 6 individual digit boxes
-    const boxes = page.locator('input[maxlength="1"]');
-    const boxCount = await boxes.count();
-    console.log(`   Individual digit boxes found: ${boxCount}`);
+  // First try main page
+  console.log('   Searching for OTP inputs in main page...');
+  otpFilled = await tryFillOtpInContext(page, code);
 
-    if (boxCount >= 6) {
-      console.log('   Filling OTP in individual digit boxes...');
-      for (let i = 0; i < 6; i++) {
-        const box = boxes.nth(i);
-        await box.waitFor({ state: 'visible', timeout: 5_000 });
-        await box.fill(code[i]);
-        console.log(`   Filled digit ${i + 1}/6: ${code[i]}`);
-      }
-      console.log('   ✅ OTP filled in digit boxes');
-    } else {
-      // Try alternative selectors
-      console.log('   Trying alternative OTP selectors...');
-      
-      // Try Clerk-specific selectors
-      const clerkInputs = page.locator('input[inputmode="numeric"], input[type="text"][maxlength="1"], input[autocomplete="one-time-code"]');
-      const clerkCount = await clerkInputs.count();
-      console.log(`   Clerk-style inputs found: ${clerkCount}`);
-      
-      if (clerkCount >= 6) {
-        for (let i = 0; i < 6; i++) {
-          await clerkInputs.nth(i).fill(code[i]);
+  // If not found in main page, search in iframes
+  if (!otpFilled) {
+    console.log('   Searching for OTP inputs in iframes...');
+    for (const frame of frames) {
+      if (frame === page.mainFrame()) continue;
+      try {
+        console.log(`   Checking frame: ${frame.name() || 'unnamed'}`);
+        otpFilled = await tryFillOtpInContext(frame, code);
+        if (otpFilled) {
+          console.log(`   ✅ OTP filled in iframe: ${frame.name() || 'unnamed'}`);
+          break;
         }
-        console.log('   ✅ OTP filled using Clerk selectors');
-      } else {
-        // Log all input fields for debugging
-        const allInputs = await page.locator('input').all();
-        console.log(`   Total input fields on page: ${allInputs.length}`);
-        for (let i = 0; i < Math.min(allInputs.length, 10); i++) {
-          const input = allInputs[i];
-          const name = await input.getAttribute('name').catch(() => 'no-name');
-          const id = await input.getAttribute('id').catch(() => 'no-id');
-          const type = await input.getAttribute('type').catch(() => 'no-type');
-          const maxlength = await input.getAttribute('maxlength').catch(() => 'no-maxlength');
-          console.log(`   Input ${i}: name=${name}, id=${id}, type=${type}, maxlength=${maxlength}`);
-        }
-        
-        throw new Error(`Could not find OTP input field. Found ${boxCount} digit boxes, ${clerkCount} Clerk inputs.`);
+      } catch (e) {
+        console.log(`   Frame check failed: ${(e as Error).message}`);
       }
     }
+  }
+
+  if (!otpFilled) {
+    // Log all input fields for debugging
+    const allInputs = await page.locator('input').all();
+    console.log(`   Total input fields on main page: ${allInputs.length}`);
+    for (let i = 0; i < Math.min(allInputs.length, 10); i++) {
+      const input = allInputs[i];
+      const name = await input.getAttribute('name').catch(() => 'no-name');
+      const id = await input.getAttribute('id').catch(() => 'no-id');
+      const type = await input.getAttribute('type').catch(() => 'no-type');
+      const maxlength = await input.getAttribute('maxlength').catch(() => 'no-maxlength');
+      const ariaLabel = await input.getAttribute('aria-label').catch(() => 'no-aria-label');
+      console.log(`   Input ${i}: name=${name}, id=${id}, type=${type}, maxlength=${maxlength}, aria-label=${ariaLabel}`);
+    }
+    
+    throw new Error('Could not find OTP input field on page or in iframes.');
   }
 
   // Wait for auto-submit, then click verify if needed
@@ -160,6 +152,53 @@ async function fillOtp(page: Page, code: string): Promise<void> {
   } else {
     console.log('   No verify button clicked, waiting for auto-submit...');
   }
+}
+
+async function tryFillOtpInContext(context: Page | Frame, code: string): Promise<boolean> {
+  // Try single OTP input first
+  const singleInput = context.locator(
+    'input[name*="otp" i], input[id*="otp" i], input[aria-label*="code" i], input[placeholder*="code" i]'
+  ).first();
+
+  const singleCount = await singleInput.count();
+  if (singleCount > 0) {
+    await singleInput.waitFor({ state: 'visible', timeout: 10_000 }).catch(() => null);
+    if (await singleInput.isVisible().catch(() => false)) {
+      await singleInput.fill(code);
+      console.log('   ✅ OTP filled in single input');
+      return true;
+    }
+  }
+
+  // Try 6 individual digit boxes
+  const boxes = context.locator('input[maxlength="1"]');
+  const boxCount = await boxes.count();
+  if (boxCount >= 6) {
+    for (let i = 0; i < 6; i++) {
+      const box = boxes.nth(i);
+      await box.waitFor({ state: 'visible', timeout: 3_000 }).catch(() => null);
+      if (!(await box.isVisible().catch(() => false))) {
+        console.log(`   Digit box ${i + 1} not visible`);
+        return false;
+      }
+      await box.fill(code[i]);
+    }
+    console.log('   ✅ OTP filled in digit boxes');
+    return true;
+  }
+
+  // Try Clerk-specific selectors
+  const clerkInputs = context.locator('input[inputmode="numeric"], input[type="text"][maxlength="1"], input[autocomplete="one-time-code"]');
+  const clerkCount = await clerkInputs.count();
+  if (clerkCount >= 6) {
+    for (let i = 0; i < 6; i++) {
+      await clerkInputs.nth(i).fill(code[i]);
+    }
+    console.log('   ✅ OTP filled using Clerk selectors');
+    return true;
+  }
+
+  return false;
 }
 
 // ─── Main ─────────────────────────────────────────────────────────────────────
@@ -191,7 +230,7 @@ async function fillOtp(page: Page, code: string): Promise<void> {
     }
 
     // 3. Fill email — note the time just before so we only pick up the new OTP email
-    const otpRequestedAt = new Date();
+    const otpRequestedAt = new Date(Date.now() - 30_000);
     await fillEmail(page);
 
     // 4. Auto-fetch OTP from Gmail
