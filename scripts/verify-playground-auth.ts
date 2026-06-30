@@ -58,7 +58,7 @@ function cookieSummary(file: string): void {
     console.log('     cd Playground_repo/playground-testing');
     console.log('     npm run playground:login');
     console.log('   Then copy to server:');
-    console.log('     scp auth/playground-auth.json yamini@136.119.127.72:~/playground-testing/auth/\n');
+    console.log('     scp auth/playground-auth.json yamini@136.119.127.72:~/projects/playground-testing/auth/\n');
     process.exit(1);
   } finally {
     await browser.close();
