@@ -1,41 +1,13 @@
 {
-  "date": "2026-07-02",
-  "generatedAt": "2/7/2026, 9:58:02 pm",
+  "date": "2026-07-03",
+  "generatedAt": "3/7/2026, 5:41:00 am",
   "dashboardUrl": "https://yamini-pal-singh.github.io/playground-testing/Playground-Report.html",
-  "totalRuns": 3,
-  "runsWithAnyFailure": 3,
+  "totalRuns": 0,
+  "runsWithAnyFailure": 0,
   "runsFullyFailed": 0,
-  "totalSuiteExecutions": 180,
-  "passedSuites": 147,
-  "failedSuites": 33,
-  "passRatePercent": 81.7,
-  "runTimings": [
-    {
-      "runId": "2026-07-02T11-30-02",
-      "runTimestamp": "2026-07-02 11:30:02",
-      "endTimestamp": "2026-07-02 12:48:44",
-      "timeIST": "11:30 AM",
-      "passed": 55,
-      "failed": 5,
-      "totalSuites": 60
-    },
-    {
-      "runId": "2026-07-02T14-30-00",
-      "runTimestamp": "2026-07-02 14:30:00",
-      "endTimestamp": "2026-07-02 15:50:52",
-      "timeIST": "2:30 PM",
-      "passed": 55,
-      "failed": 5,
-      "totalSuites": 60
-    },
-    {
-      "runId": "2026-07-02T17-32-11",
-      "runTimestamp": "2026-07-02 17:32:11",
-      "endTimestamp": "2026-07-02 21:41:58",
-      "timeIST": "5:32 PM",
-      "passed": 37,
-      "failed": 23,
-      "totalSuites": 60
-    }
-  ]
+  "totalSuiteExecutions": 0,
+  "passedSuites": 0,
+  "failedSuites": 0,
+  "passRatePercent": 0,
+  "runTimings": []
 }
