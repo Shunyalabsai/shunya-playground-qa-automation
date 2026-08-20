@@ -48,6 +48,7 @@ export default defineConfig({
       fullyParallel: false,
       use: {
         ...devices['Desktop Chrome'],
+        channel: 'chrome',
         baseURL: process.env.PLAYGROUND_URL || 'https://playground.shunyalabs.ai',
         storageState: path.resolve(__dirname, 'auth', 'playground-auth.json'),
       },

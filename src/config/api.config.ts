@@ -2,7 +2,7 @@
  * API Configuration for Shunyalabs ASR Service
  * Based on the official Shunyalabs docs (v1.0)
  *
- * Endpoint:  POST https://asr.shunyalabs.ai/v1/audio/transcriptions
+ * Endpoint:  POST https://asrv2prod.shunyalabs.ai/v1/audio/transcriptions
  * Auth:      Authorization: Bearer <API_KEY>
  * Models:    zero-indic (live), zero-codeswitch, zero-medasr, zero-universal (planned)
  */
@@ -17,6 +17,7 @@ dotenv.config({ path: path.resolve(process.cwd(), '.env') });
 export interface ApiConfig {
   apiKey: string;
   transcriptionUrl: string;
+  ttsSynthesisUrl: string;
   timeout: number;
   timeoutMs: number;
 }
@@ -28,7 +29,8 @@ export interface ModelConfig {
 
 // ── Base URL ────────────────────────────────────────────────────────────────
 
-const ASR_BASE = process.env.ASR_BASE_URL_ROOT || 'https://asr.shunyalabs.ai';
+const ASR_BASE = process.env.ASR_BASE_URL_ROOT || 'https://asrv2prod.shunyalabs.ai';
+const TTS_BASE = process.env.TTS_BASE_URL_ROOT || 'https://ttsv2.shunyalabs.ai';
 
 // ── API Config ──────────────────────────────────────────────────────────────
 
@@ -36,6 +38,8 @@ export const API_CONFIG: ApiConfig = {
   apiKey: process.env.ASR_API_KEY || '',
   transcriptionUrl:
     process.env.ASR_BASE_URL || `${ASR_BASE}/v1/audio/transcriptions`,
+  ttsSynthesisUrl:
+    process.env.TTS_BASE_URL || `${TTS_BASE}/v1/audio/speech`,
   timeout: 60000,
   timeoutMs: 60000,
 };
@@ -52,7 +56,15 @@ export const ENDPOINTS = {
   transcription: API_CONFIG.transcriptionUrl,
   health: `${ASR_BASE}/health`,
   languages: `${ASR_BASE}/languages`,
-  streaming: `wss://${new URL(ASR_BASE).host}/ws`,
+  streaming: `wss://${new URL(ASR_BASE).host}/v1/realtime`,
+  intelligence: {
+    translation: `${ASR_BASE}/v1/translate`,
+  },
+  tts: {
+    synthesis: API_CONFIG.ttsSynthesisUrl,
+    streaming: `wss://${new URL(TTS_BASE).host}/v1/realtime/v1/audio/speech`,
+    health: `${TTS_BASE}/health`,
+  },
   speakers: {
     register: `${ASR_BASE}/v1/speakers/register`,
     list: `${ASR_BASE}/v1/speakers/list`,
@@ -246,7 +258,7 @@ export function getApiUrl(): string {
 /** @deprecated Use ENDPOINTS instead. Kept temporarily for migration. */
 export const NLP_ENDPOINTS = {
   speechIntelligence: API_CONFIG.transcriptionUrl,
-  translate: API_CONFIG.transcriptionUrl,
+  translate: ENDPOINTS.intelligence.translation,
   keyterms: API_CONFIG.transcriptionUrl,
   hash: API_CONFIG.transcriptionUrl,
   summarize: API_CONFIG.transcriptionUrl,

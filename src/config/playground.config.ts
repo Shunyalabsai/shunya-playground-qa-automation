@@ -13,7 +13,7 @@ export const PLAYGROUND_URL = process.env.PLAYGROUND_URL || 'https://playground.
 /**
  * Tabs available on the Playground
  */
-export const PLAYGROUND_TABS = ['Speech to Text', 'Text to Speech', 'Voice Agent'] as const;
+export const PLAYGROUND_TABS = ['Speech to Text', 'Text to Speech'] as const;
 
 /**
  * Models available in the Model dropdown

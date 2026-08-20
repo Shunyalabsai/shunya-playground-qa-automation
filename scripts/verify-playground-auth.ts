@@ -32,7 +32,7 @@ function cookieSummary(file: string): void {
   console.log(`📁 ${AUTH_PATH}`);
   cookieSummary(AUTH_PATH);
 
-  const browser = await chromium.launch({ headless: true });
+  const browser = await chromium.launch({ channel: 'chrome', headless: true });
   const context = await browser.newContext({ storageState: AUTH_PATH });
   const page = await context.newPage();
 

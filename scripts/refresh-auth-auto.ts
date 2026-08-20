@@ -182,7 +182,7 @@ async function fillOtp(page: Page, code: string): Promise<void> {
   console.log(`   Time    : ${new Date().toISOString()}`);
   console.log('');
 
-  const browser = await chromium.launch({ headless: !DEBUG });
+  const browser = await chromium.launch({ channel: 'chrome', headless: !DEBUG });
   const context = await browser.newContext();
   const page    = await context.newPage();
 

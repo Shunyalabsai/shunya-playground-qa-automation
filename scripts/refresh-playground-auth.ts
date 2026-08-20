@@ -211,7 +211,7 @@ async function tryFillOtpInContext(context: Page | Frame, code: string): Promise
   console.log(`   Headed : ${DEBUG}`);
   console.log('');
 
-  const browser = await chromium.launch({ headless: !DEBUG });
+  const browser = await chromium.launch({ channel: 'chrome', headless: !DEBUG });
   const context = await browser.newContext();
   const page    = await context.newPage();
 

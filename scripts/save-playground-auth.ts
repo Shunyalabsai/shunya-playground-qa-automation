@@ -17,7 +17,7 @@ const AUTH_STATE_PATH = path.resolve(__dirname, '..', 'auth', 'playground-auth.j
   console.log('A browser will open. Please log in to playground.shunyalabs.ai.');
   console.log('Once you see the Playground page (API Playground), come back here.\n');
 
-  const browser = await chromium.launch({ headless: false });
+  const browser = await chromium.launch({ channel: 'chrome', headless: false });
   const context = await browser.newContext();
   const page = await context.newPage();
 
