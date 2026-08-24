@@ -555,7 +555,7 @@
         </div>
       </div>
       <div class="status-meta">
-        Latest Run: 2026-08-24 19:50:42
+        Latest Run: 2026-08-24 20:39:26
       </div>
     </div>
 
@@ -572,9 +572,9 @@
 
       <div class="kpi-card">
         <div class="kpi-label">Total Verified Tests</div>
-        <div class="kpi-value">38</div>
+        <div class="kpi-value">6</div>
         <div class="kpi-sub">
-          <span class="kpi-badge info">38 Passed</span>
+          <span class="kpi-badge info">6 Passed</span>
           <span>0 Failed</span>
         </div>
       </div>
@@ -598,7 +598,7 @@
 
       <div class="kpi-card">
         <div class="kpi-label">Total Historical Runs</div>
-        <div class="kpi-value">197</div>
+        <div class="kpi-value">200</div>
         <div class="kpi-sub">
           <span>Continuous daily automation</span>
         </div>
@@ -642,7 +642,7 @@
 
           <div class="filter-bar">
             <input type="text" id="testSearch" class="search-input" placeholder="🔍 Search test title, model, or feature..." onkeyup="filterTests()">
-            <div class="filter-pill active" onclick="setCategoryFilter('all', this)">All (38)</div>
+            <div class="filter-pill active" onclick="setCategoryFilter('all', this)">All (6)</div>
             <div class="filter-pill" onclick="setCategoryFilter('ASR Models', this)">Models</div>
             <div class="filter-pill" onclick="setCategoryFilter('ASR Features', this)">Features</div>
             <div class="filter-pill" onclick="setCategoryFilter('TTS', this)">TTS</div>
@@ -667,7 +667,7 @@
                   <td style="font-weight: 600;">ASR service health check returns 200 and healthy status</td>
                   <td><span class="badge-model">Health Checks — api-tests</span></td>
                   <td style="font-family: var(--font-mono); font-size: 12px;">Hindi</td>
-                  <td style="font-family: var(--font-mono); font-size: 12px; font-variant-numeric: tabular-nums;">351ms</td>
+                  <td style="font-family: var(--font-mono); font-size: 12px; font-variant-numeric: tabular-nums;">303ms</td>
                   <td><span class="badge-status pass">PASS</span></td>
                   <td style="color: var(--text-muted); font-size: 12px;">—</td>
                 </tr>
@@ -676,7 +676,7 @@
                   <td style="font-weight: 600;">TTS service health check returns 200</td>
                   <td><span class="badge-model">Health Checks — api-tests</span></td>
                   <td style="font-family: var(--font-mono); font-size: 12px;">Hindi/English</td>
-                  <td style="font-family: var(--font-mono); font-size: 12px; font-variant-numeric: tabular-nums;">336ms</td>
+                  <td style="font-family: var(--font-mono); font-size: 12px; font-variant-numeric: tabular-nums;">252ms</td>
                   <td><span class="badge-status pass">PASS</span></td>
                   <td style="color: var(--text-muted); font-size: 12px;">—</td>
                 </tr>
@@ -685,7 +685,7 @@
                   <td style="font-weight: 600;">ASR supported languages endpoint responds</td>
                   <td><span class="badge-model">Health Checks — api-tests</span></td>
                   <td style="font-family: var(--font-mono); font-size: 12px;">Hindi</td>
-                  <td style="font-family: var(--font-mono); font-size: 12px; font-variant-numeric: tabular-nums;">95ms</td>
+                  <td style="font-family: var(--font-mono); font-size: 12px; font-variant-numeric: tabular-nums;">100ms</td>
                   <td><span class="badge-status pass">PASS</span></td>
                   <td style="color: var(--text-muted); font-size: 12px;">—</td>
                 </tr>
@@ -694,7 +694,7 @@
                   <td style="font-weight: 600;">POST /v1/audio/speech — synthesize speech from text (Hindi/English)</td>
                   <td><span class="badge-model">TTS Speech Synthesis — api-tests</span></td>
                   <td style="font-family: var(--font-mono); font-size: 12px;">Hindi/English</td>
-                  <td style="font-family: var(--font-mono); font-size: 12px; font-variant-numeric: tabular-nums;">101ms</td>
+                  <td style="font-family: var(--font-mono); font-size: 12px; font-variant-numeric: tabular-nums;">82ms</td>
                   <td><span class="badge-status pass">PASS</span></td>
                   <td style="color: var(--text-muted); font-size: 12px;">—</td>
                 </tr>
@@ -703,7 +703,7 @@
                   <td style="font-weight: 600;">POST /v1/audio/speech — Negative case: empty input text returns 400/422</td>
                   <td><span class="badge-model">TTS Speech Synthesis — api-tests</span></td>
                   <td style="font-family: var(--font-mono); font-size: 12px;">Hindi/English</td>
-                  <td style="font-family: var(--font-mono); font-size: 12px; font-variant-numeric: tabular-nums;">102ms</td>
+                  <td style="font-family: var(--font-mono); font-size: 12px; font-variant-numeric: tabular-nums;">82ms</td>
                   <td><span class="badge-status pass">PASS</span></td>
                   <td style="color: var(--text-muted); font-size: 12px;">—</td>
                 </tr>
@@ -712,295 +712,7 @@
                   <td style="font-weight: 600;">POST /v1/audio/speech — Negative case: invalid authentication returns 401/403</td>
                   <td><span class="badge-model">TTS Speech Synthesis — api-tests</span></td>
                   <td style="font-family: var(--font-mono); font-size: 12px;">Hindi/English</td>
-                  <td style="font-family: var(--font-mono); font-size: 12px; font-variant-numeric: tabular-nums;">107ms</td>
-                  <td><span class="badge-status pass">PASS</span></td>
-                  <td style="color: var(--text-muted); font-size: 12px;">—</td>
-                </tr>
-                
-                <tr data-category="Backend API — api-tests" data-status="PASS" data-title="POST /v1/audio/transcriptions — baseline transcription with Zero Indic">
-                  <td style="font-weight: 600;">POST /v1/audio/transcriptions — baseline transcription with Zero Indic</td>
-                  <td><span class="badge-model">Backend API — api-tests</span></td>
-                  <td style="font-family: var(--font-mono); font-size: 12px;">Hindi</td>
-                  <td style="font-family: var(--font-mono); font-size: 12px; font-variant-numeric: tabular-nums;">1713ms</td>
-                  <td><span class="badge-status pass">PASS</span></td>
-                  <td style="color: var(--text-muted); font-size: 12px;">—</td>
-                </tr>
-                
-                <tr data-category="Backend API — api-tests" data-status="PASS" data-title="POST /v1/audio/transcriptions — baseline transcription with Zero Codeswitch">
-                  <td style="font-weight: 600;">POST /v1/audio/transcriptions — baseline transcription with Zero Codeswitch</td>
-                  <td><span class="badge-model">Backend API — api-tests</span></td>
-                  <td style="font-family: var(--font-mono); font-size: 12px;">Hinglish</td>
-                  <td style="font-family: var(--font-mono); font-size: 12px; font-variant-numeric: tabular-nums;">1963ms</td>
-                  <td><span class="badge-status pass">PASS</span></td>
-                  <td style="color: var(--text-muted); font-size: 12px;">—</td>
-                </tr>
-                
-                <tr data-category="Backend API — api-tests" data-status="PASS" data-title="POST /v1/audio/transcriptions — Translation feature">
-                  <td style="font-weight: 600;">POST /v1/audio/transcriptions — Translation feature</td>
-                  <td><span class="badge-model">Backend API — api-tests</span></td>
-                  <td style="font-family: var(--font-mono); font-size: 12px;">Hindi</td>
-                  <td style="font-family: var(--font-mono); font-size: 12px; font-variant-numeric: tabular-nums;">1441ms</td>
-                  <td><span class="badge-status pass">PASS</span></td>
-                  <td style="color: var(--text-muted); font-size: 12px;">—</td>
-                </tr>
-                
-                <tr data-category="Backend API — api-tests" data-status="PASS" data-title="POST /v1/audio/transcriptions — Speaker Diarization">
-                  <td style="font-weight: 600;">POST /v1/audio/transcriptions — Speaker Diarization</td>
-                  <td><span class="badge-model">Backend API — api-tests</span></td>
-                  <td style="font-family: var(--font-mono); font-size: 12px;">Hindi</td>
-                  <td style="font-family: var(--font-mono); font-size: 12px; font-variant-numeric: tabular-nums;">2009ms</td>
-                  <td><span class="badge-status pass">PASS</span></td>
-                  <td style="color: var(--text-muted); font-size: 12px;">—</td>
-                </tr>
-                
-                <tr data-category="Backend API — api-tests" data-status="PASS" data-title="POST /v1/audio/transcriptions — Word Timestamps">
-                  <td style="font-weight: 600;">POST /v1/audio/transcriptions — Word Timestamps</td>
-                  <td><span class="badge-model">Backend API — api-tests</span></td>
-                  <td style="font-family: var(--font-mono); font-size: 12px;">Hindi</td>
-                  <td style="font-family: var(--font-mono); font-size: 12px; font-variant-numeric: tabular-nums;">2232ms</td>
-                  <td><span class="badge-status pass">PASS</span></td>
-                  <td style="color: var(--text-muted); font-size: 12px;">—</td>
-                </tr>
-                
-                <tr data-category="Backend API — api-tests" data-status="PASS" data-title="POST /v1/audio/transcriptions — Sentiment and Intent Detection">
-                  <td style="font-weight: 600;">POST /v1/audio/transcriptions — Sentiment and Intent Detection</td>
-                  <td><span class="badge-model">Backend API — api-tests</span></td>
-                  <td style="font-family: var(--font-mono); font-size: 12px;">Hindi</td>
-                  <td style="font-family: var(--font-mono); font-size: 12px; font-variant-numeric: tabular-nums;">1562ms</td>
-                  <td><span class="badge-status pass">PASS</span></td>
-                  <td style="color: var(--text-muted); font-size: 12px;">—</td>
-                </tr>
-                
-                <tr data-category="Backend API — api-tests" data-status="PASS" data-title="POST /v1/audio/transcriptions — Negative case: missing audio file returns 400/422">
-                  <td style="font-weight: 600;">POST /v1/audio/transcriptions — Negative case: missing audio file returns 400/422</td>
-                  <td><span class="badge-model">Backend API — api-tests</span></td>
-                  <td style="font-family: var(--font-mono); font-size: 12px;">Hindi</td>
-                  <td style="font-family: var(--font-mono); font-size: 12px; font-variant-numeric: tabular-nums;">93ms</td>
-                  <td><span class="badge-status pass">PASS</span></td>
-                  <td style="color: var(--text-muted); font-size: 12px;">—</td>
-                </tr>
-                
-                <tr data-category="Backend API — api-tests" data-status="PASS" data-title="POST /v1/audio/transcriptions — Negative case: invalid API key returns 401/403">
-                  <td style="font-weight: 600;">POST /v1/audio/transcriptions — Negative case: invalid API key returns 401/403</td>
-                  <td><span class="badge-model">Backend API — api-tests</span></td>
-                  <td style="font-family: var(--font-mono); font-size: 12px;">Hindi</td>
-                  <td style="font-family: var(--font-mono); font-size: 12px; font-variant-numeric: tabular-nums;">94ms</td>
-                  <td><span class="badge-status pass">PASS</span></td>
-                  <td style="color: var(--text-muted); font-size: 12px;">—</td>
-                </tr>
-                
-                <tr data-category="ASR Features — api-tests" data-status="PASS" data-title="Feature 1: Translation (English target)">
-                  <td style="font-weight: 600;">Feature 1: Translation (English target)</td>
-                  <td><span class="badge-model">ASR Features — api-tests</span></td>
-                  <td style="font-family: var(--font-mono); font-size: 12px;">Hindi</td>
-                  <td style="font-family: var(--font-mono); font-size: 12px; font-variant-numeric: tabular-nums;">1451ms</td>
-                  <td><span class="badge-status pass">PASS</span></td>
-                  <td style="color: var(--text-muted); font-size: 12px;">—</td>
-                </tr>
-                
-                <tr data-category="ASR Features — api-tests" data-status="PASS" data-title="Feature 2: Transliteration">
-                  <td style="font-weight: 600;">Feature 2: Transliteration</td>
-                  <td><span class="badge-model">ASR Features — api-tests</span></td>
-                  <td style="font-family: var(--font-mono); font-size: 12px;">Hindi</td>
-                  <td style="font-family: var(--font-mono); font-size: 12px; font-variant-numeric: tabular-nums;">1327ms</td>
-                  <td><span class="badge-status pass">PASS</span></td>
-                  <td style="color: var(--text-muted); font-size: 12px;">—</td>
-                </tr>
-                
-                <tr data-category="ASR Features — api-tests" data-status="PASS" data-title="Feature 3: Speaker Diarization">
-                  <td style="font-weight: 600;">Feature 3: Speaker Diarization</td>
-                  <td><span class="badge-model">ASR Features — api-tests</span></td>
-                  <td style="font-family: var(--font-mono); font-size: 12px;">Hindi</td>
-                  <td style="font-family: var(--font-mono); font-size: 12px; font-variant-numeric: tabular-nums;">2166ms</td>
-                  <td><span class="badge-status pass">PASS</span></td>
-                  <td style="color: var(--text-muted); font-size: 12px;">—</td>
-                </tr>
-                
-                <tr data-category="ASR Features — api-tests" data-status="PASS" data-title="Feature 4: Word Timestamps">
-                  <td style="font-weight: 600;">Feature 4: Word Timestamps</td>
-                  <td><span class="badge-model">ASR Features — api-tests</span></td>
-                  <td style="font-family: var(--font-mono); font-size: 12px;">Hindi</td>
-                  <td style="font-family: var(--font-mono); font-size: 12px; font-variant-numeric: tabular-nums;">1442ms</td>
-                  <td><span class="badge-status pass">PASS</span></td>
-                  <td style="color: var(--text-muted); font-size: 12px;">—</td>
-                </tr>
-                
-                <tr data-category="ASR Features — api-tests" data-status="PASS" data-title="Feature 5: Profanity Hashing">
-                  <td style="font-weight: 600;">Feature 5: Profanity Hashing</td>
-                  <td><span class="badge-model">ASR Features — api-tests</span></td>
-                  <td style="font-family: var(--font-mono); font-size: 12px;">Hindi</td>
-                  <td style="font-family: var(--font-mono); font-size: 12px; font-variant-numeric: tabular-nums;">5726ms</td>
-                  <td><span class="badge-status pass">PASS</span></td>
-                  <td style="color: var(--text-muted); font-size: 12px;">—</td>
-                </tr>
-                
-                <tr data-category="ASR Features — api-tests" data-status="PASS" data-title="Feature 6: Custom Keyword Hashing">
-                  <td style="font-weight: 600;">Feature 6: Custom Keyword Hashing</td>
-                  <td><span class="badge-model">ASR Features — api-tests</span></td>
-                  <td style="font-family: var(--font-mono); font-size: 12px;">Hindi</td>
-                  <td style="font-family: var(--font-mono); font-size: 12px; font-variant-numeric: tabular-nums;">1423ms</td>
-                  <td><span class="badge-status pass">PASS</span></td>
-                  <td style="color: var(--text-muted); font-size: 12px;">—</td>
-                </tr>
-                
-                <tr data-category="ASR Features — api-tests" data-status="PASS" data-title="Feature 7: Intent Detection">
-                  <td style="font-weight: 600;">Feature 7: Intent Detection</td>
-                  <td><span class="badge-model">ASR Features — api-tests</span></td>
-                  <td style="font-family: var(--font-mono); font-size: 12px;">Hindi</td>
-                  <td style="font-family: var(--font-mono); font-size: 12px; font-variant-numeric: tabular-nums;">2134ms</td>
-                  <td><span class="badge-status pass">PASS</span></td>
-                  <td style="color: var(--text-muted); font-size: 12px;">—</td>
-                </tr>
-                
-                <tr data-category="ASR Features — api-tests" data-status="PASS" data-title="Feature 8: Sentiment Analysis">
-                  <td style="font-weight: 600;">Feature 8: Sentiment Analysis</td>
-                  <td><span class="badge-model">ASR Features — api-tests</span></td>
-                  <td style="font-family: var(--font-mono); font-size: 12px;">Hindi</td>
-                  <td style="font-family: var(--font-mono); font-size: 12px; font-variant-numeric: tabular-nums;">1488ms</td>
-                  <td><span class="badge-status pass">PASS</span></td>
-                  <td style="color: var(--text-muted); font-size: 12px;">—</td>
-                </tr>
-                
-                <tr data-category="ASR Features — api-tests" data-status="PASS" data-title="Feature 9: Emotion Diarization">
-                  <td style="font-weight: 600;">Feature 9: Emotion Diarization</td>
-                  <td><span class="badge-model">ASR Features — api-tests</span></td>
-                  <td style="font-family: var(--font-mono); font-size: 12px;">Hindi</td>
-                  <td style="font-family: var(--font-mono); font-size: 12px; font-variant-numeric: tabular-nums;">2304ms</td>
-                  <td><span class="badge-status pass">PASS</span></td>
-                  <td style="color: var(--text-muted); font-size: 12px;">—</td>
-                </tr>
-                
-                <tr data-category="ASR Features — api-tests" data-status="PASS" data-title="Feature 10: Summarisation">
-                  <td style="font-weight: 600;">Feature 10: Summarisation</td>
-                  <td><span class="badge-model">ASR Features — api-tests</span></td>
-                  <td style="font-family: var(--font-mono); font-size: 12px;">Hindi</td>
-                  <td style="font-family: var(--font-mono); font-size: 12px; font-variant-numeric: tabular-nums;">1511ms</td>
-                  <td><span class="badge-status pass">PASS</span></td>
-                  <td style="color: var(--text-muted); font-size: 12px;">—</td>
-                </tr>
-                
-                <tr data-category="ASR Features — api-tests" data-status="PASS" data-title="Feature 11: Keyword Normalisation">
-                  <td style="font-weight: 600;">Feature 11: Keyword Normalisation</td>
-                  <td><span class="badge-model">ASR Features — api-tests</span></td>
-                  <td style="font-family: var(--font-mono); font-size: 12px;">Hindi</td>
-                  <td style="font-family: var(--font-mono); font-size: 12px; font-variant-numeric: tabular-nums;">2491ms</td>
-                  <td><span class="badge-status pass">PASS</span></td>
-                  <td style="color: var(--text-muted); font-size: 12px;">—</td>
-                </tr>
-                
-                <tr data-category="ASR Features — api-tests" data-status="PASS" data-title="Feature 12: Combined Multi-Feature (Timestamps + Diarization + Sentiment + Intent)">
-                  <td style="font-weight: 600;">Feature 12: Combined Multi-Feature (Timestamps + Diarization + Sentiment + Intent)</td>
-                  <td><span class="badge-model">ASR Features — api-tests</span></td>
-                  <td style="font-family: var(--font-mono); font-size: 12px;">Hindi</td>
-                  <td style="font-family: var(--font-mono); font-size: 12px; font-variant-numeric: tabular-nums;">2181ms</td>
-                  <td><span class="badge-status pass">PASS</span></td>
-                  <td style="color: var(--text-muted); font-size: 12px;">—</td>
-                </tr>
-                
-                <tr data-category="ASR Models — api-tests" data-status="PASS" data-title="POST /v1/audio/transcriptions — Model: zero-indic (WAV format)">
-                  <td style="font-weight: 600;">POST /v1/audio/transcriptions — Model: zero-indic (WAV format)</td>
-                  <td><span class="badge-model">ASR Models — api-tests</span></td>
-                  <td style="font-family: var(--font-mono); font-size: 12px;">Hindi</td>
-                  <td style="font-family: var(--font-mono); font-size: 12px; font-variant-numeric: tabular-nums;">1525ms</td>
-                  <td><span class="badge-status pass">PASS</span></td>
-                  <td style="color: var(--text-muted); font-size: 12px;">—</td>
-                </tr>
-                
-                <tr data-category="ASR Models — api-tests" data-status="PASS" data-title="POST /v1/audio/transcriptions — Model: zero-indic (MP3 format)">
-                  <td style="font-weight: 600;">POST /v1/audio/transcriptions — Model: zero-indic (MP3 format)</td>
-                  <td><span class="badge-model">ASR Models — api-tests</span></td>
-                  <td style="font-family: var(--font-mono); font-size: 12px;">Hindi</td>
-                  <td style="font-family: var(--font-mono); font-size: 12px; font-variant-numeric: tabular-nums;">14305ms</td>
-                  <td><span class="badge-status pass">PASS</span></td>
-                  <td style="color: var(--text-muted); font-size: 12px;">—</td>
-                </tr>
-                
-                <tr data-category="ASR Models — api-tests" data-status="PASS" data-title="POST /v1/audio/transcriptions — Model: zero-codeswitch (Mixed Hinglish)">
-                  <td style="font-weight: 600;">POST /v1/audio/transcriptions — Model: zero-codeswitch (Mixed Hinglish)</td>
-                  <td><span class="badge-model">ASR Models — api-tests</span></td>
-                  <td style="font-family: var(--font-mono); font-size: 12px;">Hinglish</td>
-                  <td style="font-family: var(--font-mono); font-size: 12px; font-variant-numeric: tabular-nums;">1557ms</td>
-                  <td><span class="badge-status pass">PASS</span></td>
-                  <td style="color: var(--text-muted); font-size: 12px;">—</td>
-                </tr>
-                
-                <tr data-category="ASR Models — api-tests" data-status="PASS" data-title="POST /v1/audio/transcriptions — Model: zero-medasr (Medical consultation audio)">
-                  <td style="font-weight: 600;">POST /v1/audio/transcriptions — Model: zero-medasr (Medical consultation audio)</td>
-                  <td><span class="badge-model">ASR Models — api-tests</span></td>
-                  <td style="font-family: var(--font-mono); font-size: 12px;">English (Medical)</td>
-                  <td style="font-family: var(--font-mono); font-size: 12px; font-variant-numeric: tabular-nums;">14108ms</td>
-                  <td><span class="badge-status pass">PASS</span></td>
-                  <td style="color: var(--text-muted); font-size: 12px;">—</td>
-                </tr>
-                
-                <tr data-category="ASR Models — api-tests" data-status="PASS" data-title="POST /v1/audio/transcriptions — Explicit language_code (Hindi: hi)">
-                  <td style="font-weight: 600;">POST /v1/audio/transcriptions — Explicit language_code (Hindi: hi)</td>
-                  <td><span class="badge-model">ASR Models — api-tests</span></td>
-                  <td style="font-family: var(--font-mono); font-size: 12px;">Hindi</td>
-                  <td style="font-family: var(--font-mono); font-size: 12px; font-variant-numeric: tabular-nums;">1836ms</td>
-                  <td><span class="badge-status pass">PASS</span></td>
-                  <td style="color: var(--text-muted); font-size: 12px;">—</td>
-                </tr>
-                
-                <tr data-category="Backend API — api-tests" data-status="PASS" data-title="Negative: Missing Authorization header returns 401">
-                  <td style="font-weight: 600;">Negative: Missing Authorization header returns 401</td>
-                  <td><span class="badge-model">Backend API — api-tests</span></td>
-                  <td style="font-family: var(--font-mono); font-size: 12px;">Hindi</td>
-                  <td style="font-family: var(--font-mono); font-size: 12px; font-variant-numeric: tabular-nums;">178ms</td>
-                  <td><span class="badge-status pass">PASS</span></td>
-                  <td style="color: var(--text-muted); font-size: 12px;">—</td>
-                </tr>
-                
-                <tr data-category="Backend API — api-tests" data-status="PASS" data-title="Negative: Invalid API Key returns 401/403">
-                  <td style="font-weight: 600;">Negative: Invalid API Key returns 401/403</td>
-                  <td><span class="badge-model">Backend API — api-tests</span></td>
-                  <td style="font-family: var(--font-mono); font-size: 12px;">Hindi</td>
-                  <td style="font-family: var(--font-mono); font-size: 12px; font-variant-numeric: tabular-nums;">1758ms</td>
-                  <td><span class="badge-status pass">PASS</span></td>
-                  <td style="color: var(--text-muted); font-size: 12px;">—</td>
-                </tr>
-                
-                <tr data-category="Backend API — api-tests" data-status="PASS" data-title="Negative: Missing audio file in payload returns 400/422">
-                  <td style="font-weight: 600;">Negative: Missing audio file in payload returns 400/422</td>
-                  <td><span class="badge-model">Backend API — api-tests</span></td>
-                  <td style="font-family: var(--font-mono); font-size: 12px;">Hindi</td>
-                  <td style="font-family: var(--font-mono); font-size: 12px; font-variant-numeric: tabular-nums;">90ms</td>
-                  <td><span class="badge-status pass">PASS</span></td>
-                  <td style="color: var(--text-muted); font-size: 12px;">—</td>
-                </tr>
-                
-                <tr data-category="Backend API — api-tests" data-status="PASS" data-title="Negative: Invalid model identifier returns 400/422">
-                  <td style="font-weight: 600;">Negative: Invalid model identifier returns 400/422</td>
-                  <td><span class="badge-model">Backend API — api-tests</span></td>
-                  <td style="font-family: var(--font-mono); font-size: 12px;">Hindi</td>
-                  <td style="font-family: var(--font-mono); font-size: 12px; font-variant-numeric: tabular-nums;">1293ms</td>
-                  <td><span class="badge-status pass">PASS</span></td>
-                  <td style="color: var(--text-muted); font-size: 12px;">—</td>
-                </tr>
-                
-                <tr data-category="Backend API — api-tests" data-status="PASS" data-title="Negative: Corrupted audio file buffer returns 400/422">
-                  <td style="font-weight: 600;">Negative: Corrupted audio file buffer returns 400/422</td>
-                  <td><span class="badge-model">Backend API — api-tests</span></td>
-                  <td style="font-family: var(--font-mono); font-size: 12px;">Hindi</td>
-                  <td style="font-family: var(--font-mono); font-size: 12px; font-variant-numeric: tabular-nums;">231ms</td>
-                  <td><span class="badge-status pass">PASS</span></td>
-                  <td style="color: var(--text-muted); font-size: 12px;">—</td>
-                </tr>
-                
-                <tr data-category="Backend API — api-tests" data-status="PASS" data-title="Negative: 0-byte empty audio file returns 400/422">
-                  <td style="font-weight: 600;">Negative: 0-byte empty audio file returns 400/422</td>
-                  <td><span class="badge-model">Backend API — api-tests</span></td>
-                  <td style="font-family: var(--font-mono); font-size: 12px;">Hindi</td>
-                  <td style="font-family: var(--font-mono); font-size: 12px; font-variant-numeric: tabular-nums;">258ms</td>
-                  <td><span class="badge-status pass">PASS</span></td>
-                  <td style="color: var(--text-muted); font-size: 12px;">—</td>
-                </tr>
-                
-                <tr data-category="Backend API — api-tests" data-status="PASS" data-title="Edge Case: Multiple parallel requests (Concurrency stress check)">
-                  <td style="font-weight: 600;">Edge Case: Multiple parallel requests (Concurrency stress check)</td>
-                  <td><span class="badge-model">Backend API — api-tests</span></td>
-                  <td style="font-family: var(--font-mono); font-size: 12px;">Hindi</td>
-                  <td style="font-family: var(--font-mono); font-size: 12px; font-variant-numeric: tabular-nums;">5626ms</td>
+                  <td style="font-family: var(--font-mono); font-size: 12px; font-variant-numeric: tabular-nums;">86ms</td>
                   <td><span class="badge-status pass">PASS</span></td>
                   <td style="color: var(--text-muted); font-size: 12px;">—</td>
                 </tr>
@@ -1079,7 +791,7 @@
 
   <script>
     // Embedded Date History
-    const dateData = {"2026-08-24":{"runs":3,"passed":425,"failed":11,"totalTests":436}};
+    const dateData = {"2026-08-24":{"runs":6,"passed":581,"failed":19,"totalTests":600}};
 
     // Generate August 2026 Calendar Grid
     function renderCalendar() {

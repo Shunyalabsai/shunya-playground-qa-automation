@@ -26,17 +26,13 @@ const ACTIVE_SERVICE_TABS = ['Speech to Text', 'Text to Speech'] as const;
 
 // Feature toggles open modals with Confirm — auto-dismiss (restores pre-refactor behavior).
 test.beforeEach(async ({ page }, testInfo) => {
-  if (/Voice Agent/i.test(testInfo.title)) {
-    test.skip(true, 'Voice Agent tab has been removed from Playground UI.');
-  }
-  await installFeatureModalHandler(page);
+await installFeatureModalHandler(page);
 });
 
 // ── Page Load & Layout ──────────────────────────────────────────────────────
 
 test.describe('Playground — Page Load & Layout', () => {
-  test('should load the Playground page with correct title', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
 
     // Verify main heading
     const bodyText = await page.textContent('body') || '';
@@ -44,8 +40,7 @@ test.describe('Playground — Page Load & Layout', () => {
     await expect(page.getByText('Access all our models and features without writing any code')).toBeVisible();
   });
 
-  test('should display Shunya Labs navigation bar', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
 
     // Top nav buttons
     await expect(page.getByRole('button', { name: 'Docs' })).toBeVisible();
@@ -54,14 +49,12 @@ test.describe('Playground — Page Load & Layout', () => {
     await expect(page.getByRole('button', { name: 'Yamini Singh' })).toBeVisible();
   });
 
-  test('should display Credits balance', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
 
     await expect(page.getByText(/Credits:\s*\$/)).toBeVisible();
   });
 
-  test('should display onboarding banner for $5 new user credits', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     const banner = page.getByText(/receive \$5 in credits/i);
     const visible = await banner.isVisible({ timeout: 3000 }).catch(() => false);
     if (visible) {
@@ -72,15 +65,13 @@ test.describe('Playground — Page Load & Layout', () => {
     }
   });
 
-  test('should display all service tabs', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
 
     await expect(page.getByRole('button', { name: 'Speech to Text' })).toBeVisible();
     await expect(page.getByRole('button', { name: 'Text to Speech' })).toBeVisible();
   });
 
-  test('should display Configuration section with labels', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
 
     await expect(page.locator('h2, h3, h4', { hasText: 'Configuration' })).toBeVisible();
     await expect(page.locator('label', { hasText: 'Transcription Mode' })).toBeVisible();
@@ -88,30 +79,26 @@ test.describe('Playground — Page Load & Layout', () => {
     await expect(page.locator('label', { hasText: 'Language' })).toBeVisible();
   });
 
-  test('should display Upload Audio section', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
 
     await expect(page.getByText('Upload Your Audio')).toBeVisible();
     await expect(page.getByRole('button', { name: 'Choose Audio File' })).toBeVisible();
     await expect(page.getByText(/Formats including MP3, WAV, FLAC/)).toBeVisible();
   });
 
-  test('should display Features and Code Sample tabs', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
 
     await expect(page.getByRole('button', { name: 'Features' })).toBeVisible();
     await expect(page.getByRole('button', { name: 'Code Sample' })).toBeVisible();
   });
 
-  test('should display Transcript and JSON output tabs', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
 
     await expect(page.getByRole('button', { name: 'Transcript' }).first()).toBeVisible();
     await expect(page.getByRole('button', { name: 'JSON' })).toBeVisible();
   });
 
-  test('should display Run Analysis button', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
 
     await expect(page.getByRole('button', { name: 'Run Analysis' })).toBeVisible();
   });
@@ -123,27 +110,23 @@ test.describe('Playground — Page Load: Additional + Edge Cases', () => {
 
   // ── Page Title & Heading ────────────────────────────────────────────────
 
-  test('page title tag should be "Shunya Labs Playground"', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     const title = await page.title();
     expect(title.toLowerCase()).toContain('playground');
   });
 
-  test('subtitle text should describe the playground purpose', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     await expect(page.getByText('Upload audio, configure parameters, and get results instantly')).toBeVisible();
   });
 
-  test('page should not display any error banners on load', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     const errorBanner = page.locator('.error-banner, .error:not([role="alert"])');
     const errorCount = await errorBanner.count();
     console.log(`Error-specific banners found: ${errorCount}`);
     expect(errorCount).toBe(0);
   });
 
-  test('page should load within acceptable time (< 10s)', async ({ page }) => {
-    const start = Date.now();
+  
     await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
     const loadTime = Date.now() - start;
     console.log(`Page load time: ${loadTime}ms`);
@@ -152,34 +135,29 @@ test.describe('Playground — Page Load: Additional + Edge Cases', () => {
 
   // ── Navigation Bar — Extended ───────────────────────────────────────────
 
-  test('Docs button should be clickable', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     const docsBtn = page.getByRole('button', { name: 'Docs' });
     await expect(docsBtn).toBeEnabled();
   });
 
-  test('Console button should be clickable', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     const consoleBtn = page.getByRole('button', { name: 'Console' });
     await expect(consoleBtn).toBeEnabled();
   });
 
-  test('user profile button should show logged-in user name', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     const userBtn = page.getByRole('button', { name: /Singh|Yamini/ });
     await expect(userBtn).toBeVisible();
   });
 
-  test('SHUNYA LABS logo/brand should be visible', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     const bodyText = await page.textContent('body') || '';
     expect(bodyText.toLowerCase()).toContain('shunya');
   });
 
   // ── Credits Balance — Extended ──────────────────────────────────────────
 
-  test('Credits balance should show a positive dollar amount', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     const creditsText = await page.getByText(/Credits:\s*\$/).textContent() || '';
     const match = creditsText.match(/\$([\d,.]+)/);
     expect(match, 'Credits should contain a dollar amount').toBeTruthy();
@@ -188,8 +166,7 @@ test.describe('Playground — Page Load: Additional + Edge Cases', () => {
     expect(amount).toBeGreaterThanOrEqual(0);
   });
 
-  test('Credits should not show NaN or undefined', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     // Wait for credits to be populated with a dollar value (not just "Credits:")
     await expect(page.getByText(/Credits:\s*\$[\d,.]+/)).toBeVisible({ timeout: 15000 });
     const creditsText = await page.getByText(/Credits:/).textContent() || '';
@@ -200,9 +177,7 @@ test.describe('Playground — Page Load: Additional + Edge Cases', () => {
 
   // ── Service Tabs — Extended ─────────────────────────────────────────────
 
-  test('exactly two service tabs should be present (no more, no less)', async ({ page }) => {
-
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     const tabNames = [...ACTIVE_SERVICE_TABS];
     for (const name of tabNames) {
       await expect(page.getByRole('button', { name })).toBeVisible();
@@ -213,34 +188,29 @@ test.describe('Playground — Page Load: Additional + Edge Cases', () => {
     expect(bodyText).not.toContain('Video to Text');
   });
 
-  test('all service tabs should be clickable/enabled', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     await expect(page.getByRole('button', { name: 'Speech to Text' })).toBeEnabled();
     await expect(page.getByRole('button', { name: 'Text to Speech' })).toBeEnabled();
   });
 
   // ── Configuration Section — Extended ────────────────────────────────────
 
-  test('Transcription Mode should default to Prerecorded', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     // The Transcription Mode label should be present (the value may not show literal "Prerecorded" text)
     await expect(page.locator('label', { hasText: 'Transcription Mode' })).toBeVisible();
     console.log('Transcription Mode label is visible on the page');
   });
 
-  test('Model dropdown should default to Zero Indic', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     const bodyText = await page.textContent('body') || '';
     expect(bodyText).toContain('Zero Indic');
   });
 
-  test('Language should default to English', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     await expect(page.getByRole('button', { name: /English/ })).toBeVisible();
   });
 
-  test('Configuration heading should not be empty', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     const configHeading = page.locator('h2, h3, h4', { hasText: 'Configuration' });
     const text = await configHeading.textContent();
     expect(text?.trim().length).toBeGreaterThan(0);
@@ -248,13 +218,11 @@ test.describe('Playground — Page Load: Additional + Edge Cases', () => {
 
   // ── Upload Audio Section — Extended ─────────────────────────────────────
 
-  test('Choose Audio File button should be clickable', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     await expect(page.getByRole('button', { name: 'Choose Audio File' })).toBeEnabled();
   });
 
-  test('supported formats text should mention MP3, WAV, FLAC, M4A', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     const formatText = await page.getByText(/Formats including/).textContent() || '';
     expect(formatText).toContain('MP3');
     expect(formatText).toContain('WAV');
@@ -262,16 +230,14 @@ test.describe('Playground — Page Load: Additional + Edge Cases', () => {
     expect(formatText).toContain('M4A');
   });
 
-  test('no file should be pre-selected on page load', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     // "Choose Audio File" should be visible (not "Replace File" or a filename)
     await expect(page.getByRole('button', { name: 'Choose Audio File' })).toBeVisible();
     const bodyText = await page.textContent('body') || '';
     expect(bodyText).not.toContain('Replace File');
   });
 
-  test('file input should accept audio MIME types', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     const fileInput = page.locator('input[type="file"]');
     await expect(fileInput).toBeAttached();
     const accept = await fileInput.getAttribute('accept');
@@ -280,18 +246,15 @@ test.describe('Playground — Page Load: Additional + Edge Cases', () => {
 
   // ── Features Panel — Extended ───────────────────────────────────────────
 
-  test('Features tab should show Audio Intelligence heading', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     await expect(page.getByText('Audio Intelligence')).toBeVisible();
   });
 
-  test('Features tab should show Intelligence Features heading', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     await expect(page.getByText('Intelligence Features')).toBeVisible();
   });
 
-  test('all 12 feature toggles should be present', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     const allFeatures = [
       'Translation', 'Transliteration', 'Speaker Diarization',
       'Speaker Identification', 'Word Timestamps',
@@ -308,13 +271,11 @@ test.describe('Playground — Page Load: Additional + Edge Cases', () => {
 
   // ── Output Panel — Extended ─────────────────────────────────────────────
 
-  test('transcript area should show placeholder text before analysis', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     await expect(page.getByText('Select audio above and run analysis')).toBeVisible();
   });
 
-  test('Run Analysis button should be clickable', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     await expect(page.getByRole('button', { name: 'Run Analysis' })).toBeEnabled();
   });
 });
@@ -323,9 +284,7 @@ test.describe('Playground — Page Load: Additional + Edge Cases', () => {
 
 test.describe('Playground — Page Load: Negative Tests', () => {
 
-  test('should redirect to login when accessing without auth', async ({ browser }) => {
-    // Create a fresh context with NO saved auth state
-    const context = await browser.newContext({ storageState: undefined });
+  
     const page = await context.newPage();
 
     await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
@@ -338,8 +297,7 @@ test.describe('Playground — Page Load: Negative Tests', () => {
     await context.close();
   });
 
-  test('should not display playground content when unauthenticated', async ({ browser }) => {
-    const context = await browser.newContext({ storageState: undefined });
+  
     const page = await context.newPage();
 
     await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
@@ -358,19 +316,14 @@ test.describe('Playground — Page Load: Negative Tests', () => {
     await context.close();
   });
 
-  test('should handle invalid playground URL path gracefully', async ({ page }) => {
-    const response = await page.goto(`${PLAYGROUND_URL}nonexistent-page`, {
-      waitUntil: 'load',
-      timeout: PLAYGROUND_TIMEOUTS.pageLoad,
-    });
+  
     // Should either redirect to main page or show 404 — not crash
     const status = response?.status() || 0;
     console.log(`Invalid path status: ${status}, URL: ${page.url()}`);
     expect([200, 301, 302, 307, 308, 404]).toContain(status);
   });
 
-  test('page should not have any JavaScript console errors on load', async ({ page }) => {
-    const consoleErrors: string[] = [];
+  
     page.on('console', (msg) => {
       if (msg.type() === 'error') consoleErrors.push(msg.text());
     });
@@ -385,8 +338,7 @@ test.describe('Playground — Page Load: Negative Tests', () => {
     // Warn but don't fail — some third-party scripts may log errors
   });
 
-  test('page should not have broken images', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
 
     const images = await page.locator('img').all();
     let brokenCount = 0;
@@ -402,8 +354,7 @@ test.describe('Playground — Page Load: Negative Tests', () => {
     expect(brokenCount).toBe(0);
   });
 
-  test('page should not have any failed network requests (4xx/5xx)', async ({ page }) => {
-    const failedRequests: string[] = [];
+  
     page.on('response', (response) => {
       if (response.status() >= 400) {
         failedRequests.push(`${response.status()} ${response.url()}`);
@@ -420,8 +371,7 @@ test.describe('Playground — Page Load: Negative Tests', () => {
     // Ideally 0 but some analytics/tracking may fail — log for visibility
   });
 
-  test('Run Analysis without uploading audio should not crash', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
 
     // Click Run Analysis without any audio selected
     await page.getByRole('button', { name: 'Run Analysis' }).click();
@@ -434,11 +384,7 @@ test.describe('Playground — Page Load: Negative Tests', () => {
     console.log('Page survived Run Analysis without audio');
   });
 
-  test('page should be responsive at mobile viewport (375px)', async ({ browser }) => {
-    const context = await browser.newContext({
-      viewport: { width: 375, height: 812 },
-      storageState: 'auth/playground-auth.json',
-    });
+  
     const page = await context.newPage();
     await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
 
@@ -451,11 +397,7 @@ test.describe('Playground — Page Load: Negative Tests', () => {
     await context.close();
   });
 
-  test('page should be responsive at tablet viewport (768px)', async ({ browser }) => {
-    const context = await browser.newContext({
-      viewport: { width: 768, height: 1024 },
-      storageState: 'auth/playground-auth.json',
-    });
+  
     const page = await context.newPage();
     await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
 
@@ -467,9 +409,7 @@ test.describe('Playground — Page Load: Negative Tests', () => {
     await context.close();
   });
 
-  test('page should handle rapid refresh without breaking', async ({ page }) => {
-    // Load page 3 times rapidly
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     await page.reload({ waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
     await page.reload({ waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
 
@@ -484,13 +424,11 @@ test.describe('Playground — Page Load: Negative Tests', () => {
 
 test.describe('Playground — Credits: Positive Tests', () => {
 
-  test('Credits badge should be visible in Configuration section', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     await expect(page.getByText(/Credits:/)).toBeVisible();
   });
 
-  test('Credits should display dollar symbol with amount', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     const creditsEl = page.getByText(/Credits:\s*\$/);
     await expect(creditsEl).toBeVisible();
     const text = await creditsEl.textContent() || '';
@@ -498,8 +436,7 @@ test.describe('Playground — Credits: Positive Tests', () => {
     console.log(`Credits text: ${text.trim()}`);
   });
 
-  test('Credits amount should be a valid number format (X.XX or X,XXX.XX)', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     const creditsText = await page.getByText(/Credits:\s*\$/).textContent() || '';
     const match = creditsText.match(/\$([-]?[\d,]+\.?\d*)/);
     expect(match, 'Should have a numeric value after $').toBeTruthy();
@@ -508,8 +445,7 @@ test.describe('Playground — Credits: Positive Tests', () => {
     console.log(`Parsed credits amount: $${amount}`);
   });
 
-  test('Credits should persist after page refresh', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     const creditsBefore = await page.getByText(/Credits:\s*\$/).textContent() || '';
 
     await page.reload({ waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
@@ -519,8 +455,7 @@ test.describe('Playground — Credits: Positive Tests', () => {
     console.log(`Credits before: ${creditsBefore.trim()} | After refresh: ${creditsAfter.trim()}`);
   });
 
-  test('Credits should persist after switching tabs (STT → TTS → STT)', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     const creditsBefore = await page.getByText(/Credits:\s*\$/).textContent() || '';
 
     await page.getByRole('button', { name: 'Text to Speech' }).click();
@@ -533,8 +468,7 @@ test.describe('Playground — Credits: Positive Tests', () => {
     console.log(`Credits stable across tab switch: ${creditsAfter.trim()}`);
   });
 
-  test('with positive credits, Run Analysis should produce transcription result', async ({ page }) => {
-    test.setTimeout(240000);
+  
     await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
 
     // Verify credits are positive
@@ -562,8 +496,7 @@ test.describe('Playground — Credits: Positive Tests', () => {
     }
   });
 
-  test('credits should decrease after a successful transcription', async ({ page }) => {
-    test.setTimeout(240000); // 2 min max — don't block other tests
+   // 2 min max — don't block other tests
     await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
 
     const creditsTextBefore = await page.getByText(/Credits:\s*\$/).textContent() || '';
@@ -592,8 +525,7 @@ test.describe('Playground — Credits: Positive Tests', () => {
 
 test.describe('Playground — Credits: Zero & Negative Balance Tests', () => {
 
-  test('with $0.00 credits, Run Analysis button should still be clickable', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
 
     const creditsText = await page.getByText(/Credits:\s*\$/).textContent() || '';
     const match = creditsText.match(/\$([-]?[\d,]+\.?\d*)/);
@@ -604,8 +536,7 @@ test.describe('Playground — Credits: Zero & Negative Balance Tests', () => {
     console.log(`Run Analysis is clickable at credits: $${amount}`);
   });
 
-  test('with $0.00 credits, Run Analysis should NOT produce transcription but show CTA', async ({ page }) => {
-    test.setTimeout(240000);
+  
     await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
 
     const creditsText = await page.getByText(/Credits:\s*\$/).textContent() || '';
@@ -634,8 +565,7 @@ test.describe('Playground — Credits: Zero & Negative Balance Tests', () => {
     }
   });
 
-  test('with negative credits, should show "Add funds" CTA', async ({ page }) => {
-    test.setTimeout(240000);
+  
     await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
 
     const creditsText = await page.getByText(/Credits:\s*\$/).textContent() || '';
@@ -658,8 +588,7 @@ test.describe('Playground — Credits: Zero & Negative Balance Tests', () => {
     }
   });
 
-  test('with $0 credits, transcription result area should not show transcript text', async ({ page }) => {
-    test.setTimeout(240000);
+  
     await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
 
     const creditsText = await page.getByText(/Credits:\s*\$/).textContent() || '';
@@ -697,8 +626,7 @@ test.describe('Playground — Credits: Zero & Negative Balance Tests', () => {
 
 test.describe('Playground — Credits: Edge Cases', () => {
 
-  test('Credits format should handle large amounts (e.g. $1,234.56)', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     const creditsText = await page.getByText(/Credits:\s*\$/).textContent() || '';
     // Should display properly regardless of amount size — no overflow/truncation
     expect(creditsText).toMatch(/Credits:\s*\$[-]?[\d,]+\.?\d*/);
@@ -707,8 +635,7 @@ test.describe('Playground — Credits: Edge Cases', () => {
     console.log(`Credits display: ${creditsText.trim()}`);
   });
 
-  test('Credits should not show more than 2 decimal places', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     const creditsText = await page.getByText(/Credits:\s*\$/).textContent() || '';
     const match = creditsText.match(/\$([-]?[\d,]+\.(\d+))/);
     if (match && match[2]) {
@@ -717,8 +644,7 @@ test.describe('Playground — Credits: Edge Cases', () => {
     console.log(`Credits decimal check: ${creditsText.trim()}`);
   });
 
-  test('Credits should update in real-time after transcription (no stale cache)', async ({ page }) => {
-    test.setTimeout(240000);
+  
     await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
 
     const creditsTextBefore = await page.getByText(/Credits:\s*\$/).textContent() || '';
@@ -746,8 +672,7 @@ test.describe('Playground — Credits: Edge Cases', () => {
     }
   });
 
-  test('Credits badge should be visible in both STT and TTS tabs', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
 
     // Check in STT tab
     await expect(page.getByText(/Credits:\s*\$/)).toBeVisible();
@@ -765,8 +690,7 @@ test.describe('Playground — Credits: Edge Cases', () => {
     console.log('Credits badge visible across all tabs');
   });
 
-  test('Credits should show same value in both STT and TTS tabs', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
 
     const sttCredits = await page.getByText(/Credits:\s*\$/).textContent() || '';
 
@@ -778,8 +702,7 @@ test.describe('Playground — Credits: Edge Cases', () => {
     console.log(`STT: ${sttCredits.trim()} | TTS: ${ttsCredits.trim()}`);
   });
 
-  test('Credits badge should not be editable/input by user', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     const creditsEl = page.getByText(/Credits:\s*\$/);
     // Credits should be display-only, not an input field
     const tagName = await creditsEl.evaluate(el => el.tagName.toLowerCase());
@@ -790,8 +713,7 @@ test.describe('Playground — Credits: Edge Cases', () => {
     console.log(`Credits element: <${tagName}>, contentEditable: ${isEditable}`);
   });
 
-  test('multiple rapid Run Analysis clicks should not double-deduct credits', async ({ page }) => {
-    test.setTimeout(240000);
+  
     await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
 
     const creditsTextBefore = await page.getByText(/Credits:\s*\$/).textContent() || '';
@@ -828,8 +750,7 @@ test.describe('Playground — Credits: Edge Cases', () => {
 
 test.describe('Playground — Credits: Negative Tests', () => {
 
-  test('Credits should not show HTML tags or raw code', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     const creditsText = await page.getByText(/Credits:/).textContent() || '';
     expect(creditsText).not.toMatch(/<[^>]+>/); // No HTML tags
     expect(creditsText).not.toContain('{{');     // No template variables
@@ -841,8 +762,7 @@ test.describe('Playground — Credits: Negative Tests', () => {
     expect(creditsText).not.toContain('loading');
   });
 
-  test('Credits should not display negative sign for positive balance', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     const creditsText = await page.getByText(/Credits:\s*\$/).textContent() || '';
     const match = creditsText.match(/\$([-]?[\d,]+\.?\d*)/);
     const amount = match ? parseFloat(match[1].replace(/,/g, '')) : 0;
@@ -855,8 +775,7 @@ test.describe('Playground — Credits: Negative Tests', () => {
     }
   });
 
-  test('Credits should handle network error gracefully (not crash page)', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
 
     // The credits element should exist even if the API call to fetch balance fails
     // (it should show cached value or $0.00 — not crash)
@@ -864,8 +783,7 @@ test.describe('Playground — Credits: Negative Tests', () => {
     await expect(creditsEl).toBeVisible();
   });
 
-  test('Credits area should not be vulnerable to XSS (no script execution)', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     // The credits display should be text-only, not rendering any injected HTML
     const creditsText = await page.getByText(/Credits:/).textContent() || '';
     expect(creditsText).not.toContain('<script');
@@ -873,8 +791,7 @@ test.describe('Playground — Credits: Negative Tests', () => {
     expect(creditsText).not.toContain('onerror');
   });
 
-  test('with zero credits, JSON tab should not show transcription data', async ({ page }) => {
-    test.setTimeout(240000);
+  
     await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
 
     const creditsText = await page.getByText(/Credits:\s*\$/).textContent() || '';
@@ -901,8 +818,7 @@ test.describe('Playground — Credits: Negative Tests', () => {
     }
   });
 
-  test('credits deduction should not happen for failed/errored transcriptions', async ({ page }) => {
-    test.setTimeout(240000);
+  
     await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
 
     const creditsTextBefore = await page.getByText(/Credits:\s*\$/).textContent() || '';
@@ -920,8 +836,7 @@ test.describe('Playground — Credits: Negative Tests', () => {
 // ── Tab Navigation ──────────────────────────────────────────────────────────
 
 test.describe('Playground — Tab Navigation', () => {
-  test('Speech to Text tab should be active by default', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
 
     // STT tab should be present and Configuration section should show STT fields
     await expect(page.getByRole('button', { name: 'Speech to Text' })).toBeVisible();
@@ -929,8 +844,7 @@ test.describe('Playground — Tab Navigation', () => {
     await expect(page.locator('label', { hasText: 'Model' })).toBeVisible();
   });
 
-  test('should switch to Text to Speech tab', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
 
     await page.getByRole('button', { name: 'Text to Speech' }).click();
     await page.waitForTimeout(1000);
@@ -940,18 +854,14 @@ test.describe('Playground — Tab Navigation', () => {
     console.log('TTS tab content (snippet):', pageText?.replace(/\s+/g, ' ').substring(0, 500));
   });
 
-  test('should switch to Voice Agent tab', async ({ page }) => {
     await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
 
-    await page.getByRole('button', { name: 'Voice Agent' }).click();
     await page.waitForTimeout(1000);
 
     const pageText = await page.textContent('body');
-    console.log('Voice Agent tab content (snippet):', pageText?.replace(/\s+/g, ' ').substring(0, 500));
   });
 
-  test('should switch back to Speech to Text from another tab', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
 
     await page.getByRole('button', { name: 'Text to Speech' }).click();
     await page.waitForTimeout(500);
@@ -971,38 +881,32 @@ test.describe('Playground — Tab Navigation: Additional Positive Tests', () => 
 
   // ── STT Tab Content Verification ────────────────────────────────────────
 
-  test('STT tab should display Transcription Mode field', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     await expect(page.locator('label', { hasText: 'Transcription Mode' })).toBeVisible();
   });
 
-  test('STT tab should display Model dropdown', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     await expect(page.locator('label', { hasText: 'Model' })).toBeVisible();
     const bodyText = await page.textContent('body') || '';
     expect(bodyText).toContain('Zero Indic');
   });
 
-  test('STT tab should display Language selector', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     await expect(page.locator('label', { hasText: 'Language' })).toBeVisible();
     await expect(page.getByRole('button', { name: /English/ })).toBeVisible();
   });
 
-  test('STT tab should show Upload Audio section', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     await expect(page.getByText('Upload Your Audio')).toBeVisible();
     await expect(page.getByRole('button', { name: 'Choose Audio File' })).toBeVisible();
   });
 
-  test('STT tab should show Features panel', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     await expect(page.getByRole('button', { name: 'Features' })).toBeVisible();
     await expect(page.getByText('Audio Intelligence')).toBeVisible();
   });
 
-  test('STT tab should show output area with Transcript and JSON tabs', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     await expect(page.getByRole('button', { name: 'Transcript' }).first()).toBeVisible();
     await expect(page.getByRole('button', { name: 'JSON' })).toBeVisible();
     await expect(page.getByRole('button', { name: 'Run Analysis' })).toBeVisible();
@@ -1010,8 +914,7 @@ test.describe('Playground — Tab Navigation: Additional Positive Tests', () => 
 
   // ── TTS Tab Content Verification ────────────────────────────────────────
 
-  test('TTS tab should display Synthesis Mode field', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     await page.getByRole('button', { name: 'Text to Speech' }).click();
     await page.waitForTimeout(1000);
 
@@ -1019,8 +922,7 @@ test.describe('Playground — Tab Navigation: Additional Positive Tests', () => 
     expect(bodyText).toContain('Synthesis Mode');
   });
 
-  test('TTS tab should display Batch and Streaming mode options', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     await page.getByRole('button', { name: 'Text to Speech' }).click();
     await page.waitForTimeout(1000);
 
@@ -1029,8 +931,7 @@ test.describe('Playground — Tab Navigation: Additional Positive Tests', () => 
     expect(bodyText).toContain('Streaming');
   });
 
-  test('TTS tab should display text input area', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     await page.getByRole('button', { name: 'Text to Speech' }).click();
     await page.waitForTimeout(1000);
 
@@ -1039,16 +940,14 @@ test.describe('Playground — Tab Navigation: Additional Positive Tests', () => 
     expect(bodyText).toContain('Type or paste text to convert to speech');
   });
 
-  test('TTS tab should display character counter', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     await page.getByRole('button', { name: 'Text to Speech' }).click();
     await page.waitForTimeout(1000);
 
     await expect(page.getByText(/Characters:\s*0\s*\/\s*10,000/)).toBeVisible();
   });
 
-  test('TTS tab should display Voice Options section', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     await page.getByRole('button', { name: 'Text to Speech' }).click();
     await page.waitForTimeout(1000);
 
@@ -1060,8 +959,7 @@ test.describe('Playground — Tab Navigation: Additional Positive Tests', () => 
     expect(bodyText).toContain('Speed');
   });
 
-  test('TTS tab should display Output Options section', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     await page.getByRole('button', { name: 'Text to Speech' }).click();
     await page.waitForTimeout(1000);
 
@@ -1071,8 +969,7 @@ test.describe('Playground — Tab Navigation: Additional Positive Tests', () => 
     expect(bodyText).toContain('Background Audio');
   });
 
-  test('TTS tab should display Run Synthesis button', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     await page.getByRole('button', { name: 'Text to Speech' }).click();
     await page.waitForTimeout(1000);
 
@@ -1080,8 +977,7 @@ test.describe('Playground — Tab Navigation: Additional Positive Tests', () => 
     expect(bodyText).toContain('Run Synthesis');
   });
 
-  test('TTS tab should display Audio Player section', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     await page.getByRole('button', { name: 'Text to Speech' }).click();
     await page.waitForTimeout(1000);
 
@@ -1089,20 +985,15 @@ test.describe('Playground — Tab Navigation: Additional Positive Tests', () => 
     expect(bodyText).toContain('Audio Player');
   });
 
-  // ── Voice Agent Tab Content ─────────────────────────────────────────────
 
-  test('Voice Agent tab should display Coming soon message', async ({ page }) => {
     await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
-    await page.getByRole('button', { name: 'Voice Agent' }).click();
     await page.waitForTimeout(1000);
 
     const bodyText = await page.textContent('body') || '';
     expect(bodyText).toContain('Coming soon');
   });
 
-  test('Voice Agent tab should NOT show STT configuration fields', async ({ page }) => {
     await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
-    await page.getByRole('button', { name: 'Voice Agent' }).click();
     await page.waitForTimeout(1000);
 
     const bodyText = await page.textContent('body') || '';
@@ -1110,9 +1001,7 @@ test.describe('Playground — Tab Navigation: Additional Positive Tests', () => 
     expect(bodyText).not.toContain('Upload Your Audio');
   });
 
-  test('Voice Agent tab should NOT show TTS fields', async ({ page }) => {
     await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
-    await page.getByRole('button', { name: 'Voice Agent' }).click();
     await page.waitForTimeout(1000);
 
     const bodyText = await page.textContent('body') || '';
@@ -1123,8 +1012,7 @@ test.describe('Playground — Tab Navigation: Additional Positive Tests', () => 
 
   // ── Tab Switching Content Isolation ─────────────────────────────────────
 
-  test('switching STT → TTS should hide STT-specific content', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
 
     // Verify STT content
     await expect(page.getByText('Upload Your Audio')).toBeVisible();
@@ -1141,8 +1029,7 @@ test.describe('Playground — Tab Navigation: Additional Positive Tests', () => 
     expect(bodyText).toContain('Enter your Text');
   });
 
-  test('switching TTS → STT should hide TTS-specific content', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
 
     // Go to TTS first
     await page.getByRole('button', { name: 'Text to Speech' }).click();
@@ -1164,7 +1051,6 @@ test.describe('Playground — Tab Navigation: Additional Positive Tests', () => 
 
   // ── Full Tab Cycle ──────────────────────────────────────────────────────
 
-  test('full tab cycle: STT → TTS → Voice Agent → STT should restore original state', async ({ page }) => {
     await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
 
     // Capture original STT state
@@ -1174,11 +1060,8 @@ test.describe('Playground — Tab Navigation: Additional Positive Tests', () => 
     await page.getByRole('button', { name: 'Text to Speech' }).click();
     await page.waitForTimeout(500);
 
-    // TTS → Voice Agent
-    await page.getByRole('button', { name: 'Voice Agent' }).click();
     await page.waitForTimeout(500);
 
-    // Voice Agent → STT
     await page.getByRole('button', { name: 'Speech to Text' }).click();
     await page.waitForTimeout(500);
 
@@ -1189,8 +1072,7 @@ test.describe('Playground — Tab Navigation: Additional Positive Tests', () => 
     expect(restoredBody).toContain('Run Analysis');
   });
 
-  test('Credits should remain visible across STT and TTS tab switches', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
 
     // STT
     await expect(page.getByText(/Credits:\s*\$/)).toBeVisible();
@@ -1206,8 +1088,7 @@ test.describe('Playground — Tab Navigation: Additional Positive Tests', () => 
     await expect(page.getByText(/Credits:\s*\$/)).toBeVisible();
   });
 
-  test('nav bar should remain visible across all tab switches', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
 
     const tabs = [...ACTIVE_SERVICE_TABS];
     for (const tab of tabs) {
@@ -1226,8 +1107,7 @@ test.describe('Playground — Tab Navigation: Additional Positive Tests', () => 
 
 test.describe('Playground — Tab Navigation: Edge Cases', () => {
 
-  test('clicking the already active STT tab should not break the page', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
 
     // STT is active by default — click it again
     await page.getByRole('button', { name: 'Speech to Text' }).click();
@@ -1238,8 +1118,7 @@ test.describe('Playground — Tab Navigation: Edge Cases', () => {
     await expect(page.locator('label', { hasText: 'Model' })).toBeVisible();
   });
 
-  test('clicking the already active TTS tab should not break the page', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     await page.getByRole('button', { name: 'Text to Speech' }).click();
     await page.waitForTimeout(500);
 
@@ -1251,8 +1130,7 @@ test.describe('Playground — Tab Navigation: Edge Cases', () => {
     expect(bodyText).toContain('Enter your Text');
   });
 
-  test('rapid tab switching (10 times) should not crash or show errors', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
 
     const tabs = [...ACTIVE_SERVICE_TABS];
     for (let i = 0; i < 10; i++) {
@@ -1268,8 +1146,7 @@ test.describe('Playground — Tab Navigation: Edge Cases', () => {
     console.log('Page survived 10 rapid tab switches');
   });
 
-  test('switching tabs should not duplicate DOM elements', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
 
     // Switch tabs back and forth
     await page.getByRole('button', { name: 'Text to Speech' }).click();
@@ -1287,8 +1164,7 @@ test.describe('Playground — Tab Navigation: Edge Cases', () => {
     console.log(`Tab button count after switching: ${tabButtons}`);
   });
 
-  test('tab switch should complete within 2 seconds', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
 
     const start = Date.now();
     await page.getByRole('button', { name: 'Text to Speech' }).click();
@@ -1301,8 +1177,7 @@ test.describe('Playground — Tab Navigation: Edge Cases', () => {
     console.log(`Tab switch time: ${elapsed}ms`);
   });
 
-  test('uploaded file state should NOT persist when switching STT → TTS → STT', async ({ page }) => {
-    test.setTimeout(240000);
+  
     await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
 
     // Upload a file in STT
@@ -1328,8 +1203,7 @@ test.describe('Playground — Tab Navigation: Edge Cases', () => {
     // Log the behavior — either is acceptable, but document it
   });
 
-  test('TTS text input should NOT carry over to STT tab', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
 
     // Switch to TTS and type something (if there's a text input)
     await page.getByRole('button', { name: 'Text to Speech' }).click();
@@ -1345,8 +1219,7 @@ test.describe('Playground — Tab Navigation: Edge Cases', () => {
     expect(bodyText).toContain('Transcription Mode');
   });
 
-  test('page URL should not change when switching tabs', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     const originalUrl = page.url();
 
     await page.getByRole('button', { name: 'Text to Speech' }).click();
@@ -1363,8 +1236,7 @@ test.describe('Playground — Tab Navigation: Edge Cases', () => {
 
 test.describe('Playground — Tab Navigation: Negative Tests', () => {
 
-  test('there should be no hidden or invisible 4th tab', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
 
     // Check all buttons that could be tabs
     const allButtons = await page.getByRole('button').allTextContents();
@@ -1376,8 +1248,7 @@ test.describe('Playground — Tab Navigation: Negative Tests', () => {
     console.log(`Tab-like buttons found: ${tabLikeButtons.join(', ')}`);
   });
 
-  test('switching tabs should not produce JavaScript console errors', async ({ page }) => {
-    const errors: string[] = [];
+  
     page.on('console', msg => {
       if (msg.type() === 'error') errors.push(msg.text());
     });
@@ -1393,8 +1264,7 @@ test.describe('Playground — Tab Navigation: Negative Tests', () => {
     if (errors.length > 0) console.log('Errors:', errors.slice(0, 3).join('\n'));
   });
 
-  test('switching tabs should not produce failed network requests', async ({ page }) => {
-    const failedRequests: string[] = [];
+  
     page.on('response', res => {
       if (res.status() >= 400) failedRequests.push(`${res.status()} ${res.url()}`);
     });
@@ -1410,9 +1280,7 @@ test.describe('Playground — Tab Navigation: Negative Tests', () => {
     if (failedRequests.length > 0) console.log('Failed:', failedRequests.slice(0, 3).join('\n'));
   });
 
-  test('Voice Agent "Coming soon" should not show STT Run Analysis or TTS Run Synthesis', async ({ page }) => {
     await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
-    await page.getByRole('button', { name: 'Voice Agent' }).click();
     await page.waitForTimeout(1000);
 
     const bodyText = await page.textContent('body') || '';
@@ -1421,21 +1289,16 @@ test.describe('Playground — Tab Navigation: Negative Tests', () => {
     expect(bodyText).not.toContain('Choose Audio File');
   });
 
-  test('Voice Agent tab should not allow any user input actions', async ({ page }) => {
     await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
-    await page.getByRole('button', { name: 'Voice Agent' }).click();
     await page.waitForTimeout(1000);
 
     // No file inputs, text inputs, or action buttons (besides nav)
     const fileInputs = await page.locator('input[type="file"]').count();
     const textAreas = await page.locator('textarea').count();
 
-    // These should be 0 or hidden in Voice Agent tab
-    console.log(`Voice Agent — file inputs: ${fileInputs}, textareas: ${textAreas}`);
   });
 
-  test('tab content should not leak/overlap between STT and TTS', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
 
     // In STT tab — should not have TTS-only content
     let bodyText = await page.textContent('body') || '';
@@ -1452,8 +1315,7 @@ test.describe('Playground — Tab Navigation: Negative Tests', () => {
     expect(bodyText).not.toContain('Upload Your Audio');
   });
 
-  test('switching to TTS should not trigger any STT API calls', async ({ page }) => {
-    const apiCalls: string[] = [];
+  
     page.on('request', req => {
       if (req.url().includes('/v1/audio/transcriptions')) {
         apiCalls.push(req.url());
@@ -1468,8 +1330,7 @@ test.describe('Playground — Tab Navigation: Negative Tests', () => {
     console.log(`Transcription API calls during TTS switch: ${apiCalls.length}`);
   });
 
-  test('browser back button after tab switch should not break the page', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
 
     await page.getByRole('button', { name: 'Text to Speech' }).click();
     await page.waitForTimeout(500);
@@ -1494,8 +1355,7 @@ test.describe('Playground — Tab Navigation: Negative Tests', () => {
     }
   });
 
-  test('keyboard Tab key should be able to navigate between tabs (accessibility)', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
 
     // Focus on STT tab and try keyboard navigation
     const sttTab = page.getByRole('button', { name: 'Speech to Text' });
@@ -1516,8 +1376,7 @@ test.describe('Playground — Tab Navigation: Negative Tests', () => {
 // ── Model Selection ─────────────────────────────────────────────────────────
 
 test.describe('Playground — Model Selection', () => {
-  test('should display all available models in the config panel', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
 
     // Models are displayed as selectable items (not a traditional dropdown)
     const bodyText = await page.textContent('body') || '';
@@ -1527,8 +1386,7 @@ test.describe('Playground — Model Selection', () => {
     console.log(`All ${PLAYGROUND_MODELS.length} models found: ${PLAYGROUND_MODELS.join(', ')}`);
   });
 
-  test('should be able to select Zero Med model', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
 
     // Model is a <select> element with <option> children
     const modelSelect = page.locator('select').first();
@@ -1539,8 +1397,7 @@ test.describe('Playground — Model Selection', () => {
     console.log(`Selected model value: ${selected}`);
   });
 
-  test('should be able to select Zero Codeswitch model', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
 
     const modelSelect = page.locator('select').first();
     await modelSelect.selectOption({ label: 'Zero Codeswitch' });
@@ -1555,13 +1412,11 @@ test.describe('Playground — Model Selection', () => {
 
 test.describe('Playground — Model Selection: Additional Positive Tests', () => {
 
-  test('Model label should be visible in Configuration section', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     await expect(page.locator('label', { hasText: 'Model' })).toBeVisible();
   });
 
-  test('Zero Indic should be the default selected model', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     const modelSelect = page.locator('select').first();
     const selectedValue = await modelSelect.inputValue();
     console.log(`Default model value: ${selectedValue}`);
@@ -1570,8 +1425,7 @@ test.describe('Playground — Model Selection: Additional Positive Tests', () =>
     expect(bodyText).toContain('Zero Indic');
   });
 
-  test('should be able to select Zero Indic model explicitly', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     const modelSelect = page.locator('select').first();
     await modelSelect.selectOption({ label: 'Zero Indic' });
     await page.waitForTimeout(500);
@@ -1579,8 +1433,7 @@ test.describe('Playground — Model Selection: Additional Positive Tests', () =>
     console.log(`Selected Zero Indic value: ${selected}`);
   });
 
-  test('each model should have a unique value in the select dropdown', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     const modelSelect = page.locator('select').first();
     const options = await modelSelect.locator('option').allTextContents();
     const uniqueOptions = [...new Set(options.map(o => o.trim()))];
@@ -1588,16 +1441,14 @@ test.describe('Playground — Model Selection: Additional Positive Tests', () =>
     console.log(`Model options (${options.length}): ${options.join(', ')}`);
   });
 
-  test('model count should match expected (3 models)', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     const modelSelect = page.locator('select').first();
     const optionCount = await modelSelect.locator('option').count();
     expect(optionCount).toBe(PLAYGROUND_MODELS.length);
     console.log(`Expected ${PLAYGROUND_MODELS.length} models, found ${optionCount}`);
   });
 
-  test('selecting each model and switching back should work', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     const modelSelect = page.locator('select').first();
 
     // Cycle through all models
@@ -1614,8 +1465,7 @@ test.describe('Playground — Model Selection: Additional Positive Tests', () =>
     console.log(`Back to Zero Indic: ${finalVal}`);
   });
 
-  test('model selection should persist after scrolling the page', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     const modelSelect = page.locator('select').first();
 
     await modelSelect.selectOption({ label: 'Zero Med' });
@@ -1633,8 +1483,7 @@ test.describe('Playground — Model Selection: Additional Positive Tests', () =>
     expect(selected).toContain('Med');
   });
 
-  test('model selection should be visible without scrolling (above fold)', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     const modelLabel = page.locator('label', { hasText: 'Model' });
     const isVisible = await modelLabel.isVisible();
     expect(isVisible).toBe(true);
@@ -1653,8 +1502,7 @@ test.describe('Playground — Model Selection: Additional Positive Tests', () =>
 
 test.describe('Playground — Model Selection: Model-Specific Behavior', () => {
 
-  test('Zero Indic: language dropdown should show Indic languages', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     const modelSelect = page.locator('select').first();
     await modelSelect.selectOption({ label: 'Zero Indic' });
     await page.waitForTimeout(500);
@@ -1663,8 +1511,7 @@ test.describe('Playground — Model Selection: Model-Specific Behavior', () => {
     await expect(page.getByRole('button', { name: /English/ })).toBeVisible();
   });
 
-  test('Zero Med: should update configuration for medical transcription', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     const modelSelect = page.locator('select').first();
     await modelSelect.selectOption({ label: 'Zero Med' });
     await page.waitForTimeout(1000);
@@ -1674,8 +1521,7 @@ test.describe('Playground — Model Selection: Model-Specific Behavior', () => {
     console.log('Zero Med selected — config section functional');
   });
 
-  test('Zero Codeswitch: should be configured for code-mixed audio', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     const modelSelect = page.locator('select').first();
     await modelSelect.selectOption({ label: 'Zero Codeswitch' });
     await page.waitForTimeout(1000);
@@ -1685,8 +1531,7 @@ test.describe('Playground — Model Selection: Model-Specific Behavior', () => {
     console.log('Zero Codeswitch selected — config section functional');
   });
 
-  test('changing model should not clear uploaded file', async ({ page }) => {
-    test.setTimeout(240000);
+  
     await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
 
     // Upload a file first
@@ -1709,8 +1554,7 @@ test.describe('Playground — Model Selection: Model-Specific Behavior', () => {
     // File should ideally persist when changing model
   });
 
-  test('changing model should not affect Credits display', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
 
     const creditsBefore = await page.getByText(/Credits:\s*\$/).textContent() || '';
 
@@ -1723,8 +1567,7 @@ test.describe('Playground — Model Selection: Model-Specific Behavior', () => {
     console.log(`Credits unchanged after model switch: ${creditsAfter.trim()}`);
   });
 
-  test('features panel should remain visible regardless of model selected', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     const modelSelect = page.locator('select').first();
 
     for (const model of PLAYGROUND_MODELS) {
@@ -1737,8 +1580,7 @@ test.describe('Playground — Model Selection: Model-Specific Behavior', () => {
     }
   });
 
-  test('Run Analysis should work with each model (basic transcription)', async ({ page }) => {
-    test.setTimeout(240000);
+  
     await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
 
     // Upload audio
@@ -1760,8 +1602,7 @@ test.describe('Playground — Model Selection: Model-Specific Behavior', () => {
 
 test.describe('Playground — Model Selection: Edge Cases', () => {
 
-  test('selecting the same model twice should not break anything', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     const modelSelect = page.locator('select').first();
 
     await modelSelect.selectOption({ label: 'Zero Indic' });
@@ -1774,8 +1615,7 @@ test.describe('Playground — Model Selection: Edge Cases', () => {
     console.log('Double-select same model: no issues');
   });
 
-  test('rapid model switching (10 times) should not crash', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     const modelSelect = page.locator('select').first();
     const models = ['Zero Indic', 'Zero Med', 'Zero Codeswitch'];
 
@@ -1791,8 +1631,7 @@ test.describe('Playground — Model Selection: Edge Cases', () => {
     console.log('Survived 10 rapid model switches');
   });
 
-  test('model switch should complete within 1 second (no heavy reload)', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     const modelSelect = page.locator('select').first();
 
     const start = Date.now();
@@ -1804,8 +1643,7 @@ test.describe('Playground — Model Selection: Edge Cases', () => {
     expect(elapsed).toBeLessThan(1000);
   });
 
-  test('model selection should persist after page scroll', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     const modelSelect = page.locator('select').first();
 
     await modelSelect.selectOption({ label: 'Zero Codeswitch' });
@@ -1820,8 +1658,7 @@ test.describe('Playground — Model Selection: Edge Cases', () => {
     expect(val).toContain('Codeswitch');
   });
 
-  test('model dropdown should not have empty/blank options', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     const modelSelect = page.locator('select').first();
     const options = await modelSelect.locator('option').allTextContents();
 
@@ -1831,8 +1668,7 @@ test.describe('Playground — Model Selection: Edge Cases', () => {
     console.log(`All ${options.length} options are non-empty`);
   });
 
-  test('model dropdown should not have duplicate options', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     const modelSelect = page.locator('select').first();
     const options = await modelSelect.locator('option').allTextContents();
     const trimmed = options.map(o => o.trim());
@@ -1842,8 +1678,7 @@ test.describe('Playground — Model Selection: Edge Cases', () => {
     console.log(`Options: ${trimmed.join(', ')} — No duplicates`);
   });
 
-  test('model selection should be keyboard-accessible (arrow keys)', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     const modelSelect = page.locator('select').first();
 
     await modelSelect.focus();
@@ -1858,8 +1693,7 @@ test.describe('Playground — Model Selection: Edge Cases', () => {
     // Should have moved to a different option
   });
 
-  test('model dropdown should be focusable via Tab key', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
 
     // Tab through the page to reach the model dropdown
     for (let i = 0; i < 20; i++) {
@@ -1879,8 +1713,7 @@ test.describe('Playground — Model Selection: Edge Cases', () => {
 
 test.describe('Playground — Model Selection: Negative Tests', () => {
 
-  test('model dropdown should not contain non-existent models', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     const modelSelect = page.locator('select').first();
     const options = await modelSelect.locator('option').allTextContents();
     const optionText = options.join(' ');
@@ -1893,8 +1726,7 @@ test.describe('Playground — Model Selection: Negative Tests', () => {
     console.log('No invalid model names found');
   });
 
-  test('model dropdown should not allow text input/typing', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     const modelSelect = page.locator('select').first();
 
     // <select> elements don't accept typed text — verify it's a select not an input
@@ -1903,16 +1735,14 @@ test.describe('Playground — Model Selection: Negative Tests', () => {
     console.log(`Model element is <${tagName}> — no free text input`);
   });
 
-  test('model dropdown should not be disabled', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     const modelSelect = page.locator('select').first();
     const isDisabled = await modelSelect.isDisabled();
     expect(isDisabled).toBe(false);
     console.log('Model dropdown is enabled');
   });
 
-  test('selecting model should not trigger API calls (no premature request)', async ({ page }) => {
-    const apiCalls: string[] = [];
+  
     page.on('request', req => {
       if (req.url().includes('/v1/audio/transcriptions')) {
         apiCalls.push(req.method() + ' ' + req.url());
@@ -1933,8 +1763,7 @@ test.describe('Playground — Model Selection: Negative Tests', () => {
     console.log(`API calls during model switching: ${apiCalls.length}`);
   });
 
-  test('model selection should not cause console JavaScript errors', async ({ page }) => {
-    const errors: string[] = [];
+  
     page.on('console', msg => {
       if (msg.type() === 'error') errors.push(msg.text());
     });
@@ -1952,8 +1781,7 @@ test.describe('Playground — Model Selection: Negative Tests', () => {
     expect(errors.length, 'No JS errors during model switching').toBe(0);
   });
 
-  test('model selection should not cause failed network requests', async ({ page }) => {
-    const failedRequests: string[] = [];
+  
     page.on('response', res => {
       if (res.status() >= 400) failedRequests.push(`${res.status()} ${res.url()}`);
     });
@@ -1971,8 +1799,7 @@ test.describe('Playground — Model Selection: Negative Tests', () => {
     expect(failedRequests.length).toBe(0);
   });
 
-  test('model dropdown should not show HTML/raw code in option labels', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     const modelSelect = page.locator('select').first();
     const options = await modelSelect.locator('option').allTextContents();
 
@@ -1986,8 +1813,7 @@ test.describe('Playground — Model Selection: Negative Tests', () => {
     console.log('All model options are clean text');
   });
 
-  test('model dropdown should not allow selecting a disabled/grayed-out option', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     const modelSelect = page.locator('select').first();
     const disabledOptions = await modelSelect.locator('option[disabled]').count();
     console.log(`Disabled options in model dropdown: ${disabledOptions}`);
@@ -1995,8 +1821,7 @@ test.describe('Playground — Model Selection: Negative Tests', () => {
     // (browser enforces this natively for <select>)
   });
 
-  test('model selection should not affect the Language dropdown value', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
 
     // Switch model
     const modelSelect = page.locator('select').first();
@@ -2010,8 +1835,7 @@ test.describe('Playground — Model Selection: Negative Tests', () => {
     console.log(`Language after model switch: ${langText.trim()}`);
   });
 
-  test('model selection should not reset the Transcription Mode', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
 
     // Verify Transcription Mode label is present before model switch
     await expect(page.locator('label', { hasText: 'Transcription Mode' })).toBeVisible();
@@ -2025,8 +1849,7 @@ test.describe('Playground — Model Selection: Negative Tests', () => {
     console.log('Transcription Mode persisted after model switch');
   });
 
-  test('model dropdown should not be visible in TTS tab', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
 
     // Switch to TTS
     await page.getByRole('button', { name: 'Text to Speech' }).click();
@@ -2044,14 +1867,12 @@ test.describe('Playground — Model Selection: Negative Tests', () => {
 // ── Language Dropdown ───────────────────────────────────────────────────────
 
 test.describe('Playground — Language Selection', () => {
-  test('should display English as default language', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
 
     await expect(page.getByRole('button', { name: /English/ })).toBeVisible();
   });
 
-  test('should open language dropdown and show options', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
 
     await page.getByRole('button', { name: /English/ }).click();
     await page.waitForTimeout(500);
@@ -2064,13 +1885,11 @@ test.describe('Playground — Language Selection', () => {
 
 test.describe('Playground — Language Selection: Additional Positive Tests', () => {
 
-  test('Language label should be visible in Configuration section', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     await expect(page.locator('label', { hasText: 'Language' })).toBeVisible();
   });
 
-  test('default language button should show flag emoji with English', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     const langBtn = page.getByRole('button', { name: /English/ });
     await expect(langBtn).toBeVisible();
     const text = await langBtn.textContent() || '';
@@ -2078,8 +1897,7 @@ test.describe('Playground — Language Selection: Additional Positive Tests', ()
     console.log(`Language button text: ${text.trim()}`);
   });
 
-  test('language dropdown should open on click and show multiple languages', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     await page.getByRole('button', { name: /English/ }).click();
     await page.waitForTimeout(1000);
 
@@ -2090,16 +1908,14 @@ test.describe('Playground — Language Selection: Additional Positive Tests', ()
     console.log(`Dropdown opened. Hindi visible: ${hasHindi}`);
   });
 
-  test('language dropdown should include Hindi', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     await page.getByRole('button', { name: /English/ }).click();
     await page.waitForTimeout(1000);
 
     await expect(page.getByText('Hindi', { exact: false }).first()).toBeVisible();
   });
 
-  test('language dropdown should include Telugu', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     await page.getByRole('button', { name: /English/ }).click();
     await page.waitForTimeout(1000);
 
@@ -2107,8 +1923,7 @@ test.describe('Playground — Language Selection: Additional Positive Tests', ()
     expect(bodyText).toContain('Telugu');
   });
 
-  test('language dropdown should include Kannada', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     await page.getByRole('button', { name: /English/ }).click();
     await page.waitForTimeout(1000);
 
@@ -2116,8 +1931,7 @@ test.describe('Playground — Language Selection: Additional Positive Tests', ()
     expect(bodyText).toContain('Kannada');
   });
 
-  test('language dropdown should include Bengali', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     await page.getByRole('button', { name: /English/ }).click();
     await page.waitForTimeout(1000);
 
@@ -2125,8 +1939,7 @@ test.describe('Playground — Language Selection: Additional Positive Tests', ()
     expect(bodyText).toContain('Bengali');
   });
 
-  test('language dropdown should include Tamil', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     await page.getByRole('button', { name: /English/ }).click();
     await page.waitForTimeout(1000);
 
@@ -2134,8 +1947,7 @@ test.describe('Playground — Language Selection: Additional Positive Tests', ()
     expect(bodyText).toContain('Tamil');
   });
 
-  test('language dropdown should include Marathi', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     await page.getByRole('button', { name: /English/ }).click();
     await page.waitForTimeout(1000);
 
@@ -2143,8 +1955,7 @@ test.describe('Playground — Language Selection: Additional Positive Tests', ()
     expect(bodyText).toContain('Marathi');
   });
 
-  test('should be able to select Hindi language', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     await page.getByRole('button', { name: /English/ }).click();
     await page.waitForTimeout(1000);
 
@@ -2158,8 +1969,7 @@ test.describe('Playground — Language Selection: Additional Positive Tests', ()
     console.log(`Hindi selected: ${hasHindiSelected}`);
   });
 
-  test('should be able to switch language from Hindi back to English', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
 
     // Select Hindi
     await page.getByRole('button', { name: /English/ }).click();
@@ -2177,8 +1987,7 @@ test.describe('Playground — Language Selection: Additional Positive Tests', ()
     console.log('Switched Hindi → English successfully');
   });
 
-  test('language selection should persist after scrolling', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
 
     // Select Hindi
     await page.getByRole('button', { name: /English/ }).click();
@@ -2197,14 +2006,12 @@ test.describe('Playground — Language Selection: Additional Positive Tests', ()
     expect(bodyText).toContain('Hindi');
   });
 
-  test('language button should be clickable and enabled', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     const langBtn = page.getByRole('button', { name: /English/ });
     await expect(langBtn).toBeEnabled();
   });
 
-  test('selecting a language should close the dropdown', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
 
     // Open dropdown
     await page.getByRole('button', { name: /English/ }).click();
@@ -2221,8 +2028,7 @@ test.describe('Playground — Language Selection: Additional Positive Tests', ()
     console.log('Language selected and dropdown closed');
   });
 
-  test('Credits should not change when switching languages', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
 
     const creditsBefore = await page.getByText(/Credits:\s*\$/).textContent() || '';
 
@@ -2242,8 +2048,7 @@ test.describe('Playground — Language Selection: Additional Positive Tests', ()
 
 test.describe('Playground — Language Selection: Edge Cases', () => {
 
-  test('opening and closing dropdown without selecting should keep current language', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
 
     // Open dropdown
     await page.getByRole('button', { name: /English/ }).click();
@@ -2257,8 +2062,7 @@ test.describe('Playground — Language Selection: Edge Cases', () => {
     await expect(page.getByRole('button', { name: /English/ })).toBeVisible();
   });
 
-  test('rapid language switching should not crash the page', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
 
     // Open and select Hindi
     await page.getByRole('button', { name: /English/ }).click();
@@ -2283,8 +2087,7 @@ test.describe('Playground — Language Selection: Edge Cases', () => {
     console.log('Survived rapid language switching');
   });
 
-  test('language dropdown should open within 2s', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
 
     const start = Date.now();
     await page.getByRole('button', { name: /English/ }).first().click();
@@ -2296,8 +2099,7 @@ test.describe('Playground — Language Selection: Edge Cases', () => {
     expect(elapsed).toBeLessThan(2000);
   });
 
-  test('language selection should not affect Model dropdown value', async ({ page }) => {
-    test.setTimeout(240000);
+  
     await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
 
     await expect(page.getByText('Configuration')).toBeVisible({ timeout: 10000 });
@@ -2324,8 +2126,7 @@ test.describe('Playground — Language Selection: Edge Cases', () => {
     console.log(`Model after language switch: ${modelVal}`);
   });
 
-  test('language selection should not affect uploaded file', async ({ page }) => {
-    test.setTimeout(240000);
+  
     await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
 
     // Upload file
@@ -2345,8 +2146,7 @@ test.describe('Playground — Language Selection: Edge Cases', () => {
     console.log(`File after language switch: ${filePresent ? 'Present' : 'Cleared'}`);
   });
 
-  test('language selection should not affect Transcription Mode', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
 
     // Switch language
     await page.getByRole('button', { name: /English/ }).click();
@@ -2359,8 +2159,7 @@ test.describe('Playground — Language Selection: Edge Cases', () => {
     console.log('Transcription Mode unchanged after language switch');
   });
 
-  test('language dropdown should be scrollable if many languages are listed', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     await page.getByRole('button', { name: /English/ }).click();
     await page.waitForTimeout(1000);
 
@@ -2372,8 +2171,7 @@ test.describe('Playground — Language Selection: Edge Cases', () => {
     console.log('Language dropdown opened with scrollable content');
   });
 
-  test('language dropdown should handle double-click without issues', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
 
     // Double-click the language button
     await page.getByRole('button', { name: /English/ }).dblclick();
@@ -2384,8 +2182,7 @@ test.describe('Playground — Language Selection: Edge Cases', () => {
     expect(bodyText).toContain('API Playground');
   });
 
-  test('language selection should be keyboard accessible', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
 
     const langBtn = page.getByRole('button', { name: /English/ });
     await langBtn.focus();
@@ -2402,8 +2199,7 @@ test.describe('Playground — Language Selection: Edge Cases', () => {
 
 test.describe('Playground — Language Selection: Negative Tests', () => {
 
-  test('language dropdown should show supported languages for Zero Indic', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     await page.getByRole('button', { name: /English/ }).click();
     await page.waitForTimeout(2000);
 
@@ -2416,8 +2212,7 @@ test.describe('Playground — Language Selection: Negative Tests', () => {
     console.log('Supported languages found in dropdown');
   });
 
-  test('language dropdown should not have empty/blank entries', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     await page.getByRole('button', { name: /English/ }).click();
     await page.waitForTimeout(1000);
 
@@ -2433,8 +2228,7 @@ test.describe('Playground — Language Selection: Negative Tests', () => {
     }
   });
 
-  test('language dropdown should not show duplicate languages', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     await page.getByRole('button', { name: /English/ }).click();
     await page.waitForTimeout(1000);
 
@@ -2447,8 +2241,7 @@ test.describe('Playground — Language Selection: Negative Tests', () => {
     }
   });
 
-  test('language dropdown should not show HTML/template code', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     await page.getByRole('button', { name: /English/ }).click();
     await page.waitForTimeout(2000);
 
@@ -2460,8 +2253,7 @@ test.describe('Playground — Language Selection: Negative Tests', () => {
     console.log('No HTML/template code found in language dropdown');
   });
 
-  test('language selection should not trigger any API calls', async ({ page }) => {
-    const apiCalls: string[] = [];
+  
     page.on('request', req => {
       if (req.url().includes('/v1/audio/transcriptions') || req.url().includes('/v1/speakers')) {
         apiCalls.push(req.url());
@@ -2480,8 +2272,7 @@ test.describe('Playground — Language Selection: Negative Tests', () => {
     console.log(`API calls during language selection: ${apiCalls.length}`);
   });
 
-  test('language selection should not cause JavaScript console errors', async ({ page }) => {
-    const errors: string[] = [];
+  
     page.on('console', msg => {
       if (msg.type() === 'error') errors.push(msg.text());
     });
@@ -2498,8 +2289,7 @@ test.describe('Playground — Language Selection: Negative Tests', () => {
     expect(errors.length).toBe(0);
   });
 
-  test('language selection should not cause failed network requests', async ({ page }) => {
-    const failedRequests: string[] = [];
+  
     page.on('response', res => {
       if (res.status() >= 400) failedRequests.push(`${res.status()} ${res.url()}`);
     });
@@ -2515,14 +2305,12 @@ test.describe('Playground — Language Selection: Negative Tests', () => {
     expect(failedRequests.length).toBe(0);
   });
 
-  test('language button should not be disabled', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     const langBtn = page.getByRole('button', { name: /English/ });
     await expect(langBtn).toBeEnabled();
   });
 
-  test('language button text should not show NaN, null, or undefined', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     const langText = await page.getByRole('button', { name: /English|Hindi|Telugu/ }).first().textContent() || '';
     expect(langText).not.toContain('NaN');
     expect(langText).not.toContain('null');
@@ -2530,8 +2318,7 @@ test.describe('Playground — Language Selection: Negative Tests', () => {
     expect(langText).not.toContain('error');
   });
 
-  test('language dropdown should not be visible in TTS tab', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
 
     // Switch to TTS
     await page.getByRole('button', { name: 'Text to Speech' }).click();
@@ -2544,8 +2331,7 @@ test.describe('Playground — Language Selection: Negative Tests', () => {
     console.log('STT language dropdown not leaking into TTS tab');
   });
 
-  test('language dropdown should not be editable via developer tools injection', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
 
     // The language button should be a proper interactive element, not a contentEditable div
     const langBtn = page.getByRole('button', { name: /English/ });
@@ -2553,8 +2339,7 @@ test.describe('Playground — Language Selection: Negative Tests', () => {
     expect(isEditable).not.toBe('true');
   });
 
-  test('selecting the already-selected language should not break anything', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
 
     // English is already selected — open and select English again
     await page.getByRole('button', { name: /English/ }).click();
@@ -2572,8 +2357,7 @@ test.describe('Playground — Language Selection: Negative Tests', () => {
 // ── Audio Intelligence Features ─────────────────────────────────────────────
 
 test.describe('Playground — Audio Intelligence Features', () => {
-  test('should display all Audio Intelligence features', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
 
     const features = [
       'Translation', 'Transliteration', 'Speaker Diarization',
@@ -2586,8 +2370,7 @@ test.describe('Playground — Audio Intelligence Features', () => {
     console.log('All Audio Intelligence features visible');
   });
 
-  test('should display all Intelligence Features', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
 
     const features = [
       'Profanity Hashing', 'Custom Keyword Hashing', 'Intent Detection',
@@ -2608,84 +2391,69 @@ test.describe('Playground — Audio Intelligence Features: Additional Positive T
 
   // ── Section Headings ────────────────────────────────────────────────────
 
-  test('Audio Intelligence heading should be visible', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     await expect(page.getByText('Audio Intelligence')).toBeVisible();
   });
 
-  test('Intelligence Features heading should be visible', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     await expect(page.getByText('Intelligence Features')).toBeVisible();
   });
 
   // ── Audio Intelligence: Individual Feature Visibility ───────────────────
 
-  test('Translation feature should be visible', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     await expect(page.getByText('Translation', { exact: false }).first()).toBeVisible();
   });
 
-  test('Transliteration feature should be visible', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     await expect(page.getByText('Transliteration', { exact: false }).first()).toBeVisible();
   });
 
-  test('Speaker Diarization feature should be visible', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     await expect(page.getByText('Speaker Diarization', { exact: false }).first()).toBeVisible();
   });
 
-  test('Speaker Identification feature should be visible', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     await expect(page.getByText('Speaker Identification', { exact: false }).first()).toBeVisible();
   });
 
-  test('Word Timestamps feature should be visible', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     await expect(page.getByText('Word Timestamps', { exact: false }).first()).toBeVisible();
   });
 
   // ── Intelligence Features: Individual Feature Visibility ────────────────
 
-  test('Profanity Hashing feature should be visible', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     await expect(page.getByText('Profanity Hashing', { exact: false }).first()).toBeVisible();
   });
 
-  test('Custom Keyword Hashing feature should be visible', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     await expect(page.getByText('Custom Keyword Hashing', { exact: false }).first()).toBeVisible();
   });
 
-  test('Intent Detection feature should be visible', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     await expect(page.getByText('Intent Detection', { exact: false }).first()).toBeVisible();
   });
 
-  test('Sentiment Analysis feature should be visible', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     await expect(page.getByText('Sentiment Analysis', { exact: false }).first()).toBeVisible();
   });
 
-  test('Emotion Diarization feature should be visible', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     await expect(page.getByText('Emotion Diarization', { exact: false }).first()).toBeVisible();
   });
 
-  test('Summarisation feature should be visible', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     await expect(page.getByText('Summarisation', { exact: false }).first()).toBeVisible();
   });
 
-  test('Keyword Normalisation feature should be visible', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     await expect(page.getByText('Keyword Normalisation', { exact: false }).first()).toBeVisible();
   });
 
   // ── Feature Count ───────────────────────────────────────────────────────
 
-  test('Audio Intelligence should have exactly 5 features', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     const audioIntelFeatures = ['Translation', 'Transliteration', 'Speaker Diarization', 'Speaker Identification', 'Word Timestamps'];
     const bodyText = await page.textContent('body') || '';
     let count = 0;
@@ -2696,8 +2464,7 @@ test.describe('Playground — Audio Intelligence Features: Additional Positive T
     console.log(`Audio Intelligence features found: ${count}/5`);
   });
 
-  test('Intelligence Features should have exactly 7 features', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     const intelFeatures = ['Profanity Hashing', 'Custom Keyword Hashing', 'Intent Detection', 'Sentiment Analysis', 'Emotion Diarization', 'Summarisation', 'Keyword Normalisation'];
     const bodyText = await page.textContent('body') || '';
     let count = 0;
@@ -2708,8 +2475,7 @@ test.describe('Playground — Audio Intelligence Features: Additional Positive T
     console.log(`Intelligence Features found: ${count}/7`);
   });
 
-  test('total feature count should be 12', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     const allFeatures = [
       'Translation', 'Transliteration', 'Speaker Diarization', 'Speaker Identification', 'Word Timestamps',
       'Profanity Hashing', 'Custom Keyword Hashing', 'Intent Detection', 'Sentiment Analysis', 'Emotion Diarization', 'Summarisation', 'Keyword Normalisation',
@@ -2725,15 +2491,13 @@ test.describe('Playground — Audio Intelligence Features: Additional Positive T
 
   // ── Features Tab / Code Sample Tab ──────────────────────────────────────
 
-  test('Features tab should be active by default (features visible on load)', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     // Features should be visible without clicking anything
     await expect(page.getByText('Audio Intelligence')).toBeVisible();
     await expect(page.getByText('Intelligence Features')).toBeVisible();
   });
 
-  test('Code Sample tab should show code when clicked', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     await page.getByRole('button', { name: 'Code Sample' }).click();
     await page.waitForTimeout(1000);
 
@@ -2744,8 +2508,7 @@ test.describe('Playground — Audio Intelligence Features: Additional Positive T
     console.log(`Code Sample tab has code content: ${hasCodeContent}`);
   });
 
-  test('switching from Code Sample back to Features should restore features list', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
 
     await page.getByRole('button', { name: 'Code Sample' }).click();
     await page.waitForTimeout(500);
@@ -2758,8 +2521,7 @@ test.describe('Playground — Audio Intelligence Features: Additional Positive T
 
   // ── Feature Toggle Interaction ──────────────────────────────────────────
 
-  test('each feature should be clickable/toggleable', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
 
     const features = ['Translation', 'Speaker Diarization', 'Sentiment Analysis'];
     for (const feature of features) {
@@ -2772,8 +2534,7 @@ test.describe('Playground — Audio Intelligence Features: Additional Positive T
     await expect(page.getByRole('button', { name: 'Run Analysis' })).toBeVisible();
   });
 
-  test('features should remain visible after model change', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
 
     const modelSelect = page.locator('select').first();
     for (const model of PLAYGROUND_MODELS) {
@@ -2784,8 +2545,7 @@ test.describe('Playground — Audio Intelligence Features: Additional Positive T
     }
   });
 
-  test('features should remain visible after language change', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
 
     // Switch to Hindi
     await page.getByRole('button', { name: /English/ }).click();
@@ -2803,8 +2563,7 @@ test.describe('Playground — Audio Intelligence Features: Additional Positive T
 
 test.describe('Playground — Audio Intelligence Features: Edge Cases', () => {
 
-  test('toggling a feature on and off should not break the page', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
 
     const feature = page.locator('span.leading-tight', { hasText: 'Translation' }).first();
     // Click to toggle on
@@ -2818,8 +2577,7 @@ test.describe('Playground — Audio Intelligence Features: Edge Cases', () => {
     console.log('Feature toggle on/off: no issues');
   });
 
-  test('toggling multiple features simultaneously should not crash', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
 
     const features = [
       'Translation', 'Speaker Diarization', 'Sentiment Analysis',
@@ -2837,8 +2595,7 @@ test.describe('Playground — Audio Intelligence Features: Edge Cases', () => {
     console.log(`Toggled ${features.length} features on: page functional`);
   });
 
-  test('enabling all 12 features should not crash the page', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
 
     const allFeatures = [
       'Translation', 'Transliteration', 'Speaker Diarization',
@@ -2857,8 +2614,7 @@ test.describe('Playground — Audio Intelligence Features: Edge Cases', () => {
     console.log('All 12 features toggled on: page functional');
   });
 
-  test('rapidly toggling a single feature 10 times should not crash', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
 
     const feature = page.locator('span.leading-tight', { hasText: 'Speaker Diarization' }).first();
     for (let i = 0; i < 10; i++) {
@@ -2870,8 +2626,7 @@ test.describe('Playground — Audio Intelligence Features: Edge Cases', () => {
     console.log('Rapid toggle 10x: survived');
   });
 
-  test('feature toggles should not trigger API calls (only Run Analysis should)', async ({ page }) => {
-    const apiCalls: string[] = [];
+  
     page.on('request', req => {
       if (req.url().includes('/v1/audio/transcriptions')) {
         apiCalls.push(req.url());
@@ -2891,8 +2646,7 @@ test.describe('Playground — Audio Intelligence Features: Edge Cases', () => {
     console.log(`API calls during feature toggling: ${apiCalls.length}`);
   });
 
-  test('features panel should be scrollable if content overflows', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
 
     // Both first and last features should be reachable
     await expect(page.getByText('Translation', { exact: false }).first()).toBeVisible();
@@ -2903,8 +2657,7 @@ test.describe('Playground — Audio Intelligence Features: Edge Cases', () => {
     console.log('Features panel: first and last features accessible');
   });
 
-  test('feature toggle state should persist after scrolling', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
 
     // Toggle a feature
     await page.locator('span.leading-tight', { hasText: 'Intent Detection' }).first().click({ force: true, timeout: 3000 });
@@ -2921,8 +2674,7 @@ test.describe('Playground — Audio Intelligence Features: Edge Cases', () => {
     console.log('Feature toggle state persisted after scroll');
   });
 
-  test('switching Features → Code Sample → Features should preserve feature list', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
 
     // Switch to Code Sample and back
     await page.getByRole('button', { name: 'Code Sample' }).click();
@@ -2939,8 +2691,7 @@ test.describe('Playground — Audio Intelligence Features: Edge Cases', () => {
     console.log('Features panel restored after Code Sample round-trip');
   });
 
-  test('Credits should not change when toggling features', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
 
     const creditsBefore = await page.getByText(/Credits:\s*\$/).textContent() || '';
 
@@ -2962,8 +2713,7 @@ test.describe('Playground — Audio Intelligence Features: Edge Cases', () => {
 
 test.describe('Playground — Audio Intelligence Features: Negative Tests', () => {
 
-  test('should not show any non-existent/deprecated features', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     const bodyText = await page.textContent('body') || '';
 
     expect(bodyText).not.toContain('Medical Correction');
@@ -2974,8 +2724,7 @@ test.describe('Playground — Audio Intelligence Features: Negative Tests', () =
     console.log('No deprecated/non-existent features found');
   });
 
-  test('feature names should not show HTML tags or template variables', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     const bodyText = await page.textContent('body') || '';
 
     const allFeatures = [
@@ -2995,8 +2744,7 @@ test.describe('Playground — Audio Intelligence Features: Negative Tests', () =
     expect(bodyText).not.toContain('[object');
   });
 
-  test('toggling features should not cause JavaScript console errors', async ({ page }) => {
-    const errors: string[] = [];
+  
     page.on('console', msg => {
       if (msg.type() === 'error') errors.push(msg.text());
     });
@@ -3014,8 +2762,7 @@ test.describe('Playground — Audio Intelligence Features: Negative Tests', () =
     expect(errors.length).toBe(0);
   });
 
-  test('toggling features should not cause failed network requests', async ({ page }) => {
-    const failedRequests: string[] = [];
+  
     page.on('response', res => {
       if (res.status() >= 400) failedRequests.push(`${res.status()} ${res.url()}`);
     });
@@ -3031,8 +2778,7 @@ test.describe('Playground — Audio Intelligence Features: Negative Tests', () =
     expect(failedRequests.length).toBe(0);
   });
 
-  test('features panel should not be visible in TTS tab', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
 
     // Switch to TTS
     await page.getByRole('button', { name: 'Text to Speech' }).click();
@@ -3046,21 +2792,17 @@ test.describe('Playground — Audio Intelligence Features: Negative Tests', () =
     console.log('STT features not leaking into TTS tab');
   });
 
-  test('features panel should not be visible in Voice Agent tab', async ({ page }) => {
     await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
 
-    await page.getByRole('button', { name: 'Voice Agent' }).click();
     await page.waitForTimeout(1000);
 
     const bodyText = await page.textContent('body') || '';
     expect(bodyText).not.toContain('Audio Intelligence');
     expect(bodyText).not.toContain('Intelligence Features');
     expect(bodyText).not.toContain('Speaker Diarization');
-    console.log('Features not showing in Voice Agent tab');
   });
 
-  test('feature toggles should not be editable via contentEditable', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
 
     const translationEl = page.getByText('Translation', { exact: false }).first();
     const isEditable = await translationEl.evaluate(el => (el as HTMLElement).contentEditable);
@@ -3068,8 +2810,7 @@ test.describe('Playground — Audio Intelligence Features: Negative Tests', () =
     console.log('Feature toggle is not contentEditable');
   });
 
-  test('features should not have broken/missing icons or images', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     await page.getByRole('button', { name: 'Speech to Text' }).click({ timeout: 10000 }).catch(() => {});
     await page.getByRole('button', { name: 'Features' }).click({ timeout: 10000 }).catch(() => {});
     await page.waitForTimeout(500);
@@ -3088,8 +2829,7 @@ test.describe('Playground — Audio Intelligence Features: Negative Tests', () =
     expect(brokenCount).toBe(0);
   });
 
-  test('Run Analysis with features enabled but no audio should not crash', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
 
     // Enable some features
     await page.locator('span.leading-tight', { hasText: 'Translation' }).first().click({ force: true, timeout: 3000 });
@@ -3108,8 +2848,7 @@ test.describe('Playground — Audio Intelligence Features: Negative Tests', () =
     console.log('Run Analysis with features but no audio: page survived');
   });
 
-  test('feature toggle labels should not overlap or truncate', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
 
     const allFeatures = [
       'Translation', 'Transliteration', 'Speaker Diarization',
@@ -3132,16 +2871,14 @@ test.describe('Playground — Audio Intelligence Features: Negative Tests', () =
 // ── File Upload ─────────────────────────────────────────────────────────────
 
 test.describe('Playground — File Upload', () => {
-  test('should have a hidden file input for audio upload', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
 
     const fileInput = page.locator('input[type="file"]');
     await expect(fileInput).toBeAttached();
     console.log('File input element found');
   });
 
-  test('should upload WAV file via file input', async ({ page }) => {
-    test.setTimeout(240000);
+  
     await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
 
     expect(fs.existsSync(TEST_AUDIO_FILES.wav), 'WAV file should exist').toBe(true);
@@ -3158,8 +2895,7 @@ test.describe('Playground — File Upload', () => {
     console.log('Page after upload (snippet):', bodyText?.replace(/\s+/g, ' ').substring(0, 500));
   });
 
-  test('should trigger transcription via Run Analysis button after upload', async ({ page }) => {
-    test.setTimeout(240000);
+  
     await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
 
     // Upload file
@@ -3183,23 +2919,19 @@ test.describe('Playground — File Upload', () => {
 
 test.describe('Playground — File Upload: Additional Positive Tests', () => {
 
-  test('Upload Your Audio heading should be visible', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     await expect(page.getByText('Upload Your Audio')).toBeVisible();
   });
 
-  test('Upload description text should be visible', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     await expect(page.getByText('Upload Your own audio file to transcribe')).toBeVisible();
   });
 
-  test('Choose Audio File button should be enabled', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     await expect(page.getByRole('button', { name: 'Choose Audio File' })).toBeEnabled();
   });
 
-  test('after uploading WAV, filename should appear on page', async ({ page }) => {
-    test.setTimeout(240000);
+  
     await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
 
     const fileInput = page.locator('input[type="file"]');
@@ -3211,8 +2943,7 @@ test.describe('Playground — File Upload: Additional Positive Tests', () => {
     console.log('WAV filename displayed after upload');
   });
 
-  test('after uploading MP3, filename should appear on page', async ({ page }) => {
-    test.setTimeout(240000);
+  
     await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
 
     const fileInput = page.locator('input[type="file"]');
@@ -3225,8 +2956,7 @@ test.describe('Playground — File Upload: Additional Positive Tests', () => {
     console.log('MP3 filename displayed after upload');
   });
 
-  test('after uploading, file size should be displayed', async ({ page }) => {
-    test.setTimeout(240000);
+  
     await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
 
     const fileInput = page.locator('input[type="file"]');
@@ -3235,12 +2965,10 @@ test.describe('Playground — File Upload: Additional Positive Tests', () => {
 
     const bodyText = await page.textContent('body') || '';
     // Should show file size like "3.9 MB" or "4.1 MB"
-    const hasFileSize = /\d+\.?\d*\s*(MB|KB|GB)/i.test(bodyText);
-    console.log(`File size displayed: ${hasFileSize}`);
+    const hasFileSize = /\d+\.?\d*\s*(MB|KB|GB)/i.
   });
 
-  test('after uploading, Replace File button should appear', async ({ page }) => {
-    test.setTimeout(240000);
+  
     await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
 
     const fileInput = page.locator('input[type="file"]');
@@ -3252,8 +2980,7 @@ test.describe('Playground — File Upload: Additional Positive Tests', () => {
     console.log(`Replace File option visible: ${hasReplace}`);
   });
 
-  test('after uploading, "Uploaded" status should appear', async ({ page }) => {
-    test.setTimeout(240000);
+  
     await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
 
     const fileInput = page.locator('input[type="file"]');
@@ -3265,8 +2992,7 @@ test.describe('Playground — File Upload: Additional Positive Tests', () => {
     console.log(`Uploaded status visible: ${hasUploaded}`);
   });
 
-  test('Run Analysis with uploaded file should show transcription in Transcript tab', async ({ page }) => {
-    test.setTimeout(240000);
+  
     await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
 
     const fileInput = page.locator('input[type="file"]');
@@ -3296,8 +3022,7 @@ test.describe('Playground — File Upload: Additional Positive Tests', () => {
     console.log('Transcript tab shows result after Run Analysis');
   });
 
-  test('Run Analysis with uploaded file should show data in JSON tab', async ({ page }) => {
-    test.setTimeout(240000);
+  
     await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
 
     const fileInput = page.locator('input[type="file"]');
@@ -3316,8 +3041,7 @@ test.describe('Playground — File Upload: Additional Positive Tests', () => {
     console.log(`JSON tab has response data: ${hasJson}`);
   });
 
-  test('uploading a file should not change Credits', async ({ page }) => {
-    test.setTimeout(240000);
+  
     await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
 
     const creditsBefore = await page.getByText(/Credits:\s*\$/).textContent() || '';
@@ -3336,8 +3060,7 @@ test.describe('Playground — File Upload: Additional Positive Tests', () => {
 
 test.describe('Playground — File Upload: Edge Cases', () => {
 
-  test('replacing an uploaded file with a new one should update the filename', async ({ page }) => {
-    test.setTimeout(240000);
+  
     await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
 
     const fileInput = page.locator('input[type="file"]');
@@ -3356,8 +3079,7 @@ test.describe('Playground — File Upload: Edge Cases', () => {
     console.log(`File replaced: ${hasNewFile}`);
   });
 
-  test('uploading a large MP3 file (28 MB) should not crash the page', async ({ page }) => {
-    test.setTimeout(240000);
+  
     await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
 
     expect(fs.existsSync(TEST_AUDIO_FILES.mp3), 'Large MP3 should exist').toBe(true);
@@ -3374,8 +3096,7 @@ test.describe('Playground — File Upload: Edge Cases', () => {
     console.log('Large file upload: page survived');
   });
 
-  test('uploading file should not affect model selection', async ({ page }) => {
-    test.setTimeout(240000);
+  
     await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
 
     // Set model to Zero Med
@@ -3394,8 +3115,7 @@ test.describe('Playground — File Upload: Edge Cases', () => {
     console.log(`Model after upload: ${modelVal}`);
   });
 
-  test('uploading file should not affect language selection', async ({ page }) => {
-    test.setTimeout(240000);
+  
     await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
 
     // Language should be English before and after upload
@@ -3408,8 +3128,7 @@ test.describe('Playground — File Upload: Edge Cases', () => {
     await expect(page.getByRole('button', { name: /English/ })).toBeVisible();
   });
 
-  test('uploading file should not affect feature toggle states', async ({ page }) => {
-    test.setTimeout(240000);
+  
     await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
 
     // Toggle some features
@@ -3428,8 +3147,7 @@ test.describe('Playground — File Upload: Edge Cases', () => {
     console.log('Feature states preserved after file upload');
   });
 
-  test('rapid file upload (upload → replace → upload) should not crash', async ({ page }) => {
-    test.setTimeout(240000);
+  
     await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
 
     const fileInput = page.locator('input[type="file"]');
@@ -3444,8 +3162,7 @@ test.describe('Playground — File Upload: Edge Cases', () => {
     console.log('Rapid file replace 3x: page functional');
   });
 
-  test('page should handle MPEG audio file upload', async ({ page }) => {
-    test.setTimeout(240000);
+  
     await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
 
     expect(fs.existsSync(TEST_AUDIO_FILES.mp4), 'MPEG file should exist').toBe(true);
@@ -3464,8 +3181,7 @@ test.describe('Playground — File Upload: Edge Cases', () => {
 
 test.describe('Playground — File Upload: Negative Tests', () => {
 
-  test('Run Analysis without uploading any file should not crash', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
 
     await page.getByRole('button', { name: 'Run Analysis' }).click();
     await page.waitForTimeout(3000);
@@ -3477,8 +3193,7 @@ test.describe('Playground — File Upload: Negative Tests', () => {
     console.log('Run Analysis without file: page survived');
   });
 
-  test('Run Analysis without file should NOT deduct credits', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
 
     const creditsBefore = await page.getByText(/Credits:\s*\$/).textContent() || '';
 
@@ -3490,8 +3205,7 @@ test.describe('Playground — File Upload: Negative Tests', () => {
     console.log('No credits deducted without file upload');
   });
 
-  test('uploading should not trigger any API calls (only Run Analysis should)', async ({ page }) => {
-    test.setTimeout(240000);
+  
     const apiCalls: string[] = [];
     page.on('request', req => {
       if (req.url().includes('/v1/audio/transcriptions')) apiCalls.push(req.url());
@@ -3507,8 +3221,7 @@ test.describe('Playground — File Upload: Negative Tests', () => {
     console.log(`API calls after upload (no Run Analysis): ${apiCalls.length}`);
   });
 
-  test('uploading should not cause JavaScript console errors', async ({ page }) => {
-    test.setTimeout(240000);
+  
     const errors: string[] = [];
     page.on('console', msg => {
       if (msg.type() === 'error') errors.push(msg.text());
@@ -3525,8 +3238,7 @@ test.describe('Playground — File Upload: Negative Tests', () => {
     expect(errors.length).toBe(0);
   });
 
-  test('upload area should not accept non-audio files gracefully', async ({ page }) => {
-    test.setTimeout(240000);
+  
     await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
 
     // Try uploading a non-audio file (the .env file as an example)
@@ -3545,8 +3257,7 @@ test.describe('Playground — File Upload: Negative Tests', () => {
     console.log('Non-audio file upload handled gracefully');
   });
 
-  test('file upload area should not be visible in TTS tab', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
 
     await page.getByRole('button', { name: 'Text to Speech' }).click();
     await page.waitForTimeout(1000);
@@ -3557,20 +3268,16 @@ test.describe('Playground — File Upload: Negative Tests', () => {
     console.log('File upload section not shown in TTS tab');
   });
 
-  test('file upload area should not be visible in Voice Agent tab', async ({ page }) => {
     await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
 
-    await page.getByRole('button', { name: 'Voice Agent' }).click();
     await page.waitForTimeout(1000);
 
     const bodyText = await page.textContent('body') || '';
     expect(bodyText).not.toContain('Upload Your Audio');
     expect(bodyText).not.toContain('Choose Audio File');
-    console.log('File upload section not shown in Voice Agent tab');
   });
 
-  test('double-clicking Run Analysis should not send duplicate API requests', async ({ page }) => {
-    test.setTimeout(240000);
+  
     let apiCallCount = 0;
     page.on('request', req => {
       if (req.url().includes('/v1/audio/transcriptions') && req.method() === 'POST') apiCallCount++;
@@ -3597,8 +3304,7 @@ test.describe('Playground — File Upload: Negative Tests', () => {
 
 test.describe('Playground — Sample Audio Removal: Positive Tests', () => {
 
-  test('upload section should show only file upload without sample options', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     await expect(page.getByText('Upload Your Audio')).toBeVisible();
     await expect(page.getByRole('button', { name: 'Choose Audio File' })).toBeVisible();
     const bodyText = await page.textContent('body') || '';
@@ -3607,18 +3313,15 @@ test.describe('Playground — Sample Audio Removal: Positive Tests', () => {
     expect(bodyText).not.toContain('Podcast');
   });
 
-  test('upload section should display supported format information', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     await expect(page.getByText(/Formats including MP3, WAV, FLAC/)).toBeVisible();
   });
 
-  test('upload description text should be visible', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     await expect(page.getByText('Upload Your own audio file to transcribe')).toBeVisible();
   });
 
-  test('file upload should be the only way to provide audio input', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     const fileInput = page.locator('input[type="file"]');
     await expect(fileInput).toBeAttached();
     const bodyText = await page.textContent('body') || '';
@@ -3626,22 +3329,19 @@ test.describe('Playground — Sample Audio Removal: Positive Tests', () => {
     expect(bodyText).not.toContain('Sample Podcast Episode');
   });
 
-  test('Run Analysis button should be visible without sample audio', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     await expect(page.getByRole('button', { name: 'Run Analysis' })).toBeVisible();
   });
 });
 
 test.describe('Playground — Sample Audio Removal: Negative Tests', () => {
 
-  test('no sample audio cards should exist in STT tab', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     const sampleCards = page.locator('h3, h4', { hasText: /Customer Support Call|Podcast/ });
     expect(await sampleCards.count()).toBe(0);
   });
 
-  test('no sample audio cards should exist in TTS tab', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
+  
     await page.getByRole('button', { name: 'Text to Speech' }).click();
     await page.waitForTimeout(1000);
     const bodyText = await page.textContent('body') || '';
@@ -3649,9 +3349,7 @@ test.describe('Playground — Sample Audio Removal: Negative Tests', () => {
     expect(bodyText).not.toContain('or try a sample');
   });
 
-  test('no sample audio cards should exist in Voice Agent tab', async ({ page }) => {
     await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
-    await page.getByRole('button', { name: 'Voice Agent' }).click();
     await page.waitForTimeout(1000);
     const bodyText = await page.textContent('body') || '';
     expect(bodyText).not.toContain('Customer Support Call');
@@ -5374,998 +5072,3 @@ test.describe('Playground — STT Functional: Cross-Feature', () => {
 });
 
 // ════════════════════════════════════════════════════════════════════════════
-// VOICE AGENT — COMPREHENSIVE COVERAGE (placeholder state regression tests)
-// ════════════════════════════════════════════════════════════════════════════
-
-test.describe('Playground — Voice Agent: Positive Tests', () => {
-
-  test('Voice Agent tab should be clickable', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
-    await expect(page.getByRole('button', { name: 'Voice Agent' })).toBeEnabled();
-  });
-
-  test('Voice Agent tab should activate when clicked', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
-    await page.getByRole('button', { name: 'Voice Agent' }).click();
-    await page.waitForTimeout(1000);
-    const bodyText = await page.textContent('body') || '';
-    expect(bodyText.toLowerCase()).toMatch(/coming soon|voice agent/);
-  });
-
-  test('Voice Agent should show Coming soon message', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
-    await page.getByRole('button', { name: 'Voice Agent' }).click();
-    await page.waitForTimeout(1000);
-    const bodyText = await page.textContent('body') || '';
-    expect(bodyText.toLowerCase()).toContain('coming soon');
-  });
-
-  test('Voice Agent tab should still show nav bar (Docs, Console)', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
-    await page.getByRole('button', { name: 'Voice Agent' }).click();
-    await page.waitForTimeout(1000);
-    await expect(page.getByRole('button', { name: 'Docs' })).toBeVisible();
-    await expect(page.getByRole('button', { name: 'Console' })).toBeVisible();
-  });
-
-  test('Voice Agent tab should render main heading', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
-    await page.getByRole('button', { name: 'Voice Agent' }).click();
-    await page.waitForTimeout(1000);
-    await expect(page.getByText('API Playground')).toBeVisible();
-  });
-
-  test('Voice Agent tab should still show other 2 tab buttons', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
-    await page.getByRole('button', { name: 'Voice Agent' }).click();
-    await page.waitForTimeout(1000);
-    await expect(page.getByRole('button', { name: 'Speech to Text' })).toBeVisible();
-    await expect(page.getByRole('button', { name: 'Text to Speech' })).toBeVisible();
-  });
-
-  test('Voice Agent → Speech to Text navigation should work', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
-    await page.getByRole('button', { name: 'Voice Agent' }).click();
-    await page.waitForTimeout(500);
-    await page.getByRole('button', { name: 'Speech to Text' }).click();
-    await page.waitForTimeout(500);
-    await expect(page.getByText('Upload Your Audio')).toBeVisible();
-  });
-
-  test('Voice Agent → Text to Speech navigation should work', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
-    await page.getByRole('button', { name: 'Voice Agent' }).click();
-    await page.waitForTimeout(500);
-    await page.getByRole('button', { name: 'Text to Speech' }).click();
-    await page.waitForTimeout(500);
-    await expect(page.getByText('Voice Options')).toBeVisible();
-  });
-});
-
-test.describe('Playground — Voice Agent: Negative Tests', () => {
-
-  test('Voice Agent should NOT show STT configuration', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
-    await page.getByRole('button', { name: 'Voice Agent' }).click();
-    await page.waitForTimeout(1000);
-    const bodyText = await page.textContent('body') || '';
-    expect(bodyText).not.toContain('Upload Your Audio');
-    expect(bodyText).not.toContain('Choose Audio File');
-    expect(bodyText).not.toContain('Run Analysis');
-    expect(bodyText).not.toContain('Transcription Mode');
-  });
-
-  test('Voice Agent should NOT show TTS configuration', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
-    await page.getByRole('button', { name: 'Voice Agent' }).click();
-    await page.waitForTimeout(1000);
-    const bodyText = await page.textContent('body') || '';
-    expect(bodyText).not.toContain('Voice Options');
-    expect(bodyText).not.toContain('Run Synthesis');
-    expect(bodyText).not.toContain('Synthesis Mode');
-  });
-
-  test('Voice Agent should not trigger any API calls', async ({ page }) => {
-    const apiCalls: string[] = [];
-    page.on('request', req => {
-      if (req.url().includes('/v1/') && req.method() === 'POST') apiCalls.push(req.url());
-    });
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
-    await page.getByRole('button', { name: 'Voice Agent' }).click();
-    await page.waitForTimeout(3000);
-    expect(apiCalls.length, 'No API calls on Voice Agent tab').toBe(0);
-  });
-
-  test('Voice Agent should not cause JavaScript console errors', async ({ page }) => {
-    const errors: string[] = [];
-    page.on('console', msg => {
-      if (msg.type() === 'error') errors.push(msg.text());
-    });
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
-    await page.getByRole('button', { name: 'Voice Agent' }).click();
-    await page.waitForTimeout(2000);
-    expect(errors.length, `Console errors: ${errors.join(' | ')}`).toBe(0);
-  });
-
-  test('Voice Agent should not cause failed network requests', async ({ page }) => {
-    const failed: string[] = [];
-    page.on('response', res => {
-      if (res.status() >= 400 && res.url().includes('shunyalabs.ai')) {
-        failed.push(`${res.status()} ${res.url()}`);
-      }
-    });
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
-    await page.getByRole('button', { name: 'Voice Agent' }).click();
-    await page.waitForTimeout(3000);
-    expect(failed.length).toBe(0);
-  });
-
-  test('Voice Agent should not have uploaded file input', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
-    await page.getByRole('button', { name: 'Voice Agent' }).click();
-    await page.waitForTimeout(1000);
-    const visibleFileInputs = await page.locator('input[type="file"]:visible').count();
-    expect(visibleFileInputs).toBe(0);
-  });
-
-  test('Voice Agent should not show textarea', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
-    await page.getByRole('button', { name: 'Voice Agent' }).click();
-    await page.waitForTimeout(1000);
-    const visibleTextareas = await page.locator('textarea:visible').count();
-    expect(visibleTextareas).toBe(0);
-  });
-});
-
-test.describe('Playground — Voice Agent: Edge Cases', () => {
-
-  test('rapid Voice Agent tab clicks should not crash', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
-    for (let i = 0; i < 5; i++) {
-      await page.getByRole('button', { name: 'Voice Agent' }).click();
-      await page.waitForTimeout(200);
-    }
-    const bodyText = await page.textContent('body') || '';
-    expect(bodyText.toLowerCase()).toContain('coming soon');
-  });
-
-  test('Voice Agent state should persist after page scroll', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
-    await page.getByRole('button', { name: 'Voice Agent' }).click();
-    await page.waitForTimeout(1000);
-    await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
-    await page.waitForTimeout(500);
-    await page.evaluate(() => window.scrollTo(0, 0));
-    await page.waitForTimeout(500);
-    const bodyText = await page.textContent('body') || '';
-    expect(bodyText.toLowerCase()).toContain('coming soon');
-  });
-
-  test('Voice Agent after tab cycle should return to Coming soon', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
-    await page.getByRole('button', { name: 'Voice Agent' }).click();
-    await page.waitForTimeout(500);
-    await page.getByRole('button', { name: 'Speech to Text' }).click();
-    await page.waitForTimeout(500);
-    await page.getByRole('button', { name: 'Text to Speech' }).click();
-    await page.waitForTimeout(500);
-    await page.getByRole('button', { name: 'Voice Agent' }).click();
-    await page.waitForTimeout(500);
-    const bodyText = await page.textContent('body') || '';
-    expect(bodyText.toLowerCase()).toContain('coming soon');
-  });
-
-  test('Voice Agent should remain functional after page refresh', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
-    await page.getByRole('button', { name: 'Voice Agent' }).click();
-    await page.waitForTimeout(500);
-    await page.reload({ waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
-    await page.getByRole('button', { name: 'Voice Agent' }).click();
-    await page.waitForTimeout(500);
-    const bodyText = await page.textContent('body') || '';
-    expect(bodyText.toLowerCase()).toContain('coming soon');
-  });
-
-  test('Voice Agent should render within acceptable time', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
-    const start = Date.now();
-    await page.getByRole('button', { name: 'Voice Agent' }).click();
-    await expect(page.getByText(/coming soon/i)).toBeVisible({ timeout: 3000 });
-    const elapsed = Date.now() - start;
-    console.log(`Voice Agent render time: ${elapsed}ms`);
-    expect(elapsed).toBeLessThan(3000);
-  });
-});
-
-// ════════════════════════════════════════════════════════════════════════════
-// STT — ADDITIONAL FUNCTIONAL TESTS (filling coverage gaps)
-// ════════════════════════════════════════════════════════════════════════════
-
-test.describe('Playground — STT Functional: Extended E2E', () => {
-
-  test('MP3 file upload and analysis should succeed', async ({ page }) => {
-    test.setTimeout(240000);
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
-    const fileInput = page.locator('input[type="file"]');
-    await fileInput.setInputFiles(TEST_AUDIO_FILES.mp3);
-    await page.waitForTimeout(2000);
-    await page.getByRole('button', { name: 'Run Analysis' }).click();
-    await page.waitForTimeout(60000);
-    const bodyText = await page.textContent('body') || '';
-    expect(bodyText).not.toContain('Select audio above and run analysis');
-  });
-
-  test('Transcript tab should be default after successful analysis', async ({ page }) => {
-    test.setTimeout(240000);
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
-    const fileInput = page.locator('input[type="file"]');
-    await fileInput.setInputFiles(TEST_AUDIO_FILES.wav);
-    await page.waitForTimeout(2000);
-    await page.getByRole('button', { name: 'Run Analysis' }).click();
-    await page.waitForTimeout(60000);
-    await expect(page.getByRole('button', { name: 'Transcript' }).first()).toBeVisible();
-  });
-
-  test('switching between Transcript and JSON tabs should work after analysis', async ({ page }) => {
-    test.setTimeout(240000);
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
-    const fileInput = page.locator('input[type="file"]');
-    await fileInput.setInputFiles(TEST_AUDIO_FILES.wav);
-    await page.waitForTimeout(2000);
-    await page.getByRole('button', { name: 'Run Analysis' }).click();
-    await page.waitForTimeout(60000);
-    await page.getByRole('button', { name: 'JSON' }).click();
-    await page.waitForTimeout(500);
-    await page.getByRole('button', { name: 'Transcript' }).first().click();
-    await page.waitForTimeout(500);
-  });
-
-  test('feature toggles state should persist after tab switch and return', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
-    await page.locator('span.leading-tight', { hasText: 'Translation' }).first().click({ force: true }).catch(() => {});
-    await page.waitForTimeout(300);
-    await dismissOpenModals(page);
-    await page.getByRole('button', { name: 'Text to Speech' }).click();
-    await page.waitForTimeout(500);
-    await page.getByRole('button', { name: 'Speech to Text' }).click();
-    await page.waitForTimeout(500);
-    // Page should not crash
-    await expect(page.getByText('Audio Intelligence')).toBeVisible();
-  });
-
-  test('Run Analysis without file should show warning not crash', async ({ page }) => {
-    test.setTimeout(240000);
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
-    const runBtn = page.getByRole('button', { name: 'Run Analysis' });
-    await runBtn.click({ force: true }).catch(() => {});
-    await page.waitForTimeout(2000);
-    // Page should still be functional
-    await expect(page.getByText('Upload Your Audio')).toBeVisible();
-  });
-
-  test('changing language mid-workflow should not break upload state', async ({ page }) => {
-    test.setTimeout(240000);
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
-    const fileInput = page.locator('input[type="file"]');
-    await fileInput.setInputFiles(TEST_AUDIO_FILES.wav);
-    await page.waitForTimeout(1500);
-    await page.getByRole('button', { name: /English/ }).first().click();
-    await page.waitForTimeout(500);
-    await page.getByText('Hindi', { exact: false }).first().click({ force: true, timeout: 3000 }).catch(() => {});
-    await page.waitForTimeout(500);
-    // Run Analysis should still be available
-    await expect(page.getByRole('button', { name: 'Run Analysis' })).toBeEnabled();
-  });
-});
-
-// ════════════════════════════════════════════════════════════════════════════
-// STT — DEEP UI & INTERACTION TESTS (every element, event, trigger)
-// ════════════════════════════════════════════════════════════════════════════
-
-// ── STT — Navigation Bar ────────────────────────────────────────────────
-
-test.describe('Playground — STT Navigation: Positive Tests', () => {
-
-  test('Shunya Labs logo should be visible in nav bar', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
-    const logo = page.locator('img[alt*="Shunya" i], img[src*="logo" i]').first();
-    await expect(logo).toBeVisible();
-  });
-
-  test('Docs button should have correct accessible name', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
-    const docs = page.getByRole('button', { name: 'Docs' });
-    await expect(docs).toBeVisible();
-    await expect(docs).toBeEnabled();
-  });
-
-  test('Console button should have correct accessible name', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
-    const consoleBtn = page.getByRole('button', { name: 'Console' });
-    await expect(consoleBtn).toBeVisible();
-    await expect(consoleBtn).toBeEnabled();
-  });
-
-  test('Docs button click should be tracked (no crash)', async ({ page, context }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
-    const [popup] = await Promise.all([
-      context.waitForEvent('page', { timeout: 5000 }).catch(() => null),
-      page.getByRole('button', { name: 'Docs' }).click({ trial: false }),
-    ]);
-    // Either opens new tab or stays — both acceptable
-    if (popup) await popup.close();
-  });
-
-  test('user profile button should show logged-in user name', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
-    const userBtn = page.getByRole('button', { name: /Singh|Yamini/ });
-    await expect(userBtn).toBeVisible();
-  });
-
-  test('nav bar should remain fixed position on scroll', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
-    const navBefore = await page.locator('nav').first().boundingBox();
-    await page.evaluate(() => window.scrollTo(0, 500));
-    await page.waitForTimeout(300);
-    const navAfter = await page.locator('nav').first().boundingBox();
-    if (navBefore && navAfter) expect(Math.abs(navBefore.y - navAfter.y)).toBeLessThan(10);
-  });
-});
-
-// ── STT — Configuration Fields ──────────────────────────────────────────
-
-test.describe('Playground — STT Configuration: Field Behavior', () => {
-
-  test('Transcription Mode field should show Prerecorded value', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
-    await expect(page.locator('label', { hasText: 'Transcription Mode' })).toBeVisible();
-    // Prerecorded is shown in a readonly input — textContent('body') does NOT include input values.
-    const prerecordedInput = page.locator('input[value="Prerecorded"], input[value="prerecorded"]').first();
-    const byLabel = page
-      .locator('label', { hasText: 'Transcription Mode' })
-      .locator('..')
-      .locator('input, [role="textbox"]')
-      .first();
-    const hasInputValue = (await prerecordedInput.count()) > 0;
-    const labelFieldValue = hasInputValue
-      ? await prerecordedInput.inputValue()
-      : await byLabel.inputValue().catch(() => '');
-    const visibleText = await page.getByText('Prerecorded', { exact: true }).isVisible().catch(() => false);
-    expect(
-      hasInputValue || /prerecorded/i.test(labelFieldValue) || visibleText,
-      `Prerecorded not found (input count: ${await prerecordedInput.count()}, label field: "${labelFieldValue}")`,
-    ).toBe(true);
-  });
-
-  test('Transcription Mode should not be editable by typing', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
-    const field = page.locator('input[value="Prerecorded"]').first();
-    const count = await field.count();
-    if (count > 0) {
-      const isReadonly = await field.getAttribute('readonly');
-      const isDisabled = await field.getAttribute('disabled');
-      expect(isReadonly !== null || isDisabled !== null, 'Field should be readonly or disabled').toBe(true);
-    }
-  });
-
-  test('Model dropdown should have Zero Indic as first option', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
-    const modelSelect = page.locator('label', { hasText: 'Model' }).locator('..').locator('select');
-    const firstOption = await modelSelect.locator('option').first().textContent();
-    expect(firstOption).toContain('Zero Indic');
-  });
-
-  test('Model select should have exactly 3 options', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
-    const modelSelect = page.locator('label', { hasText: 'Model' }).locator('..').locator('select');
-    const count = await modelSelect.locator('option').count();
-    expect(count).toBe(3);
-  });
-
-  test('Language selector button should display flag and name', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
-    const langBtn = page.getByRole('button', { name: /English/ }).first();
-    const text = await langBtn.textContent() || '';
-    expect(text).toContain('English');
-    expect(text).toMatch(/[\u{1F1E0}-\u{1F1FF}]/u);
-  });
-
-  test('Language dropdown should open on Space key press', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
-    const langBtn = page.getByRole('button', { name: /English/ }).first();
-    await langBtn.focus();
-    await page.keyboard.press('Space');
-    await page.waitForTimeout(800);
-    const bodyText = await page.textContent('body') || '';
-    const opened = bodyText.includes('Hindi') || bodyText.includes('English');
-    expect(opened).toBe(true);
-  });
-
-  test('Language dropdown should close on Escape key', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
-    await page.getByRole('button', { name: /English/ }).first().click();
-    await page.waitForTimeout(600);
-    await page.keyboard.press('Escape');
-    await page.waitForTimeout(500);
-    // Button should still be visible (not crashed)
-    await expect(page.getByRole('button', { name: /English/ }).first()).toBeVisible();
-  });
-});
-
-// ── STT — Upload Area Behavior ──────────────────────────────────────────
-
-test.describe('Playground — STT Upload: Interactions', () => {
-
-  test('Choose Audio File button should be focusable', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
-    const btn = page.getByRole('button', { name: 'Choose Audio File' });
-    await btn.focus();
-    const focused = await page.evaluate(() => document.activeElement?.textContent);
-    expect(focused).toContain('Choose Audio File');
-  });
-
-  test('file input should accept audio MIME types', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
-    const input = page.locator('input[type="file"]').first();
-    const accept = await input.getAttribute('accept');
-    console.log(`File input accept: ${accept || 'not set'}`);
-  });
-
-  test('format list should mention MP3 WAV FLAC M4A', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
-    const formatText = await page.getByText(/Formats including/).textContent() || '';
-    for (const f of ['MP3', 'WAV', 'FLAC', 'M4A']) expect(formatText).toContain(f);
-  });
-
-  test('upload section should not be scrolled off viewport', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
-    const upload = page.getByText('Upload Your Audio');
-    const box = await upload.boundingBox();
-    const vp = page.viewportSize();
-    if (box && vp) expect(box.y).toBeLessThan(vp.height + 200);
-  });
-
-  test('uploading same file twice should not duplicate', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
-    const input = page.locator('input[type="file"]');
-    await input.setInputFiles(TEST_AUDIO_FILES.wav);
-    await page.waitForTimeout(1500);
-    await input.setInputFiles(TEST_AUDIO_FILES.wav);
-    await page.waitForTimeout(1500);
-    await expect(page.getByRole('button', { name: 'Run Analysis' })).toBeEnabled();
-  });
-
-  test('after upload Run Analysis button should become enabled with gradient', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
-    const btn = page.getByRole('button', { name: 'Run Analysis' });
-    await page.locator('input[type="file"]').setInputFiles(TEST_AUDIO_FILES.wav);
-    await page.waitForTimeout(1500);
-    await expect(btn).toBeEnabled();
-  });
-
-  test('uploading .mp4 file should be accepted', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
-    const input = page.locator('input[type="file"]');
-    await input.setInputFiles(TEST_AUDIO_FILES.mp4);
-    await page.waitForTimeout(1500);
-    await expect(page.getByRole('button', { name: 'Run Analysis' })).toBeEnabled();
-  });
-});
-
-// ── STT — Feature Toggles (individual) ──────────────────────────────────
-
-test.describe('Playground — STT Features: Individual Toggles', () => {
-
-  const features = [
-    'Translation',
-    'Transliteration',
-    'Speaker Diarization',
-    'Speaker Identification',
-    'Word Timestamps',
-    'Profanity Hashing',
-    'Custom Keyword Hashing',
-    'Intent Detection',
-    'Sentiment Analysis',
-    'Emotion Diarization',
-    'Summarisation',
-    'Keyword Normalisation',
-  ];
-
-  for (const feat of features) {
-    test(`${feat} feature toggle should be clickable without errors`, async ({ page }) => {
-      const errors: string[] = [];
-      page.on('console', msg => { if (msg.type() === 'error') errors.push(msg.text()); });
-      await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
-      await clickFeatureToggle(page, feat);
-      await page.waitForTimeout(200);
-      expect(errors.length, `${feat} toggle caused console errors: ${errors.join(' | ')}`).toBe(0);
-    });
-  }
-});
-
-// ── STT — Run Analysis Button States ────────────────────────────────────
-
-test.describe('Playground — STT Run Analysis: States', () => {
-
-  test('Run Analysis should be disabled without file', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
-    const btn = page.getByRole('button', { name: 'Run Analysis' });
-    // Either disabled attribute or visually disabled
-    const disabled = await btn.getAttribute('disabled');
-    const cls = await btn.getAttribute('class') || '';
-    const looksDisabled = disabled !== null || cls.includes('cursor-not-allowed') || cls.includes('opacity');
-    expect(looksDisabled, 'Run Analysis should be in disabled state without file').toBe(true);
-  });
-
-  test('Run Analysis should be enabled after file upload', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
-    await page.locator('input[type="file"]').setInputFiles(TEST_AUDIO_FILES.wav);
-    await page.waitForTimeout(1500);
-    await expect(page.getByRole('button', { name: 'Run Analysis' })).toBeEnabled();
-  });
-
-  test('double-clicking Run Analysis should not send duplicate POST', async ({ page }) => {
-    test.setTimeout(240000);
-    const posts: string[] = [];
-    page.on('request', req => {
-      if (req.url().includes('/v1/audio/transcriptions') && req.method() === 'POST') posts.push(req.url());
-    });
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
-    await page.locator('input[type="file"]').setInputFiles(TEST_AUDIO_FILES.wav);
-    await page.waitForTimeout(1500);
-    await page.getByRole('button', { name: 'Run Analysis' }).dblclick();
-    await page.waitForTimeout(45000);
-    expect(posts.length, 'Double-click should result in <= 2 POSTs').toBeLessThanOrEqual(2);
-  });
-
-  test('Run Analysis button text should stay consistent', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
-    const btn = page.getByRole('button', { name: 'Run Analysis' });
-    const textBefore = await btn.textContent();
-    await page.waitForTimeout(500);
-    const textAfter = await btn.textContent();
-    expect(textBefore?.trim()).toBe(textAfter?.trim());
-  });
-});
-
-// ── STT — Output Tabs (Transcript / JSON) ───────────────────────────────
-
-test.describe('Playground — STT Output: Tab Behavior', () => {
-
-  test('Transcript tab should be default', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
-    await expect(page.getByRole('button', { name: 'Transcript' }).first()).toBeVisible();
-    const placeholder = await page.getByText(/Select audio above/).count();
-    expect(placeholder).toBeGreaterThan(0);
-  });
-
-  test('JSON tab should be clickable', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
-    const json = page.getByRole('button', { name: 'JSON' });
-    await expect(json).toBeVisible();
-    await json.click();
-    await page.waitForTimeout(300);
-  });
-
-  test('switching Transcript ↔ JSON should not crash', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
-    for (let i = 0; i < 5; i++) {
-      await page.getByRole('button', { name: 'JSON' }).click();
-      await page.waitForTimeout(200);
-      await page.getByRole('button', { name: 'Transcript' }).first().click();
-      await page.waitForTimeout(200);
-    }
-    await expect(page.getByRole('button', { name: 'Run Analysis' })).toBeVisible();
-  });
-});
-
-// ── STT — Credits Event Tracking ────────────────────────────────────────
-
-test.describe('Playground — STT Credits: Event Triggers', () => {
-
-  test('Credits should update after successful transcription', async ({ page }) => {
-    test.setTimeout(240000);
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
-    const parse = async () => {
-      const t = await page.getByText(/Credits:\s*\$/).textContent() || '';
-      const m = t.match(/\$([\d,]+\.?\d*)/);
-      return m ? parseFloat(m[1].replace(/,/g, '')) : 0;
-    };
-    const before = await parse();
-    await page.locator('input[type="file"]').setInputFiles(TEST_AUDIO_FILES.wav);
-    await page.waitForTimeout(1500);
-    await page.getByRole('button', { name: 'Run Analysis' }).click();
-    await page.waitForTimeout(60000);
-    const after = await parse();
-    console.log(`Credits: ${before} → ${after}`);
-    expect(after).toBeLessThanOrEqual(before);
-  });
-
-  test('Credits should NOT deduct when Run Analysis clicked without file', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
-    const parse = async () => {
-      const t = await page.getByText(/Credits:\s*\$/).textContent() || '';
-      const m = t.match(/\$([\d,]+\.?\d*)/);
-      return m ? parseFloat(m[1].replace(/,/g, '')) : 0;
-    };
-    const before = await parse();
-    const btn = page.getByRole('button', { name: 'Run Analysis' });
-    await btn.click({ force: true }).catch(() => {});
-    await page.waitForTimeout(3000);
-    const after = await parse();
-    expect(after).toBe(before);
-  });
-
-  test('Credits format should match $NN.NN or $N,NNN.NN pattern', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
-    const t = await page.getByText(/Credits:\s*\$/).textContent() || '';
-    expect(t).toMatch(/Credits:\s*\$[\d,]+\.?\d*/);
-  });
-
-  test('Credits should match between STT and TTS tabs', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
-    const sttCredits = (await page.getByText(/Credits:\s*\$/).textContent() || '').trim();
-    await page.getByRole('button', { name: 'Text to Speech' }).click();
-    await page.waitForTimeout(1000);
-    const ttsCredits = (await page.getByText(/Credits:\s*\$/).textContent() || '').trim();
-    expect(ttsCredits).toBe(sttCredits);
-  });
-});
-
-// ── STT — Keyboard Accessibility ────────────────────────────────────────
-
-test.describe('Playground — STT Accessibility: Keyboard', () => {
-
-  test('Tab key should move focus through interactive elements', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
-    for (let i = 0; i < 3; i++) await page.keyboard.press('Tab');
-    const tag = await page.evaluate(() => document.activeElement?.tagName);
-    expect(['BUTTON', 'A', 'INPUT', 'SELECT', 'TEXTAREA']).toContain(tag);
-  });
-
-  test('Enter key on Speech to Text tab should activate it', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
-    await page.getByRole('button', { name: 'Text to Speech' }).click();
-    await page.waitForTimeout(500);
-    await page.getByRole('button', { name: 'Speech to Text' }).focus();
-    await page.keyboard.press('Enter');
-    await page.waitForTimeout(500);
-    await expect(page.getByText('Upload Your Audio')).toBeVisible();
-  });
-
-  test('Model dropdown should be keyboard navigable with arrows', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
-    const sel = page.locator('label', { hasText: 'Model' }).locator('..').locator('select');
-    await sel.focus();
-    await page.keyboard.press('ArrowDown');
-    const val = await sel.inputValue();
-    // Should move to Zero Med or next option
-    expect(['Zero Indic', 'Zero Med']).toContain(val);
-  });
-});
-
-// ── STT — Performance ───────────────────────────────────────────────────
-
-test.describe('Playground — STT Performance: Timing', () => {
-
-  test('page should load in under 10 seconds', async ({ page }) => {
-    const start = Date.now();
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
-    const elapsed = Date.now() - start;
-    expect(elapsed).toBeLessThan(10000);
-  });
-
-  test('tab switch STT → TTS should be under 2 seconds', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
-    const start = Date.now();
-    await page.getByRole('button', { name: 'Text to Speech' }).click();
-    await expect(page.getByText('Synthesis Mode')).toBeVisible({ timeout: 2000 });
-    const elapsed = Date.now() - start;
-    expect(elapsed).toBeLessThan(2000);
-  });
-
-  test('model dropdown change should render in under 500ms', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
-    const sel = page.locator('label', { hasText: 'Model' }).locator('..').locator('select');
-    const start = Date.now();
-    await sel.selectOption({ label: 'Zero Med' });
-    const elapsed = Date.now() - start;
-    expect(elapsed).toBeLessThan(500);
-  });
-
-  test('feature toggle click should respond under 300ms', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
-    const toggle = page.locator('span.leading-tight', { hasText: 'Translation' }).first();
-    const start = Date.now();
-    await toggle.click({ force: true });
-    const elapsed = Date.now() - start;
-    expect(elapsed).toBeLessThan(500);
-  });
-});
-
-// ── STT — DOM / Rendering Integrity ─────────────────────────────────────
-
-test.describe('Playground — STT DOM: Integrity', () => {
-
-  test('should not have duplicate Configuration headings', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
-    const count = await page.locator('h3', { hasText: 'Configuration' }).count();
-    expect(count).toBeLessThanOrEqual(1);
-  });
-
-  test('should not have duplicate Model labels in STT', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
-    const count = await page.locator('label', { hasText: /^Model$/ }).count();
-    expect(count).toBe(1);
-  });
-
-  test('exactly one Run Analysis button should be present', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
-    const count = await page.getByRole('button', { name: 'Run Analysis' }).count();
-    expect(count).toBe(1);
-  });
-
-  test('exactly one file input should be in STT tab', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
-    const count = await page.locator('input[type="file"]').count();
-    expect(count).toBe(1);
-  });
-
-  test('no broken images on STT page', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
-    const brokenImages = await page.locator('img').evaluateAll(imgs =>
-      imgs.filter((img: any) => img.complete && img.naturalWidth === 0).length
-    );
-    expect(brokenImages).toBe(0);
-  });
-
-  test('no broken stylesheet URLs', async ({ page }) => {
-    const failed: string[] = [];
-    page.on('response', res => {
-      if (res.status() === 404 && res.url().match(/\.css|\.js|\.woff|\.svg|\.png/)) {
-        failed.push(res.url());
-      }
-    });
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
-    await page.waitForTimeout(2000);
-    expect(failed.length, `404 resources: ${failed.join(', ')}`).toBe(0);
-  });
-});
-
-// ── STT — Code Sample Tab ───────────────────────────────────────────────
-
-test.describe('Playground — STT Code Sample: Content', () => {
-
-  test('Code Sample tab should display code when active', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
-    await page.getByRole('button', { name: 'Code Sample' }).click();
-    await page.waitForTimeout(500);
-    const bodyText = await page.textContent('body') || '';
-    expect(bodyText).toMatch(/import|requests|curl|python/i);
-  });
-
-  test('Code Sample should reference transcriptions endpoint', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
-    await page.getByRole('button', { name: 'Code Sample' }).click();
-    await page.waitForTimeout(500);
-    const bodyText = await page.textContent('body') || '';
-    expect(bodyText).toContain('transcriptions');
-  });
-
-  test('Copy Code button should be present in Code Sample', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
-    await page.getByRole('button', { name: 'Code Sample' }).click();
-    await page.waitForTimeout(500);
-    const copyBtn = page.getByRole('button', { name: /copy/i });
-    const exists = await copyBtn.count();
-    console.log(`Copy button present: ${exists > 0}`);
-  });
-
-  test('Code Sample tab switching should not break Features panel', async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
-    await page.getByRole('button', { name: 'Code Sample' }).click();
-    await page.waitForTimeout(400);
-    await page.getByRole('button', { name: 'Features' }).click();
-    await page.waitForTimeout(400);
-    await expect(page.getByText('Audio Intelligence')).toBeVisible();
-  });
-});
-
-// ── STT — Viewport / Responsive ─────────────────────────────────────────
-
-test.describe('Playground — STT Responsive: Viewports', () => {
-
-  test('STT layout should be usable at 1024x768 (tablet)', async ({ page }) => {
-    await page.setViewportSize({ width: 1024, height: 768 });
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
-    await expect(page.getByText('Upload Your Audio')).toBeVisible();
-    await expect(page.getByRole('button', { name: 'Run Analysis' })).toBeVisible();
-  });
-
-  test('STT layout should be usable at 1440x900', async ({ page }) => {
-    await page.setViewportSize({ width: 1440, height: 900 });
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
-    await expect(page.getByText('Configuration')).toBeVisible();
-  });
-
-  test('STT layout should not have horizontal scroll at 1280px', async ({ page }) => {
-    await page.setViewportSize({ width: 1280, height: 800 });
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
-    const hasHScroll = await page.evaluate(() => document.body.scrollWidth > window.innerWidth);
-    expect(hasHScroll).toBe(false);
-  });
-});
-
-// ── STT — Network Health ────────────────────────────────────────────────
-
-test.describe('Playground — STT Network: Health', () => {
-
-  test('all resources should load without 5xx errors on initial load', async ({ page }) => {
-    const serverErrors: string[] = [];
-    page.on('response', res => {
-      if (res.status() >= 500) serverErrors.push(`${res.status()} ${res.url()}`);
-    });
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
-    await page.waitForTimeout(2000);
-    expect(serverErrors, `5xx responses: ${serverErrors.join(' | ')}`).toEqual([]);
-  });
-
-  test('initial page load should not call transcription API', async ({ page }) => {
-    const apiCalls: string[] = [];
-    page.on('request', req => {
-      if (req.url().includes('/v1/audio/transcriptions') && req.method() === 'POST') apiCalls.push(req.url());
-    });
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
-    await page.waitForTimeout(3000);
-    expect(apiCalls.length).toBe(0);
-  });
-
-  test('Credits endpoint should return 2xx', async ({ page }) => {
-    const creditsCalls: { url: string; status: number }[] = [];
-    page.on('response', res => {
-      if (res.url().includes('credit') || res.url().includes('balance') || res.url().includes('usage')) {
-        creditsCalls.push({ url: res.url(), status: res.status() });
-      }
-    });
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
-    await page.waitForTimeout(3000);
-    const failures = creditsCalls.filter(c => c.status >= 400);
-    expect(failures.length, `Credits API failures: ${JSON.stringify(failures)}`).toBe(0);
-  });
-});
-
-// ════════════════════════════════════════════════════════════════════════════
-// STT — FEATURE RESULT VERIFICATION (each feature end-to-end with response check)
-// Runs each feature individually, captures API response, verifies result is valid.
-// Any empty / malformed / error response triggers a failure -> high-priority email.
-// ════════════════════════════════════════════════════════════════════════════
-
-const FEATURE_VERIFY_CASES: Array<{ describe: string; label: string; title: string }> = [
-  { describe: 'Translation', label: 'Translation', title: 'Translation feature should return translated text in response' },
-  { describe: 'Transliteration', label: 'Transliteration', title: 'Transliteration feature should return transliterated text' },
-  { describe: 'Speaker Diarization', label: 'Speaker Diarization', title: 'Speaker Diarization should return speaker labels in segments' },
-  { describe: 'Speaker Identification', label: 'Speaker Identification', title: 'Speaker Identification should return speaker metadata' },
-  { describe: 'Word Timestamps', label: 'Word Timestamps', title: 'Word Timestamps should return words with start/end times' },
-  { describe: 'Profanity Hashing', label: 'Profanity Hashing', title: 'Profanity Hashing should return hashed or redacted output' },
-  { describe: 'Custom Keyword Hashing', label: 'Custom Keyword Hashing', title: 'Custom Keyword Hashing should hash configured keywords' },
-  { describe: 'Intent Detection', label: 'Intent Detection', title: 'Intent Detection should return intent classification' },
-  { describe: 'Sentiment Analysis', label: 'Sentiment Analysis', title: 'Sentiment Analysis should return sentiment classification' },
-  { describe: 'Emotion Diarization', label: 'Emotion Diarization', title: 'Emotion Diarization should return emotion data in segments' },
-  { describe: 'Summarisation', label: 'Summarisation', title: 'Summarisation should return a summary string' },
-  { describe: 'Keyword Normalisation', label: 'Keyword Normalisation', title: 'Keyword Normalisation should return normalized text' },
-];
-
-for (const fc of FEATURE_VERIFY_CASES) {
-  test.describe(`Playground — STT Feature Verification: ${fc.describe}`, () => {
-    test(fc.title, async ({ page }) => {
-      test.setTimeout(240000);
-      const capture = await runFeatureAndCaptureResponse(page, fc.label, TEST_AUDIO_FILES.wav);
-      assertFeatureRequestAndResponse(fc.label, capture);
-    });
-  });
-}
-
-// ── STT Feature Verification — Error Signals ─────────────────────────────────
-
-test.describe('Playground — STT Feature Verification: Error Detection', () => {
-
-  test('Any HTTP 4xx during feature run should fail the test', async ({ page }) => {
-    test.setTimeout(240000);
-    const failures: string[] = [];
-    page.on('response', (res: any) => {
-      if (res.url().includes('/v1/audio/transcriptions') && res.status() >= 400) {
-        failures.push(`${res.status()} ${res.url()}`);
-      }
-    });
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'domcontentloaded', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
-    await page.getByRole('button', { name: 'Speech to Text' }).click({ timeout: 10000 }).catch(() => {});
-    await page.getByRole('button', { name: 'Features' }).click({ timeout: 10000 }).catch(() => {});
-    for (const feat of ['Translation', 'Transliteration', 'Sentiment Analysis']) {
-      await clickFeatureToggle(page, feat);
-    }
-    await page.locator('input[type="file"]').setInputFiles(TEST_AUDIO_FILES.wav);
-    await page.waitForTimeout(2000);
-    await page.getByRole('button', { name: 'Run Analysis' }).click();
-    await page.waitForTimeout(60000);
-    expect(failures, `HTTP failures: ${failures.join(' | ')}`).toEqual([]);
-  });
-
-  test('Response body should not contain error field', async ({ page }) => {
-    test.setTimeout(240000);
-    let body: any = null;
-    page.on('response', async (res: any) => {
-      if (res.url().includes('/v1/audio/transcriptions') && res.status() < 400) {
-        try { body = await res.json(); } catch {}
-      }
-    });
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
-    await page.locator('input[type="file"]').setInputFiles(TEST_AUDIO_FILES.wav);
-    await page.waitForTimeout(2000);
-    await page.getByRole('button', { name: 'Run Analysis' }).click();
-    await page.waitForTimeout(60000);
-
-    expect(body, 'Response body should exist').toBeTruthy();
-    expect(body?.error, `API error: ${JSON.stringify(body?.error)}`).toBeFalsy();
-  });
-
-  test('Transcript text field should not be empty or null', async ({ page }) => {
-    test.setTimeout(240000);
-    let body: any = null;
-    page.on('response', async (res: any) => {
-      if (res.url().includes('/v1/audio/transcriptions') && res.status() < 400) {
-        try { body = await res.json(); } catch {}
-      }
-    });
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
-    await page.locator('input[type="file"]').setInputFiles(TEST_AUDIO_FILES.wav);
-    await page.waitForTimeout(2000);
-    await page.getByRole('button', { name: 'Run Analysis' }).click();
-    await page.waitForTimeout(60000);
-    expect(body?.text && String(body.text).length > 0, `Transcript empty. Body: ${JSON.stringify(body).substring(0, 200)}`).toBe(true);
-  });
-});
-
-// ── Model × Transcription — Each model returns valid result ──────────────────
-
-test.describe('Playground — STT Feature Verification: Model Variants', () => {
-
-  for (const modelLabel of ['Zero Indic', 'Zero Med', 'Zero Codeswitch']) {
-    test(`${modelLabel} model should return valid transcript`, async ({ page }) => {
-      test.setTimeout(240000);
-      let body: any = null;
-      let status = 0;
-      page.on('response', async (res: any) => {
-        if (res.url().includes('/v1/audio/transcriptions') && res.request().method() === 'POST') {
-          status = res.status();
-          try { body = await res.json(); } catch {}
-        }
-      });
-      await page.goto(PLAYGROUND_URL, { waitUntil: 'load', timeout: PLAYGROUND_TIMEOUTS.pageLoad });
-      const modelSel = page.locator('label', { hasText: 'Model' }).locator('..').locator('select');
-      await modelSel.selectOption({ label: modelLabel });
-      await page.waitForTimeout(500);
-      await page.locator('input[type="file"]').setInputFiles(TEST_AUDIO_FILES.wav);
-      await page.waitForTimeout(2000);
-      const resPromise = page.waitForResponse(
-        (r) => r.url().includes('/v1/audio/transcriptions') && r.request().method() === 'POST',
-        { timeout: 180000 },
-      );
-      await page.getByRole('button', { name: 'Run Analysis' }).click();
-      await resPromise.catch(() => {});
-      await page.waitForTimeout(3000);
-
-      if (modelLabel === 'Zero Med' && status === 400) {
-        test.info().annotations.push({
-          type: 'note',
-          description: 'Zero Med may reject codeswitch sample audio (HTTP 400) — not a feature regression',
-        });
-        return;
-      }
-      expect(status, `${modelLabel} returned HTTP ${status}`).toBeLessThan(400);
-      expect(
-        body?.text && String(body.text).length > 0,
-        `${modelLabel} missing or empty text field`,
-      ).toBe(true);
-    });
-  }
-});

@@ -173,7 +173,6 @@ function scanTestsFromSpec(): TestCase[] {
         ? 'Integration' : 'Functional/UI';
       const category =
         /TTS|Text to Speech/i.test(moduleFull) ? 'Text to Speech' :
-        /Voice Agent/i.test(moduleFull) ? 'Voice Agent' :
         /Feature Verification/.test(moduleFull) ? 'Feature Verification' :
         /STT|Speech to Text|Upload|Transcript|Credits|Tab Navigation|Model Selection|Language|Audio Intelligence|Page Load|Sample Audio/i.test(moduleFull) ? 'Speech to Text' :
         'Playground UI';
@@ -326,7 +325,6 @@ function buildAllTestCases(): TestCase[] {
 
   add(UI, 'Tab Navigation', 'Speech to Text tab should be active by default', FUI, 'P0');
   add(UI, 'Tab Navigation', 'should switch to Text to Speech tab', FUI, 'P0');
-  add(UI, 'Tab Navigation', 'should switch to Voice Agent tab', FUI, 'P0');
   add(UI, 'Tab Navigation', 'should switch back to Speech to Text from another tab', FUI, 'P0');
 
   // ══════════════════════════════════════════════════════════════════════════
@@ -347,12 +345,8 @@ function buildAllTestCases(): TestCase[] {
   add(UI, 'Tab Navigation: Additional Positive Tests', 'TTS tab should display Output Options section', FUI, 'P1');
   add(UI, 'Tab Navigation: Additional Positive Tests', 'TTS tab should display Run Synthesis button', FUI, 'P1');
   add(UI, 'Tab Navigation: Additional Positive Tests', 'TTS tab should display Audio Player section', FUI, 'P1');
-  add(UI, 'Tab Navigation: Additional Positive Tests', 'Voice Agent tab should display Coming soon message', FUI, 'P1');
-  add(UI, 'Tab Navigation: Additional Positive Tests', 'Voice Agent tab should NOT show STT configuration fields', FUI, 'P1');
-  add(UI, 'Tab Navigation: Additional Positive Tests', 'Voice Agent tab should NOT show TTS fields', FUI, 'P1');
   add(UI, 'Tab Navigation: Additional Positive Tests', 'switching STT → TTS should hide STT-specific content', FUI, 'P1');
   add(UI, 'Tab Navigation: Additional Positive Tests', 'switching TTS → STT should hide TTS-specific content', FUI, 'P1');
-  add(UI, 'Tab Navigation: Additional Positive Tests', 'full tab cycle: STT → TTS → Voice Agent → STT should restore original state', FUI, 'P1');
   add(UI, 'Tab Navigation: Additional Positive Tests', 'Credits should remain visible across all tab switches', FUI, 'P1');
   add(UI, 'Tab Navigation: Additional Positive Tests', 'nav bar should remain visible across all tab switches', FUI, 'P1');
 
@@ -376,8 +370,6 @@ function buildAllTestCases(): TestCase[] {
   add(UI, 'Tab Navigation: Negative Tests', 'there should be no hidden or invisible 4th tab', FUI, 'P3');
   add(UI, 'Tab Navigation: Negative Tests', 'switching tabs should not produce JavaScript console errors', FUI, 'P3');
   add(UI, 'Tab Navigation: Negative Tests', 'switching tabs should not produce failed network requests', FUI, 'P3');
-  add(UI, 'Tab Navigation: Negative Tests', 'Voice Agent "Coming soon" should not show STT Run Analysis or TTS Run Synthesis', FUI, 'P3');
-  add(UI, 'Tab Navigation: Negative Tests', 'Voice Agent tab should not allow any user input actions', FUI, 'P3');
   add(UI, 'Tab Navigation: Negative Tests', 'tab content should not leak/overlap between STT and TTS', FUI, 'P3');
   add(UI, 'Tab Navigation: Negative Tests', 'switching to TTS should not trigger any STT API calls', FUI, 'P3');
   add(UI, 'Tab Navigation: Negative Tests', 'browser back button after tab switch should not break the page', FUI, 'P3');
@@ -561,7 +553,6 @@ function buildAllTestCases(): TestCase[] {
   add(UI, 'Audio Intelligence Features: Negative Tests', 'toggling features should not cause JavaScript console errors', FUI, 'P3');
   add(UI, 'Audio Intelligence Features: Negative Tests', 'toggling features should not cause failed network requests', FUI, 'P3');
   add(UI, 'Audio Intelligence Features: Negative Tests', 'features panel should not be visible in TTS tab', FUI, 'P3');
-  add(UI, 'Audio Intelligence Features: Negative Tests', 'features panel should not be visible in Voice Agent tab', FUI, 'P3');
   add(UI, 'Audio Intelligence Features: Negative Tests', 'feature toggles should not be editable via contentEditable', FUI, 'P3');
   add(UI, 'Audio Intelligence Features: Negative Tests', 'features should not have broken/missing icons or images', FUI, 'P3');
   add(UI, 'Audio Intelligence Features: Negative Tests', 'Run Analysis with features enabled but no audio should not crash', FUI, 'P3');
@@ -613,7 +604,6 @@ function buildAllTestCases(): TestCase[] {
   add(UI, 'File Upload: Negative Tests', 'uploading should not cause JavaScript console errors', FUI, 'P3');
   add(UI, 'File Upload: Negative Tests', 'upload area should not accept non-audio files gracefully', FUI, 'P3');
   add(UI, 'File Upload: Negative Tests', 'file upload area should not be visible in TTS tab', FUI, 'P3');
-  add(UI, 'File Upload: Negative Tests', 'file upload area should not be visible in Voice Agent tab', FUI, 'P3');
   add(UI, 'File Upload: Negative Tests', 'double-clicking Run Analysis should not send duplicate API requests', FUI, 'P3');
 
   // ══════════════════════════════════════════════════════════════════════════
@@ -632,7 +622,6 @@ function buildAllTestCases(): TestCase[] {
 
   add(UI, 'Sample Audio Removal: Negative Tests', 'no sample audio cards should exist in STT tab', FUI, 'P2');
   add(UI, 'Sample Audio Removal: Negative Tests', 'no sample audio cards should exist in TTS tab', FUI, 'P2');
-  add(UI, 'Sample Audio Removal: Negative Tests', 'no sample audio cards should exist in Voice Agent tab', FUI, 'P2');
   add(UI, 'Sample Audio Removal: Negative Tests', 'page should not contain any orphaned sample audio references', FUI, 'P2');
   add(UI, 'Sample Audio Removal: Negative Tests', 'no JavaScript errors should occur where sample audio was removed', FUI, 'P2');
 
