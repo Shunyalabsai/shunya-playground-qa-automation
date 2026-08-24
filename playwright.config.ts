@@ -20,6 +20,7 @@ export default defineConfig({
   workers: 1, // Run sequentially for API tests
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: [
+    ['./scripts/playwright-sheet-reporter.ts', {}],
     ['./scripts/playwright-debug-reporter.ts', {}],
     ['html', { outputFolder: 'playwright-report', open: 'never' }],
     ['list'], // Console reporter
