@@ -5,6 +5,7 @@ on:
     branches:
       - main
     paths:
+      - 'reports/Stakeholder-Dashboard.html'
       - 'reports/Playground-Report.html'
       - 'reports/playground-runs.json'
       - 'reports/playground-today-summary.json'
@@ -30,13 +31,15 @@ jobs:
       - name: Prepare pages directory
         run: |
           mkdir -p pages-output/reports
-          cp reports/Playground-Report.html pages-output/index.html
+          cp reports/Stakeholder-Dashboard.html pages-output/index.html
+          cp reports/Stakeholder-Dashboard.html pages-output/Stakeholder-Dashboard.html
+          cp reports/Stakeholder-Dashboard.html pages-output/reports/Stakeholder-Dashboard.html
           cp reports/Playground-Report.html pages-output/Playground-Report.html
           cp reports/Playground-Report.html pages-output/reports/Playground-Report.html
           cp reports/playground-runs.json pages-output/playground-runs.json
           cp reports/playground-runs.json pages-output/reports/playground-runs.json
-          cp reports/playground-today-summary.json pages-output/playground-today-summary.json
-          cp reports/playground-today-summary.json pages-output/reports/playground-today-summary.json
+          cp reports/playground-today-summary.json pages-output/playground-today-summary.json 2>/dev/null || true
+          cp reports/playground-today-summary.json pages-output/reports/playground-today-summary.json 2>/dev/null || true
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
