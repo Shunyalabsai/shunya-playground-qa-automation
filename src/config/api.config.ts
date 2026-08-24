@@ -36,7 +36,7 @@ const TTS_BASE = process.env.TTS_BASE_URL_ROOT || 'https://ttsv2.shunyalabs.ai';
 // ── API Config ──────────────────────────────────────────────────────────────
 
 export const API_CONFIG: ApiConfig = {
-  apiKey: process.env.ASR_API_KEY || '',
+  apiKey: (process.env.ASR_API_KEY || '').trim(),
   transcriptionUrl:
     process.env.ASR_BASE_URL || `${ASR_BASE}/v1/audio/transcriptions`,
   ttsSynthesisUrl:
@@ -47,8 +47,46 @@ export const API_CONFIG: ApiConfig = {
 
 // ── Auth ─────────────────────────────────────────────────────────────────────
 
-export function getAuthHeaders(): { Authorization: string } {
-  return { Authorization: `Bearer ${API_CONFIG.apiKey}` };
+let cachedToken: string | null = null;
+let tokenExpiresAt = 0;
+
+export async function getAuthToken(apiKey?: string): Promise<string> {
+  const key = (apiKey || API_CONFIG.apiKey).trim();
+  if (!key) return '';
+
+  const now = Math.floor(Date.now() / 1000);
+  if (cachedToken && tokenExpiresAt > now + 60) {
+    return cachedToken;
+  }
+
+  try {
+    const res = await fetch(`${ASR_BASE}/auth/token`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${key}`,
+        'api-key': key,
+        'Accept': 'application/json',
+      },
+    });
+
+    if (res.ok) {
+      const data = (await res.json()) as { token?: string; expires_at?: number; expires_in?: number };
+      if (data?.token) {
+        cachedToken = data.token;
+        tokenExpiresAt = data.expires_at || (now + (data.expires_in || 900));
+        return cachedToken;
+      }
+    }
+  } catch {
+    /* fallback to raw API key */
+  }
+
+  return key;
+}
+
+export function getAuthHeaders(tokenOrKey?: string): { Authorization: string } {
+  const token = tokenOrKey || cachedToken || API_CONFIG.apiKey.trim();
+  return { Authorization: `Bearer ${token}` };
 }
 
 // ── Endpoints ────────────────────────────────────────────────────────────────

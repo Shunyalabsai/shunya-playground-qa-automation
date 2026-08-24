@@ -6,10 +6,14 @@
 import { test, expect } from '@playwright/test';
 import * as fs from 'fs';
 import * as path from 'path';
-import { API_CONFIG, getAuthHeaders, ENDPOINTS } from '../../config/api.config';
+import { API_CONFIG, getAuthHeaders, getAuthToken, ENDPOINTS } from '../../config/api.config';
 import { TEST_AUDIO_FILES } from '../../config/playground.config';
 
 test.describe('Backend API — ASR Transcription', () => {
+  test.beforeAll(async () => {
+    await getAuthToken();
+  });
+
   test.skip(!API_CONFIG.apiKey, 'ASR_API_KEY is required for backend transcription tests');
 
   test('POST /v1/audio/transcriptions — baseline transcription with Zero Indic', async ({ request }) => {
