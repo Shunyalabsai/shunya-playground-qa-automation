@@ -1170,7 +1170,23 @@ function esc(str) {
 
   const dashboardPath = path.join(reportsDir, 'Stakeholder-Dashboard.html');
   fs.writeFileSync(dashboardPath, html, 'utf8');
+
+  // Also write to repository root index.html, docs/index.html, and .nojekyll
+  // so GitHub Pages serves the dashboard immediately regardless of branch/actions settings
+  const rootDir = path.resolve(__dirname, '..');
+  const rootIndexPath = path.join(rootDir, 'index.html');
+  const docsDir = path.join(rootDir, 'docs');
+  if (!fs.existsSync(docsDir)) fs.mkdirSync(docsDir, { recursive: true });
+  const docsIndexPath = path.join(docsDir, 'index.html');
+  const nojekyllPath = path.join(rootDir, '.nojekyll');
+
+  fs.writeFileSync(rootIndexPath, html, 'utf8');
+  fs.writeFileSync(docsIndexPath, html, 'utf8');
+  if (!fs.existsSync(nojekyllPath)) fs.writeFileSync(nojekyllPath, '', 'utf8');
+
   console.log(`[DashboardGenerator] Wrote executive dashboard to: ${dashboardPath}`);
+  console.log(`[DashboardGenerator] Wrote root index.html to: ${rootIndexPath}`);
+  console.log(`[DashboardGenerator] Wrote docs/index.html to: ${docsIndexPath}`);
   return dashboardPath;
 }
 
