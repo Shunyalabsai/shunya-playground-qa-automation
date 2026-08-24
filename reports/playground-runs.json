@@ -1,5 +1,221 @@
 [
   {
+    "runId": "run-1787607857701",
+    "timestamp": "2026-08-24T21:44:17.701Z",
+    "date": "2026-08-24",
+    "durationSeconds": 335.8,
+    "status": "PASS",
+    "totalTests": 33,
+    "passedTests": 33,
+    "failedTests": 0,
+    "passRate": 100,
+    "summary": {
+      "asrHealthy": true,
+      "ttsHealthy": true,
+      "zeroIndic": true,
+      "zeroCodeswitch": true,
+      "zeroMed": true
+    }
+  },
+  {
+    "runId": "run-1787607515673",
+    "timestamp": "2026-08-24T21:38:35.673Z",
+    "date": "2026-08-24",
+    "durationSeconds": 286.7,
+    "status": "PASS",
+    "totalTests": 118,
+    "passedTests": 118,
+    "failedTests": 0,
+    "passRate": 100,
+    "summary": {
+      "asrHealthy": true,
+      "ttsHealthy": true,
+      "zeroIndic": true,
+      "zeroCodeswitch": true,
+      "zeroMed": true
+    }
+  },
+  {
+    "runId": "run-1787607218538",
+    "timestamp": "2026-08-24T21:33:38.538Z",
+    "date": "2026-08-24",
+    "durationSeconds": 283.1,
+    "status": "PASS",
+    "totalTests": 118,
+    "passedTests": 118,
+    "failedTests": 0,
+    "passRate": 100,
+    "summary": {
+      "asrHealthy": true,
+      "ttsHealthy": true,
+      "zeroIndic": true,
+      "zeroCodeswitch": true,
+      "zeroMed": true
+    }
+  },
+  {
+    "runId": "run-1787606923867",
+    "timestamp": "2026-08-24T21:28:43.867Z",
+    "date": "2026-08-24",
+    "durationSeconds": 270,
+    "status": "PASS",
+    "totalTests": 33,
+    "passedTests": 33,
+    "failedTests": 0,
+    "passRate": 100,
+    "summary": {
+      "asrHealthy": true,
+      "ttsHealthy": true,
+      "zeroIndic": true,
+      "zeroCodeswitch": true,
+      "zeroMed": true
+    }
+  },
+  {
+    "runId": "run-1787606621174",
+    "timestamp": "2026-08-24T21:23:41.174Z",
+    "date": "2026-08-24",
+    "durationSeconds": 98.8,
+    "status": "FAIL",
+    "totalTests": 33,
+    "passedTests": 5,
+    "failedTests": 28,
+    "passRate": 15.2,
+    "summary": {
+      "asrHealthy": true,
+      "ttsHealthy": true,
+      "zeroIndic": true,
+      "zeroCodeswitch": true,
+      "zeroMed": true
+    }
+  },
+  {
+    "runId": "run-1787606503652",
+    "timestamp": "2026-08-24T21:21:43.652Z",
+    "date": "2026-08-24",
+    "durationSeconds": 518.4,
+    "status": "FAIL",
+    "totalTests": 118,
+    "passedTests": 116,
+    "failedTests": 2,
+    "passRate": 98.3,
+    "summary": {
+      "asrHealthy": true,
+      "ttsHealthy": true,
+      "zeroIndic": true,
+      "zeroCodeswitch": true,
+      "zeroMed": true
+    }
+  },
+  {
+    "runId": "run-1787606496298",
+    "timestamp": "2026-08-24T21:21:36.298Z",
+    "date": "2026-08-24",
+    "durationSeconds": 44,
+    "status": "FAIL",
+    "totalTests": 33,
+    "passedTests": 0,
+    "failedTests": 33,
+    "passRate": 0,
+    "summary": {
+      "asrHealthy": true,
+      "ttsHealthy": true,
+      "zeroIndic": true,
+      "zeroCodeswitch": true,
+      "zeroMed": true
+    }
+  },
+  {
+    "runId": "run-1787606445584",
+    "timestamp": "2026-08-24T21:20:45.584Z",
+    "date": "2026-08-24",
+    "durationSeconds": 275.6,
+    "status": "PASS",
+    "totalTests": 118,
+    "passedTests": 118,
+    "failedTests": 0,
+    "passRate": 100,
+    "summary": {
+      "asrHealthy": true,
+      "ttsHealthy": true,
+      "zeroIndic": true,
+      "zeroCodeswitch": true,
+      "zeroMed": true
+    }
+  },
+  {
+    "runId": "run-1787605333490",
+    "timestamp": "2026-08-24T21:02:13.490Z",
+    "date": "2026-08-24",
+    "durationSeconds": 166.4,
+    "status": "PASS",
+    "totalTests": 38,
+    "passedTests": 38,
+    "failedTests": 0,
+    "passRate": 100,
+    "summary": {
+      "asrHealthy": true,
+      "ttsHealthy": true,
+      "zeroIndic": true,
+      "zeroCodeswitch": true,
+      "zeroMed": true
+    }
+  },
+  {
+    "runId": "run-1787605161239",
+    "timestamp": "2026-08-24T20:59:21.238Z",
+    "date": "2026-08-24",
+    "durationSeconds": 371.9,
+    "status": "PASS",
+    "totalTests": 33,
+    "passedTests": 33,
+    "failedTests": 0,
+    "passRate": 100,
+    "summary": {
+      "asrHealthy": true,
+      "ttsHealthy": true,
+      "zeroIndic": true,
+      "zeroCodeswitch": true,
+      "zeroMed": true
+    }
+  },
+  {
+    "runId": "run-1787605105067",
+    "timestamp": "2026-08-24T20:58:25.067Z",
+    "date": "2026-08-24",
+    "durationSeconds": 108.7,
+    "status": "PASS",
+    "totalTests": 38,
+    "passedTests": 38,
+    "failedTests": 0,
+    "passRate": 100,
+    "summary": {
+      "asrHealthy": true,
+      "ttsHealthy": true,
+      "zeroIndic": true,
+      "zeroCodeswitch": true,
+      "zeroMed": true
+    }
+  },
+  {
+    "runId": "run-1787604990481",
+    "timestamp": "2026-08-24T20:56:30.480Z",
+    "date": "2026-08-24",
+    "durationSeconds": 191.9,
+    "status": "PASS",
+    "totalTests": 33,
+    "passedTests": 33,
+    "failedTests": 0,
+    "passRate": 100,
+    "summary": {
+      "asrHealthy": true,
+      "ttsHealthy": true,
+      "zeroIndic": true,
+      "zeroCodeswitch": true,
+      "zeroMed": true
+    }
+  },
+  {
     "runId": "run-1787603966837",
     "timestamp": "2026-08-24T20:39:26.837Z",
     "date": "2026-08-24",

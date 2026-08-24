@@ -17,9 +17,11 @@ import { GOOGLE_SHEETS_CONFIG } from '../config/api.config';
 // ── Interfaces ──────────────────────────────────────────────────────────────
 
 export interface PlaygroundSuiteResult {
+  test_id?: string;
   date: string;
-  feature: string; // e.g. "Baseline Transcription", "Translation", "Zero Med", etc.
-  category: string; // "Health Checks", "ASR Models", "ASR Features", "TTS", "Negative"
+  module: string; // Category / Module (e.g. "Intelligence Feature Matrix", "Authentication", "UI Suite")
+  feature: string; // Specific Feature (e.g. "Translation (English)", "Speaker Diarization", "Zero Codeswitch")
+  scenario: string; // Scenario Title / Description (e.g. "Backend API Parameter: Translation (English Target)")
   audio_file: string;
   language: string;
   lang_code: string;
@@ -30,6 +32,101 @@ export interface PlaygroundSuiteResult {
   cer: number; // -1 if not applicable
   api_response_preview: string;
   timestamp: string;
+}
+
+// ── Date & Parser Helpers ───────────────────────────────────────────────────
+
+export function getLocalDateDMY(d: Date = new Date()): string {
+  const pad = (n: number) => (n < 10 ? '0' + n : String(n));
+  return `${pad(d.getDate())}-${pad(d.getMonth() + 1)}-${d.getFullYear()}`;
+}
+
+export function getLocalTimestamp(d: Date = new Date()): string {
+  const pad = (n: number) => (n < 10 ? '0' + n : String(n));
+  const dateStr = `${pad(d.getDate())}-${pad(d.getMonth() + 1)}-${d.getFullYear()}`;
+  const timeStr = `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+  return `${dateStr} ${timeStr}`;
+}
+
+export function parseTestDetails(testTitle: string, defaultModule: string = 'Backend API'): {
+  testId: string;
+  module: string;
+  feature: string;
+  scenario: string;
+} {
+  let testId = '';
+  const idMatch = testTitle.match(/^(TC-[A-Z0-9-]+)/i);
+  if (idMatch) {
+    testId = idMatch[1];
+  }
+
+  let remaining = testTitle;
+  if (testId && remaining.startsWith(testId + ':')) {
+    remaining = remaining.substring(testId.length + 1).trim();
+  }
+
+  let module = defaultModule;
+  const modMatch = remaining.match(/^\[(.*?)\]/);
+  if (modMatch) {
+    module = modMatch[1].replace(/^(UI - |Backend API - )/i, '').trim();
+    remaining = remaining.substring(modMatch[0].length).trim();
+  }
+
+  const scenario = remaining;
+
+  // Derive clean concise feature tag
+  let feature = module;
+  const sLower = scenario.toLowerCase();
+  if (sLower.includes('translation')) {
+    feature = sLower.includes('hindi') ? 'Translation (Hindi)' : 'Translation (English)';
+  } else if (sLower.includes('transliteration')) {
+    feature = sLower.includes('latin') ? 'Transliteration (Latin)' : 'Transliteration (Devanagari)';
+  } else if (sLower.includes('speaker diarization') || sLower.includes('diariz')) {
+    feature = 'Speaker Diarization';
+  } else if (sLower.includes('speaker identification') || sLower.includes('identification')) {
+    feature = 'Speaker Identification';
+  } else if (sLower.includes('timestamp')) {
+    feature = 'Word Timestamps';
+  } else if (sLower.includes('profanity')) {
+    feature = 'Profanity Hashing';
+  } else if (sLower.includes('custom keyword') || sLower.includes('sensitive terms')) {
+    feature = 'Custom Keyword Hashing';
+  } else if (sLower.includes('intent')) {
+    feature = 'Intent Detection';
+  } else if (sLower.includes('sentiment')) {
+    feature = 'Sentiment Analysis';
+  } else if (sLower.includes('emotion')) {
+    feature = 'Emotion Diarization';
+  } else if (sLower.includes('summaris') || sLower.includes('summariz')) {
+    feature = 'Summarisation';
+  } else if (sLower.includes('normalis') || sLower.includes('normaliz')) {
+    feature = 'Keyword Normalisation';
+  } else if (sLower.includes('zero-codeswitch') || sLower.includes('codeswitch') || sLower.includes('hinglish')) {
+    feature = 'Zero Codeswitch Model';
+  } else if (sLower.includes('zero-medasr') || sLower.includes('medasr') || sLower.includes('medical')) {
+    feature = 'Zero Med Model';
+  } else if (sLower.includes('zero-indic') || sLower.includes('indic')) {
+    feature = 'Zero Indic Model';
+  } else if (sLower.includes('jwt token') || sLower.includes('/auth/token')) {
+    feature = 'JWT Token Exchange';
+  } else if (sLower.includes('sign up') || sLower.includes('login') || sLower.includes('logout') || sLower.includes('auth')) {
+    feature = 'Authentication & Session';
+  } else if (sLower.includes('tts') || sLower.includes('speech synthesis') || sLower.includes('/v1/audio/speech')) {
+    feature = 'TTS Speech Synthesis';
+  } else if (sLower.includes('onboarding') || sLower.includes('credits') || sLower.includes('survey')) {
+    feature = 'Onboarding & Credits';
+  } else if (sLower.includes('401') || sLower.includes('403') || sLower.includes('unauthorized')) {
+    feature = 'Auth Rejection Guardrail';
+  } else if (sLower.includes('corrupted') || sLower.includes('0-byte') || sLower.includes('empty') || sLower.includes('missing')) {
+    feature = 'Negative Payload Validation';
+  } else if (sLower.includes('concurrency') || sLower.includes('burst')) {
+    feature = 'Concurrency Load Burst';
+  } else if (sLower.includes('language selection') || sLower.includes('transcription:')) {
+    const langMatch = scenario.match(/Transcription:\s*([A-Za-z]+)/i);
+    feature = langMatch ? `Language (${langMatch[1]})` : 'Language Selection';
+  }
+
+  return { testId, module, feature, scenario };
 }
 
 // ── Auth ───────────────────────────────────────────────────────────────────
@@ -167,9 +264,11 @@ const MODEL_PASTEL_COLORS: Record<string, { bg: string; text: string }> = {
 // ── Column Definitions ──────────────────────────────────────────────────────
 
 const PLAYGROUND_HEADERS = [
+  'Test Case ID',
   'Date',
-  'Feature / Scenario Title',
   'Module / Category',
+  'Feature',
+  'Scenario Description',
   'Audio / Input Payload',
   'Language',
   'Lang Code',
@@ -181,14 +280,40 @@ const PLAYGROUND_HEADERS = [
   'API Response Preview',
   'Timestamp',
 ];
-const PLAYGROUND_COL_COUNT = PLAYGROUND_HEADERS.length; // 13
-const CATEGORY_COL_INDEX = 2;
-const STATUS_COL_INDEX = 6;
-const FAILURE_REASON_COL_INDEX = 7;
-const LATENCY_COL_INDEX = 8;
-const WER_COL_INDEX = 9;
-const CER_COL_INDEX = 10;
-const TIMESTAMP_COL_INDEX = 12;
+const PLAYGROUND_COL_COUNT = PLAYGROUND_HEADERS.length; // 15
+const TEST_ID_COL_INDEX = 0;
+const DATE_COL_INDEX = 1;
+const MODULE_COL_INDEX = 2;
+const FEATURE_COL_INDEX = 3;
+const SCENARIO_COL_INDEX = 4;
+const AUDIO_COL_INDEX = 5;
+const LANG_COL_INDEX = 6;
+const LANG_CODE_COL_INDEX = 7;
+const STATUS_COL_INDEX = 8;
+const FAILURE_REASON_COL_INDEX = 9;
+const LATENCY_COL_INDEX = 10;
+const WER_COL_INDEX = 11;
+const CER_COL_INDEX = 12;
+const API_PREVIEW_COL_INDEX = 13;
+const TIMESTAMP_COL_INDEX = 14;
+
+const COLUMN_WIDTHS = [
+  130, // 0: Test Case ID
+  100, // 1: Date
+  170, // 2: Module / Category
+  180, // 3: Feature
+  340, // 4: Scenario Description
+  170, // 5: Audio / Input Payload
+  120, // 6: Language
+  90,  // 7: Lang Code
+  110, // 8: Status (PASS/FAIL)
+  200, // 9: Failure Reason
+  100, // 10: Latency (ms)
+  85,  // 11: WER (%)
+  85,  // 12: CER (%)
+  250, // 13: API Response Preview
+  150, // 14: Timestamp
+];
 
 // ── Main Execution ──────────────────────────────────────────────────────────
 
@@ -208,73 +333,61 @@ export async function writePlaygroundResults(
     const passed = results.filter((r) => r.status === 'PASS').length;
     const failed = results.filter((r) => r.status === 'FAIL').length;
     const passRate = total > 0 ? ((passed / total) * 100).toFixed(1) : '0';
-    const now = new Date().toISOString().replace('T', ' ').substring(0, 19);
+    const now = getLocalTimestamp();
 
-    // 2. Ensure headers exist at row 1
-    const existingData = await sheets.spreadsheets.values.get({
+    // 2. Ensure headers exist at row 1 and are up-to-date
+    await sheets.spreadsheets.values.update({
       spreadsheetId,
       range: `${sheetName}!A1:${colLetter(PLAYGROUND_COL_COUNT)}1`,
+      valueInputOption: 'USER_ENTERED',
+      requestBody: {
+        values: [PLAYGROUND_HEADERS],
+      },
     });
 
-    const hasHeaders =
-      existingData.data.values &&
-      existingData.data.values.length > 0 &&
-      existingData.data.values[0].length > 0;
-
-    if (!hasHeaders) {
-      await sheets.spreadsheets.values.update({
-        spreadsheetId,
-        range: `${sheetName}!A1:${colLetter(PLAYGROUND_COL_COUNT)}1`,
-        valueInputOption: 'USER_ENTERED',
-        requestBody: {
-          values: [PLAYGROUND_HEADERS],
-        },
-      });
-
-      // Format Header Row (Navy Blue #0F172A with white bold text, centered, frozen)
-      await sheets.spreadsheets.batchUpdate({
-        spreadsheetId,
-        requestBody: {
-          requests: [
-            {
-              repeatCell: {
-                range: {
-                  sheetId,
-                  startRowIndex: 0,
-                  endRowIndex: 1,
-                  startColumnIndex: 0,
-                  endColumnIndex: PLAYGROUND_COL_COUNT,
-                },
-                cell: {
-                  userEnteredFormat: {
-                    backgroundColor: hexToColor('#0F172A'),
-                    textFormat: {
-                      foregroundColor: { red: 1, green: 1, blue: 1, alpha: 1 },
-                      bold: true,
-                      fontSize: 10,
-                    },
-                    horizontalAlignment: 'CENTER',
-                    verticalAlignment: 'MIDDLE',
-                  },
-                },
-                fields: 'userEnteredFormat(backgroundColor,textFormat,horizontalAlignment,verticalAlignment)',
+    // Format Header Row (Navy Blue #0F172A with white bold text, centered, frozen)
+    await sheets.spreadsheets.batchUpdate({
+      spreadsheetId,
+      requestBody: {
+        requests: [
+          {
+            repeatCell: {
+              range: {
+                sheetId,
+                startRowIndex: 0,
+                endRowIndex: 1,
+                startColumnIndex: 0,
+                endColumnIndex: PLAYGROUND_COL_COUNT,
               },
-            },
-            {
-              updateSheetProperties: {
-                properties: {
-                  sheetId,
-                  gridProperties: {
-                    frozenRowCount: 1,
+              cell: {
+                userEnteredFormat: {
+                  backgroundColor: hexToColor('#0F172A'),
+                  textFormat: {
+                    foregroundColor: { red: 1, green: 1, blue: 1, alpha: 1 },
+                    bold: true,
+                    fontSize: 10,
                   },
+                  horizontalAlignment: 'CENTER',
+                  verticalAlignment: 'MIDDLE',
                 },
-                fields: 'gridProperties.frozenRowCount',
               },
+              fields: 'userEnteredFormat(backgroundColor,textFormat,horizontalAlignment,verticalAlignment)',
             },
-          ],
-        },
-      });
-    }
+          },
+          {
+            updateSheetProperties: {
+              properties: {
+                sheetId,
+                gridProperties: {
+                  frozenRowCount: 1,
+                },
+              },
+              fields: 'gridProperties.frozenRowCount',
+            },
+          },
+        ],
+      },
+    });
 
     // 3. Prepare Rows:
     // Row 1 of run: Elegant Summary Card Banner
@@ -288,9 +401,11 @@ export async function writePlaygroundResults(
     ];
 
     const dataRows = results.map((r) => [
+      r.test_id || '',
       r.date,
+      r.module,
       r.feature,
-      r.category,
+      r.scenario,
       r.audio_file,
       r.language,
       r.lang_code,
@@ -349,7 +464,6 @@ export async function writePlaygroundResults(
     const formatRequests: any[] = [];
 
     // A. Format Run Summary Banner (Row index 1)
-    // Elegant Dark Slate Navy with clean white typography
     const bannerBg = failed === 0 ? hexToColor('#1E293B') : hexToColor('#881337');
     formatRequests.push(
       {
@@ -441,15 +555,38 @@ export async function writePlaygroundResults(
         },
       });
 
-      // 2. Date column centered
+      // 2. Test ID column (Soft Purple/Indigo text, bold, centered)
       formatRequests.push({
         repeatCell: {
           range: {
             sheetId,
             startRowIndex: rowIndex,
             endRowIndex: rowIndex + 1,
-            startColumnIndex: 0,
-            endColumnIndex: 1,
+            startColumnIndex: TEST_ID_COL_INDEX,
+            endColumnIndex: TEST_ID_COL_INDEX + 1,
+          },
+          cell: {
+            userEnteredFormat: {
+              textFormat: {
+                foregroundColor: hexToColor('#3730A3'),
+                bold: true,
+              },
+              horizontalAlignment: 'CENTER',
+            },
+          },
+          fields: 'userEnteredFormat(textFormat,horizontalAlignment)',
+        },
+      });
+
+      // 3. Date column centered
+      formatRequests.push({
+        repeatCell: {
+          range: {
+            sheetId,
+            startRowIndex: rowIndex,
+            endRowIndex: rowIndex + 1,
+            startColumnIndex: DATE_COL_INDEX,
+            endColumnIndex: DATE_COL_INDEX + 1,
           },
           cell: {
             userEnteredFormat: {
@@ -460,16 +597,16 @@ export async function writePlaygroundResults(
         },
       });
 
-      // 3. Module / Category Column (Soft Pastel Styling)
-      const catColor = getCategoryColor(r.category);
+      // 4. Module / Category Column (Soft Pastel Styling)
+      const catColor = getCategoryColor(r.module);
       formatRequests.push({
         repeatCell: {
           range: {
             sheetId,
             startRowIndex: rowIndex,
             endRowIndex: rowIndex + 1,
-            startColumnIndex: CATEGORY_COL_INDEX,
-            endColumnIndex: CATEGORY_COL_INDEX + 1,
+            startColumnIndex: MODULE_COL_INDEX,
+            endColumnIndex: MODULE_COL_INDEX + 1,
           },
           cell: {
             userEnteredFormat: {
@@ -486,7 +623,74 @@ export async function writePlaygroundResults(
         },
       });
 
-      // 4. Status Cell (Soft Pastel Badge: PASS in #DCFCE7, FAIL in #FEE2E2)
+      // 5. Feature Column (Soft Pastel Indigo / Lavender badge)
+      formatRequests.push({
+        repeatCell: {
+          range: {
+            sheetId,
+            startRowIndex: rowIndex,
+            endRowIndex: rowIndex + 1,
+            startColumnIndex: FEATURE_COL_INDEX,
+            endColumnIndex: FEATURE_COL_INDEX + 1,
+          },
+          cell: {
+            userEnteredFormat: {
+              backgroundColor: hexToColor('#EEF2FF'),
+              textFormat: {
+                foregroundColor: hexToColor('#4338CA'),
+                bold: true,
+                fontSize: 10,
+              },
+              horizontalAlignment: 'CENTER',
+            },
+          },
+          fields: 'userEnteredFormat(backgroundColor,textFormat,horizontalAlignment)',
+        },
+      });
+
+      // 6. Scenario Description Column (Crisp clean text, left-aligned)
+      formatRequests.push({
+        repeatCell: {
+          range: {
+            sheetId,
+            startRowIndex: rowIndex,
+            endRowIndex: rowIndex + 1,
+            startColumnIndex: SCENARIO_COL_INDEX,
+            endColumnIndex: SCENARIO_COL_INDEX + 1,
+          },
+          cell: {
+            userEnteredFormat: {
+              textFormat: {
+                foregroundColor: hexToColor('#0F172A'),
+                fontSize: 10,
+              },
+              horizontalAlignment: 'LEFT',
+            },
+          },
+          fields: 'userEnteredFormat(textFormat,horizontalAlignment)',
+        },
+      });
+
+      // 7. Audio, Language, Lang Code centered
+      formatRequests.push({
+        repeatCell: {
+          range: {
+            sheetId,
+            startRowIndex: rowIndex,
+            endRowIndex: rowIndex + 1,
+            startColumnIndex: AUDIO_COL_INDEX,
+            endColumnIndex: LANG_CODE_COL_INDEX + 1,
+          },
+          cell: {
+            userEnteredFormat: {
+              horizontalAlignment: 'CENTER',
+            },
+          },
+          fields: 'userEnteredFormat(horizontalAlignment)',
+        },
+      });
+
+      // 8. Status Cell (Soft Pastel Badge: PASS in #DCFCE7, FAIL in #FEE2E2)
       const statusBg = r.status === 'PASS' ? hexToColor('#DCFCE7') : hexToColor('#FEE2E2');
       const statusFg = r.status === 'PASS' ? hexToColor('#166534') : hexToColor('#991B1B');
 
@@ -514,7 +718,7 @@ export async function writePlaygroundResults(
         },
       });
 
-      // 5. Failure reason styling (Soft light red #FEF2F2 ONLY if error present)
+      // 9. Failure reason styling (Soft light red #FEF2F2 ONLY if error present)
       if (r.failure_reason) {
         formatRequests.push({
           repeatCell: {
@@ -540,7 +744,7 @@ export async function writePlaygroundResults(
         });
       }
 
-      // 6. Latency, WER, CER, Timestamp columns centered
+      // 10. Latency, WER, CER, Timestamp columns centered
       formatRequests.push({
         repeatCell: {
           range: {
@@ -598,16 +802,22 @@ export async function writePlaygroundResults(
       },
     });
 
-    // E. Auto-resize columns
-    formatRequests.push({
-      autoResizeDimensions: {
-        dimensions: {
-          sheetId,
-          dimension: 'COLUMNS',
-          startIndex: 0,
-          endIndex: PLAYGROUND_COL_COUNT,
+    // E. Set precise, optimal column widths (prevent wide banner stretch)
+    COLUMN_WIDTHS.forEach((pixelSize, colIdx) => {
+      formatRequests.push({
+        updateDimensionProperties: {
+          range: {
+            sheetId,
+            dimension: 'COLUMNS',
+            startIndex: colIdx,
+            endIndex: colIdx + 1,
+          },
+          properties: {
+            pixelSize,
+          },
+          fields: 'pixelSize',
         },
-      },
+      });
     });
 
     // Apply all batch formatting

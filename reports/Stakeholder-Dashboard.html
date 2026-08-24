@@ -555,7 +555,7 @@
         </div>
       </div>
       <div class="status-meta">
-        Latest Run: 2026-08-24 20:39:26
+        Latest Run: 2026-08-24 21:44:17
       </div>
     </div>
 
@@ -572,9 +572,9 @@
 
       <div class="kpi-card">
         <div class="kpi-label">Total Verified Tests</div>
-        <div class="kpi-value">6</div>
+        <div class="kpi-value">33</div>
         <div class="kpi-sub">
-          <span class="kpi-badge info">6 Passed</span>
+          <span class="kpi-badge info">33 Passed</span>
           <span>0 Failed</span>
         </div>
       </div>
@@ -598,7 +598,7 @@
 
       <div class="kpi-card">
         <div class="kpi-label">Total Historical Runs</div>
-        <div class="kpi-value">200</div>
+        <div class="kpi-value">212</div>
         <div class="kpi-sub">
           <span>Continuous daily automation</span>
         </div>
@@ -642,7 +642,7 @@
 
           <div class="filter-bar">
             <input type="text" id="testSearch" class="search-input" placeholder="🔍 Search test title, model, or feature..." onkeyup="filterTests()">
-            <div class="filter-pill active" onclick="setCategoryFilter('all', this)">All (6)</div>
+            <div class="filter-pill active" onclick="setCategoryFilter('all', this)">All (33)</div>
             <div class="filter-pill" onclick="setCategoryFilter('ASR Models', this)">Models</div>
             <div class="filter-pill" onclick="setCategoryFilter('ASR Features', this)">Features</div>
             <div class="filter-pill" onclick="setCategoryFilter('TTS', this)">TTS</div>
@@ -663,56 +663,299 @@
               </thead>
               <tbody>
                 
-                <tr data-category="Health Checks — api-tests" data-status="PASS" data-title="ASR service health check returns 200 and healthy status">
-                  <td style="font-weight: 600;">ASR service health check returns 200 and healthy status</td>
-                  <td><span class="badge-model">Health Checks — api-tests</span></td>
+                <tr data-category="Backend API — api-tests" data-status="PASS" data-title="TC-AUTH-008: [Authentication & Session] Backend JWT Token Exchange Endpoint (POST /auth/token)">
+                  <td style="font-weight: 600;">TC-AUTH-008: [Authentication & Session] Backend JWT Token Exchange Endpoint (POST /auth/token)</td>
+                  <td><span class="badge-model">Backend API — api-tests</span></td>
                   <td style="font-family: var(--font-mono); font-size: 12px;">Hindi</td>
-                  <td style="font-family: var(--font-mono); font-size: 12px; font-variant-numeric: tabular-nums;">303ms</td>
+                  <td style="font-family: var(--font-mono); font-size: 12px; font-variant-numeric: tabular-nums;">27ms</td>
                   <td><span class="badge-status pass">PASS</span></td>
                   <td style="color: var(--text-muted); font-size: 12px;">—</td>
                 </tr>
                 
-                <tr data-category="Health Checks — api-tests" data-status="PASS" data-title="TTS service health check returns 200">
-                  <td style="font-weight: 600;">TTS service health check returns 200</td>
-                  <td><span class="badge-model">Health Checks — api-tests</span></td>
-                  <td style="font-family: var(--font-mono); font-size: 12px;">Hindi/English</td>
-                  <td style="font-family: var(--font-mono); font-size: 12px; font-variant-numeric: tabular-nums;">252ms</td>
-                  <td><span class="badge-status pass">PASS</span></td>
-                  <td style="color: var(--text-muted); font-size: 12px;">—</td>
-                </tr>
-                
-                <tr data-category="Health Checks — api-tests" data-status="PASS" data-title="ASR supported languages endpoint responds">
-                  <td style="font-weight: 600;">ASR supported languages endpoint responds</td>
-                  <td><span class="badge-model">Health Checks — api-tests</span></td>
+                <tr data-category="ASR Features — api-tests" data-status="PASS" data-title="TC-FEAT-API-002: [Backend API - Intelligence Feature Matrix] Backend API Parameter: Translation (English Target)">
+                  <td style="font-weight: 600;">TC-FEAT-API-002: [Backend API - Intelligence Feature Matrix] Backend API Parameter: Translation (English Target)</td>
+                  <td><span class="badge-model">ASR Features — api-tests</span></td>
                   <td style="font-family: var(--font-mono); font-size: 12px;">Hindi</td>
-                  <td style="font-family: var(--font-mono); font-size: 12px; font-variant-numeric: tabular-nums;">100ms</td>
+                  <td style="font-family: var(--font-mono); font-size: 12px; font-variant-numeric: tabular-nums;">713ms</td>
                   <td><span class="badge-status pass">PASS</span></td>
                   <td style="color: var(--text-muted); font-size: 12px;">—</td>
                 </tr>
                 
-                <tr data-category="TTS Speech Synthesis — api-tests" data-status="PASS" data-title="POST /v1/audio/speech — synthesize speech from text (Hindi/English)">
-                  <td style="font-weight: 600;">POST /v1/audio/speech — synthesize speech from text (Hindi/English)</td>
-                  <td><span class="badge-model">TTS Speech Synthesis — api-tests</span></td>
-                  <td style="font-family: var(--font-mono); font-size: 12px;">Hindi/English</td>
-                  <td style="font-family: var(--font-mono); font-size: 12px; font-variant-numeric: tabular-nums;">82ms</td>
+                <tr data-category="ASR Features — api-tests" data-status="PASS" data-title="TC-FEAT-API-004: [Backend API - Intelligence Feature Matrix] Backend API Parameter: Translation (Hindi Target)">
+                  <td style="font-weight: 600;">TC-FEAT-API-004: [Backend API - Intelligence Feature Matrix] Backend API Parameter: Translation (Hindi Target)</td>
+                  <td><span class="badge-model">ASR Features — api-tests</span></td>
+                  <td style="font-family: var(--font-mono); font-size: 12px;">Hindi</td>
+                  <td style="font-family: var(--font-mono); font-size: 12px; font-variant-numeric: tabular-nums;">1673ms</td>
                   <td><span class="badge-status pass">PASS</span></td>
                   <td style="color: var(--text-muted); font-size: 12px;">—</td>
                 </tr>
                 
-                <tr data-category="TTS Speech Synthesis — api-tests" data-status="PASS" data-title="POST /v1/audio/speech — Negative case: empty input text returns 400/422">
-                  <td style="font-weight: 600;">POST /v1/audio/speech — Negative case: empty input text returns 400/422</td>
-                  <td><span class="badge-model">TTS Speech Synthesis — api-tests</span></td>
-                  <td style="font-family: var(--font-mono); font-size: 12px;">Hindi/English</td>
-                  <td style="font-family: var(--font-mono); font-size: 12px; font-variant-numeric: tabular-nums;">82ms</td>
+                <tr data-category="ASR Features — api-tests" data-status="PASS" data-title="TC-FEAT-API-006: [Backend API - Intelligence Feature Matrix] Backend API Parameter: Transliteration (Devanagari Script)">
+                  <td style="font-weight: 600;">TC-FEAT-API-006: [Backend API - Intelligence Feature Matrix] Backend API Parameter: Transliteration (Devanagari Script)</td>
+                  <td><span class="badge-model">ASR Features — api-tests</span></td>
+                  <td style="font-family: var(--font-mono); font-size: 12px;">Hindi</td>
+                  <td style="font-family: var(--font-mono); font-size: 12px; font-variant-numeric: tabular-nums;">706ms</td>
                   <td><span class="badge-status pass">PASS</span></td>
                   <td style="color: var(--text-muted); font-size: 12px;">—</td>
                 </tr>
                 
-                <tr data-category="TTS Speech Synthesis — api-tests" data-status="PASS" data-title="POST /v1/audio/speech — Negative case: invalid authentication returns 401/403">
-                  <td style="font-weight: 600;">POST /v1/audio/speech — Negative case: invalid authentication returns 401/403</td>
-                  <td><span class="badge-model">TTS Speech Synthesis — api-tests</span></td>
+                <tr data-category="ASR Features — api-tests" data-status="PASS" data-title="TC-FEAT-API-008: [Backend API - Intelligence Feature Matrix] Backend API Parameter: Transliteration (Latin Script)">
+                  <td style="font-weight: 600;">TC-FEAT-API-008: [Backend API - Intelligence Feature Matrix] Backend API Parameter: Transliteration (Latin Script)</td>
+                  <td><span class="badge-model">ASR Features — api-tests</span></td>
+                  <td style="font-family: var(--font-mono); font-size: 12px;">Hindi</td>
+                  <td style="font-family: var(--font-mono); font-size: 12px; font-variant-numeric: tabular-nums;">351ms</td>
+                  <td><span class="badge-status pass">PASS</span></td>
+                  <td style="color: var(--text-muted); font-size: 12px;">—</td>
+                </tr>
+                
+                <tr data-category="ASR Features — api-tests" data-status="PASS" data-title="TC-FEAT-API-010: [Backend API - Intelligence Feature Matrix] Backend API Parameter: Speaker Diarization (Debate Audio with Multiple Speakers)">
+                  <td style="font-weight: 600;">TC-FEAT-API-010: [Backend API - Intelligence Feature Matrix] Backend API Parameter: Speaker Diarization (Debate Audio with Multiple Speakers)</td>
+                  <td><span class="badge-model">ASR Features — api-tests</span></td>
+                  <td style="font-family: var(--font-mono); font-size: 12px;">Hindi</td>
+                  <td style="font-family: var(--font-mono); font-size: 12px; font-variant-numeric: tabular-nums;">2640ms</td>
+                  <td><span class="badge-status pass">PASS</span></td>
+                  <td style="color: var(--text-muted); font-size: 12px;">—</td>
+                </tr>
+                
+                <tr data-category="ASR Features — api-tests" data-status="PASS" data-title="TC-FEAT-API-012: [Backend API - Intelligence Feature Matrix] Backend API Parameter: Speaker Diarization (Rajya Sabha Budget Session Parliamentary Debate)">
+                  <td style="font-weight: 600;">TC-FEAT-API-012: [Backend API - Intelligence Feature Matrix] Backend API Parameter: Speaker Diarization (Rajya Sabha Budget Session Parliamentary Debate)</td>
+                  <td><span class="badge-model">ASR Features — api-tests</span></td>
+                  <td style="font-family: var(--font-mono); font-size: 12px;">Hindi</td>
+                  <td style="font-family: var(--font-mono); font-size: 12px; font-variant-numeric: tabular-nums;">63569ms</td>
+                  <td><span class="badge-status pass">PASS</span></td>
+                  <td style="color: var(--text-muted); font-size: 12px;">—</td>
+                </tr>
+                
+                <tr data-category="ASR Features — api-tests" data-status="PASS" data-title="TC-FEAT-API-014: [Backend API - Intelligence Feature Matrix] Backend API Parameter: Speaker Identification (Voiceprint Matching on Studio Debate)">
+                  <td style="font-weight: 600;">TC-FEAT-API-014: [Backend API - Intelligence Feature Matrix] Backend API Parameter: Speaker Identification (Voiceprint Matching on Studio Debate)</td>
+                  <td><span class="badge-model">ASR Features — api-tests</span></td>
+                  <td style="font-family: var(--font-mono); font-size: 12px;">Hindi</td>
+                  <td style="font-family: var(--font-mono); font-size: 12px; font-variant-numeric: tabular-nums;">41368ms</td>
+                  <td><span class="badge-status pass">PASS</span></td>
+                  <td style="color: var(--text-muted); font-size: 12px;">—</td>
+                </tr>
+                
+                <tr data-category="ASR Features — api-tests" data-status="PASS" data-title="TC-FEAT-API-016: [Backend API - Intelligence Feature Matrix] Backend API Parameter: Word Timestamps (Word Start/End Timing Offsets on WAV)">
+                  <td style="font-weight: 600;">TC-FEAT-API-016: [Backend API - Intelligence Feature Matrix] Backend API Parameter: Word Timestamps (Word Start/End Timing Offsets on WAV)</td>
+                  <td><span class="badge-model">ASR Features — api-tests</span></td>
+                  <td style="font-family: var(--font-mono); font-size: 12px;">Hindi</td>
+                  <td style="font-family: var(--font-mono); font-size: 12px; font-variant-numeric: tabular-nums;">4220ms</td>
+                  <td><span class="badge-status pass">PASS</span></td>
+                  <td style="color: var(--text-muted); font-size: 12px;">—</td>
+                </tr>
+                
+                <tr data-category="ASR Features — api-tests" data-status="PASS" data-title="TC-FEAT-API-018: [Backend API - Intelligence Feature Matrix] Backend API Parameter: Profanity Hashing (Abusive Language Test Audio)">
+                  <td style="font-weight: 600;">TC-FEAT-API-018: [Backend API - Intelligence Feature Matrix] Backend API Parameter: Profanity Hashing (Abusive Language Test Audio)</td>
+                  <td><span class="badge-model">ASR Features — api-tests</span></td>
+                  <td style="font-family: var(--font-mono); font-size: 12px;">Hindi</td>
+                  <td style="font-family: var(--font-mono); font-size: 12px; font-variant-numeric: tabular-nums;">19033ms</td>
+                  <td><span class="badge-status pass">PASS</span></td>
+                  <td style="color: var(--text-muted); font-size: 12px;">—</td>
+                </tr>
+                
+                <tr data-category="ASR Features — api-tests" data-status="PASS" data-title="TC-FEAT-API-020: [Backend API - Intelligence Feature Matrix] Backend API Parameter: Custom Keyword Hashing (Customer Call with Sensitive Terms)">
+                  <td style="font-weight: 600;">TC-FEAT-API-020: [Backend API - Intelligence Feature Matrix] Backend API Parameter: Custom Keyword Hashing (Customer Call with Sensitive Terms)</td>
+                  <td><span class="badge-model">ASR Features — api-tests</span></td>
+                  <td style="font-family: var(--font-mono); font-size: 12px;">Hindi</td>
+                  <td style="font-family: var(--font-mono); font-size: 12px; font-variant-numeric: tabular-nums;">1610ms</td>
+                  <td><span class="badge-status pass">PASS</span></td>
+                  <td style="color: var(--text-muted); font-size: 12px;">—</td>
+                </tr>
+                
+                <tr data-category="ASR Features — api-tests" data-status="PASS" data-title="TC-FEAT-API-022: [Backend API - Intelligence Feature Matrix] Backend API Parameter: Intent Detection (Customer Call Support Intent Classification)">
+                  <td style="font-weight: 600;">TC-FEAT-API-022: [Backend API - Intelligence Feature Matrix] Backend API Parameter: Intent Detection (Customer Call Support Intent Classification)</td>
+                  <td><span class="badge-model">ASR Features — api-tests</span></td>
+                  <td style="font-family: var(--font-mono); font-size: 12px;">Hindi</td>
+                  <td style="font-family: var(--font-mono); font-size: 12px; font-variant-numeric: tabular-nums;">3757ms</td>
+                  <td><span class="badge-status pass">PASS</span></td>
+                  <td style="color: var(--text-muted); font-size: 12px;">—</td>
+                </tr>
+                
+                <tr data-category="ASR Features — api-tests" data-status="PASS" data-title="TC-FEAT-API-024: [Backend API - Intelligence Feature Matrix] Backend API Parameter: Sentiment Analysis (Customer Sentiment Polarity)">
+                  <td style="font-weight: 600;">TC-FEAT-API-024: [Backend API - Intelligence Feature Matrix] Backend API Parameter: Sentiment Analysis (Customer Sentiment Polarity)</td>
+                  <td><span class="badge-model">ASR Features — api-tests</span></td>
+                  <td style="font-family: var(--font-mono); font-size: 12px;">Hindi</td>
+                  <td style="font-family: var(--font-mono); font-size: 12px; font-variant-numeric: tabular-nums;">3498ms</td>
+                  <td><span class="badge-status pass">PASS</span></td>
+                  <td style="color: var(--text-muted); font-size: 12px;">—</td>
+                </tr>
+                
+                <tr data-category="ASR Features — api-tests" data-status="PASS" data-title="TC-FEAT-API-026: [Backend API - Intelligence Feature Matrix] Backend API Parameter: Emotion Diarization (Group Meeting Audio)">
+                  <td style="font-weight: 600;">TC-FEAT-API-026: [Backend API - Intelligence Feature Matrix] Backend API Parameter: Emotion Diarization (Group Meeting Audio)</td>
+                  <td><span class="badge-model">ASR Features — api-tests</span></td>
+                  <td style="font-family: var(--font-mono); font-size: 12px;">Hindi</td>
+                  <td style="font-family: var(--font-mono); font-size: 12px; font-variant-numeric: tabular-nums;">101344ms</td>
+                  <td><span class="badge-status pass">PASS</span></td>
+                  <td style="color: var(--text-muted); font-size: 12px;">—</td>
+                </tr>
+                
+                <tr data-category="ASR Features — api-tests" data-status="PASS" data-title="TC-FEAT-API-028: [Backend API - Intelligence Feature Matrix] Backend API Parameter: Summarisation (Executive Abstract on Parliamentary Debate)">
+                  <td style="font-weight: 600;">TC-FEAT-API-028: [Backend API - Intelligence Feature Matrix] Backend API Parameter: Summarisation (Executive Abstract on Parliamentary Debate)</td>
+                  <td><span class="badge-model">ASR Features — api-tests</span></td>
+                  <td style="font-family: var(--font-mono); font-size: 12px;">Hindi</td>
+                  <td style="font-family: var(--font-mono); font-size: 12px; font-variant-numeric: tabular-nums;">53902ms</td>
+                  <td><span class="badge-status pass">PASS</span></td>
+                  <td style="color: var(--text-muted); font-size: 12px;">—</td>
+                </tr>
+                
+                <tr data-category="ASR Features — api-tests" data-status="PASS" data-title="TC-FEAT-API-030: [Backend API - Intelligence Feature Matrix] Backend API Parameter: Keyword Normalisation (Hindi Stress Test Variations)">
+                  <td style="font-weight: 600;">TC-FEAT-API-030: [Backend API - Intelligence Feature Matrix] Backend API Parameter: Keyword Normalisation (Hindi Stress Test Variations)</td>
+                  <td><span class="badge-model">ASR Features — api-tests</span></td>
+                  <td style="font-family: var(--font-mono); font-size: 12px;">Hindi</td>
+                  <td style="font-family: var(--font-mono); font-size: 12px; font-variant-numeric: tabular-nums;">17955ms</td>
+                  <td><span class="badge-status pass">PASS</span></td>
+                  <td style="color: var(--text-muted); font-size: 12px;">—</td>
+                </tr>
+                
+                <tr data-category="ASR Features — api-tests" data-status="PASS" data-title="TC-FEAT-API-032: [Backend API - Intelligence Feature Matrix] Backend API Parameter: Keyword Normalisation (Industry Jargon & Brand Normalization)">
+                  <td style="font-weight: 600;">TC-FEAT-API-032: [Backend API - Intelligence Feature Matrix] Backend API Parameter: Keyword Normalisation (Industry Jargon & Brand Normalization)</td>
+                  <td><span class="badge-model">ASR Features — api-tests</span></td>
+                  <td style="font-family: var(--font-mono); font-size: 12px;">Hindi</td>
+                  <td style="font-family: var(--font-mono); font-size: 12px; font-variant-numeric: tabular-nums;">5945ms</td>
+                  <td><span class="badge-status pass">PASS</span></td>
+                  <td style="color: var(--text-muted); font-size: 12px;">—</td>
+                </tr>
+                
+                <tr data-category="Backend API — api-tests" data-status="PASS" data-title="TC-TTS-API-002: [Backend API - TTS Speech Synthesis] Backend POST /v1/audio/speech: EN voice=shunya-female-1">
+                  <td style="font-weight: 600;">TC-TTS-API-002: [Backend API - TTS Speech Synthesis] Backend POST /v1/audio/speech: EN voice=shunya-female-1</td>
+                  <td><span class="badge-model">Backend API — api-tests</span></td>
                   <td style="font-family: var(--font-mono); font-size: 12px;">Hindi/English</td>
-                  <td style="font-family: var(--font-mono); font-size: 12px; font-variant-numeric: tabular-nums;">86ms</td>
+                  <td style="font-family: var(--font-mono); font-size: 12px; font-variant-numeric: tabular-nums;">710ms</td>
+                  <td><span class="badge-status pass">PASS</span></td>
+                  <td style="color: var(--text-muted); font-size: 12px;">—</td>
+                </tr>
+                
+                <tr data-category="Backend API — api-tests" data-status="PASS" data-title="TC-TTS-API-004: [Backend API - TTS Speech Synthesis] Backend POST /v1/audio/speech: EN voice=shunya-male-1">
+                  <td style="font-weight: 600;">TC-TTS-API-004: [Backend API - TTS Speech Synthesis] Backend POST /v1/audio/speech: EN voice=shunya-male-1</td>
+                  <td><span class="badge-model">Backend API — api-tests</span></td>
+                  <td style="font-family: var(--font-mono); font-size: 12px;">Hindi/English</td>
+                  <td style="font-family: var(--font-mono); font-size: 12px; font-variant-numeric: tabular-nums;">482ms</td>
+                  <td><span class="badge-status pass">PASS</span></td>
+                  <td style="color: var(--text-muted); font-size: 12px;">—</td>
+                </tr>
+                
+                <tr data-category="Backend API — api-tests" data-status="PASS" data-title="TC-TTS-API-006: [Backend API - TTS Speech Synthesis] Backend POST /v1/audio/speech: HI voice=shunya-female-1">
+                  <td style="font-weight: 600;">TC-TTS-API-006: [Backend API - TTS Speech Synthesis] Backend POST /v1/audio/speech: HI voice=shunya-female-1</td>
+                  <td><span class="badge-model">Backend API — api-tests</span></td>
+                  <td style="font-family: var(--font-mono); font-size: 12px;">Hindi/English</td>
+                  <td style="font-family: var(--font-mono); font-size: 12px; font-variant-numeric: tabular-nums;">363ms</td>
+                  <td><span class="badge-status pass">PASS</span></td>
+                  <td style="color: var(--text-muted); font-size: 12px;">—</td>
+                </tr>
+                
+                <tr data-category="Backend API — api-tests" data-status="PASS" data-title="TC-TTS-API-008: [Backend API - TTS Speech Synthesis] Backend POST /v1/audio/speech: HI voice=shunya-male-1">
+                  <td style="font-weight: 600;">TC-TTS-API-008: [Backend API - TTS Speech Synthesis] Backend POST /v1/audio/speech: HI voice=shunya-male-1</td>
+                  <td><span class="badge-model">Backend API — api-tests</span></td>
+                  <td style="font-family: var(--font-mono); font-size: 12px;">Hindi/English</td>
+                  <td style="font-family: var(--font-mono); font-size: 12px; font-variant-numeric: tabular-nums;">663ms</td>
+                  <td><span class="badge-status pass">PASS</span></td>
+                  <td style="color: var(--text-muted); font-size: 12px;">—</td>
+                </tr>
+                
+                <tr data-category="Backend API — api-tests" data-status="PASS" data-title="TC-TTS-API-010: [Backend API - TTS Speech Synthesis] Backend POST /v1/audio/speech: BN voice=shunya-female-1">
+                  <td style="font-weight: 600;">TC-TTS-API-010: [Backend API - TTS Speech Synthesis] Backend POST /v1/audio/speech: BN voice=shunya-female-1</td>
+                  <td><span class="badge-model">Backend API — api-tests</span></td>
+                  <td style="font-family: var(--font-mono); font-size: 12px;">Hindi/English</td>
+                  <td style="font-family: var(--font-mono); font-size: 12px; font-variant-numeric: tabular-nums;">388ms</td>
+                  <td><span class="badge-status pass">PASS</span></td>
+                  <td style="color: var(--text-muted); font-size: 12px;">—</td>
+                </tr>
+                
+                <tr data-category="Backend API — api-tests" data-status="PASS" data-title="TC-TTS-API-012: [Backend API - TTS Speech Synthesis] Backend POST /v1/audio/speech: TA voice=shunya-female-1">
+                  <td style="font-weight: 600;">TC-TTS-API-012: [Backend API - TTS Speech Synthesis] Backend POST /v1/audio/speech: TA voice=shunya-female-1</td>
+                  <td><span class="badge-model">Backend API — api-tests</span></td>
+                  <td style="font-family: var(--font-mono); font-size: 12px;">Hindi/English</td>
+                  <td style="font-family: var(--font-mono); font-size: 12px; font-variant-numeric: tabular-nums;">286ms</td>
+                  <td><span class="badge-status pass">PASS</span></td>
+                  <td style="color: var(--text-muted); font-size: 12px;">—</td>
+                </tr>
+                
+                <tr data-category="Backend API — api-tests" data-status="PASS" data-title="TC-TTS-API-014: [Backend API - TTS Speech Synthesis] Backend POST /v1/audio/speech: TE voice=shunya-female-1">
+                  <td style="font-weight: 600;">TC-TTS-API-014: [Backend API - TTS Speech Synthesis] Backend POST /v1/audio/speech: TE voice=shunya-female-1</td>
+                  <td><span class="badge-model">Backend API — api-tests</span></td>
+                  <td style="font-family: var(--font-mono); font-size: 12px;">Hindi/English</td>
+                  <td style="font-family: var(--font-mono); font-size: 12px; font-variant-numeric: tabular-nums;">282ms</td>
+                  <td><span class="badge-status pass">PASS</span></td>
+                  <td style="color: var(--text-muted); font-size: 12px;">—</td>
+                </tr>
+                
+                <tr data-category="Backend API — api-tests" data-status="PASS" data-title="TC-TTS-API-016: [Backend API - TTS Speech Synthesis] Backend POST /v1/audio/speech: EN voice=shunya-female-1">
+                  <td style="font-weight: 600;">TC-TTS-API-016: [Backend API - TTS Speech Synthesis] Backend POST /v1/audio/speech: EN voice=shunya-female-1</td>
+                  <td><span class="badge-model">Backend API — api-tests</span></td>
+                  <td style="font-family: var(--font-mono); font-size: 12px;">Hindi/English</td>
+                  <td style="font-family: var(--font-mono); font-size: 12px; font-variant-numeric: tabular-nums;">879ms</td>
+                  <td><span class="badge-status pass">PASS</span></td>
+                  <td style="color: var(--text-muted); font-size: 12px;">—</td>
+                </tr>
+                
+                <tr data-category="Backend API — api-tests" data-status="PASS" data-title="TC-TTS-API-018: [Backend API - TTS Speech Synthesis] Backend POST /v1/audio/speech: EN voice=shunya-female-1">
+                  <td style="font-weight: 600;">TC-TTS-API-018: [Backend API - TTS Speech Synthesis] Backend POST /v1/audio/speech: EN voice=shunya-female-1</td>
+                  <td><span class="badge-model">Backend API — api-tests</span></td>
+                  <td style="font-family: var(--font-mono); font-size: 12px;">Hindi/English</td>
+                  <td style="font-family: var(--font-mono); font-size: 12px; font-variant-numeric: tabular-nums;">491ms</td>
+                  <td><span class="badge-status pass">PASS</span></td>
+                  <td style="color: var(--text-muted); font-size: 12px;">—</td>
+                </tr>
+                
+                <tr data-category="Backend API — api-tests" data-status="PASS" data-title="TC-TTS-API-020: [Backend API - TTS Speech Synthesis] Backend POST /v1/audio/speech: EN voice=shunya-female-1">
+                  <td style="font-weight: 600;">TC-TTS-API-020: [Backend API - TTS Speech Synthesis] Backend POST /v1/audio/speech: EN voice=shunya-female-1</td>
+                  <td><span class="badge-model">Backend API — api-tests</span></td>
+                  <td style="font-family: var(--font-mono); font-size: 12px;">Hindi/English</td>
+                  <td style="font-family: var(--font-mono); font-size: 12px; font-variant-numeric: tabular-nums;">314ms</td>
+                  <td><span class="badge-status pass">PASS</span></td>
+                  <td style="color: var(--text-muted); font-size: 12px;">—</td>
+                </tr>
+                
+                <tr data-category="Backend API — api-tests" data-status="PASS" data-title="TC-API-NEG-001: [Backend API - Negative, Auth & Stress] Missing Authorization Header Returns 401 Unauthorized">
+                  <td style="font-weight: 600;">TC-API-NEG-001: [Backend API - Negative, Auth & Stress] Missing Authorization Header Returns 401 Unauthorized</td>
+                  <td><span class="badge-model">Backend API — api-tests</span></td>
+                  <td style="font-family: var(--font-mono); font-size: 12px;">Hindi</td>
+                  <td style="font-family: var(--font-mono); font-size: 12px; font-variant-numeric: tabular-nums;">107ms</td>
+                  <td><span class="badge-status pass">PASS</span></td>
+                  <td style="color: var(--text-muted); font-size: 12px;">—</td>
+                </tr>
+                
+                <tr data-category="Backend API — api-tests" data-status="PASS" data-title="TC-API-NEG-002: [Backend API - Negative, Auth & Stress] Invalid API Key / Bearer Token Returns 401 or 403">
+                  <td style="font-weight: 600;">TC-API-NEG-002: [Backend API - Negative, Auth & Stress] Invalid API Key / Bearer Token Returns 401 or 403</td>
+                  <td><span class="badge-model">Backend API — api-tests</span></td>
+                  <td style="font-family: var(--font-mono); font-size: 12px;">Hindi</td>
+                  <td style="font-family: var(--font-mono); font-size: 12px; font-variant-numeric: tabular-nums;">260ms</td>
+                  <td><span class="badge-status pass">PASS</span></td>
+                  <td style="color: var(--text-muted); font-size: 12px;">—</td>
+                </tr>
+                
+                <tr data-category="Backend API — api-tests" data-status="PASS" data-title="TC-API-NEG-003: [Backend API - Negative, Auth & Stress] Missing Audio File in Multipart Payload Returns 400 or 422">
+                  <td style="font-weight: 600;">TC-API-NEG-003: [Backend API - Negative, Auth & Stress] Missing Audio File in Multipart Payload Returns 400 or 422</td>
+                  <td><span class="badge-model">Backend API — api-tests</span></td>
+                  <td style="font-family: var(--font-mono); font-size: 12px;">Hindi</td>
+                  <td style="font-family: var(--font-mono); font-size: 12px; font-variant-numeric: tabular-nums;">103ms</td>
+                  <td><span class="badge-status pass">PASS</span></td>
+                  <td style="color: var(--text-muted); font-size: 12px;">—</td>
+                </tr>
+                
+                <tr data-category="Backend API — api-tests" data-status="PASS" data-title="TC-API-NEG-004: [Backend API - Negative, Auth & Stress] Corrupted Audio Byte Buffer Payload Returns 400 or 422">
+                  <td style="font-weight: 600;">TC-API-NEG-004: [Backend API - Negative, Auth & Stress] Corrupted Audio Byte Buffer Payload Returns 400 or 422</td>
+                  <td><span class="badge-model">Backend API — api-tests</span></td>
+                  <td style="font-family: var(--font-mono); font-size: 12px;">Hindi</td>
+                  <td style="font-family: var(--font-mono); font-size: 12px; font-variant-numeric: tabular-nums;">263ms</td>
+                  <td><span class="badge-status pass">PASS</span></td>
+                  <td style="color: var(--text-muted); font-size: 12px;">—</td>
+                </tr>
+                
+                <tr data-category="Backend API — api-tests" data-status="PASS" data-title="TC-API-NEG-005: [Backend API - Negative, Auth & Stress] 0-Byte Empty Audio Buffer Payload Returns 400 or 422">
+                  <td style="font-weight: 600;">TC-API-NEG-005: [Backend API - Negative, Auth & Stress] 0-Byte Empty Audio Buffer Payload Returns 400 or 422</td>
+                  <td><span class="badge-model">Backend API — api-tests</span></td>
+                  <td style="font-family: var(--font-mono); font-size: 12px;">Hindi</td>
+                  <td style="font-family: var(--font-mono); font-size: 12px; font-variant-numeric: tabular-nums;">248ms</td>
+                  <td><span class="badge-status pass">PASS</span></td>
+                  <td style="color: var(--text-muted); font-size: 12px;">—</td>
+                </tr>
+                
+                <tr data-category="Backend API — api-tests" data-status="PASS" data-title="TC-API-NEG-006: [Backend API - Negative, Auth & Stress] Concurrency Burst Test: 3 Parallel Transcription Requests">
+                  <td style="font-weight: 600;">TC-API-NEG-006: [Backend API - Negative, Auth & Stress] Concurrency Burst Test: 3 Parallel Transcription Requests</td>
+                  <td><span class="badge-model">Backend API — api-tests</span></td>
+                  <td style="font-family: var(--font-mono); font-size: 12px;">Hindi</td>
+                  <td style="font-family: var(--font-mono); font-size: 12px; font-variant-numeric: tabular-nums;">5777ms</td>
                   <td><span class="badge-status pass">PASS</span></td>
                   <td style="color: var(--text-muted); font-size: 12px;">—</td>
                 </tr>
@@ -791,7 +1034,7 @@
 
   <script>
     // Embedded Date History
-    const dateData = {"2026-08-24":{"runs":6,"passed":581,"failed":19,"totalTests":600}};
+    const dateData = {"2026-08-24":{"runs":18,"passed":1264,"failed":82,"totalTests":1346}};
 
     // Generate August 2026 Calendar Grid
     function renderCalendar() {

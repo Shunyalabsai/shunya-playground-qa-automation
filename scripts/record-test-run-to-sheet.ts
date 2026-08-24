@@ -11,15 +11,21 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { execSync } from 'child_process';
-import { writePlaygroundResults, PlaygroundSuiteResult } from '../src/utils/playgroundSheetWriter';
+import {
+  writePlaygroundResults,
+  PlaygroundSuiteResult,
+  getLocalDateDMY,
+  getLocalTimestamp,
+  parseTestDetails,
+} from '../src/utils/playgroundSheetWriter';
 
 async function main() {
   console.log('================================================================');
   console.log('🚀 Running Test Execution & Recording to Playground Output Sheet');
   console.log('================================================================\n');
 
-  const today = new Date().toISOString().split('T')[0];
-  const timestamp = new Date().toISOString().replace('T', ' ').substring(0, 19);
+  const today = getLocalDateDMY();
+  const timestamp = getLocalTimestamp();
 
   // Run backend tests and produce json reporter
   const resultsJsonPath = path.resolve(__dirname, '../test-results-summary.json');
@@ -52,10 +58,15 @@ async function main() {
             const latency = result?.duration || 0;
             const errorMsg = result?.errors?.[0]?.message || '';
 
+            const specTitle = spec.title || 'Backend API Test';
+            const parsedDetails = parseTestDetails(specTitle, 'Backend API');
+
             results.push({
+              test_id: parsedDetails.testId,
               date: today,
-              feature: spec.title || 'Backend API Test',
-              category: 'Backend API',
+              module: parsedDetails.module,
+              feature: parsedDetails.feature,
+              scenario: parsedDetails.scenario,
               audio_file: 'Standard Test Dataset',
               language: 'Hindi/English',
               lang_code: 'hi/en',
@@ -78,10 +89,15 @@ async function main() {
               const latency = result?.duration || 0;
               const errorMsg = result?.errors?.[0]?.message || '';
 
+              const specTitle = spec.title || 'Backend API Test';
+              const parsedDetails = parseTestDetails(specTitle, 'Backend API');
+
               results.push({
+                test_id: parsedDetails.testId,
                 date: today,
-                feature: spec.title || 'Backend API Test',
-                category: 'Backend API',
+                module: parsedDetails.module,
+                feature: parsedDetails.feature,
+                scenario: parsedDetails.scenario,
                 audio_file: 'Standard Test Dataset',
                 language: 'Hindi/English',
                 lang_code: 'hi/en',

@@ -113,7 +113,7 @@ function hexToRgb(hex: string): { red: number; green: number; blue: number } {
   };
 }
 
-function generateTestCases(): DeepTestCase[] {
+export function generateTestCases(): DeepTestCase[] {
   const list: DeepTestCase[] = [];
   let seq = 1;
   const nextId = (prefix: string) => `${prefix}-${String(seq++).padStart(3, '0')}`;
@@ -1638,7 +1638,9 @@ async function run() {
   console.log('Successfully formatted Master Input Sheet with Module, Model, Suite, and Priority color coding!');
 }
 
-run().catch((err) => {
-  console.error('Failed to populate exhaustive master input sheet:', err);
-  process.exit(1);
-});
+if (require.main === module) {
+  run().catch((err) => {
+    console.error('Failed to populate exhaustive master input sheet:', err);
+    process.exit(1);
+  });
+}

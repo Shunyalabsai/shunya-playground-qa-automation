@@ -10,7 +10,13 @@
 import type { FullConfig, FullResult, Reporter, Suite, TestCase, TestResult } from '@playwright/test/reporter';
 import * as fs from 'fs';
 import * as path from 'path';
-import { writePlaygroundResults, PlaygroundSuiteResult } from '../src/utils/playgroundSheetWriter';
+import {
+  writePlaygroundResults,
+  PlaygroundSuiteResult,
+  getLocalDateDMY,
+  getLocalTimestamp,
+  parseTestDetails,
+} from '../src/utils/playgroundSheetWriter';
 import { generateStakeholderDashboard } from './generate-stakeholder-dashboard';
 
 export default class PlaywrightSheetReporter implements Reporter {
@@ -24,8 +30,8 @@ export default class PlaywrightSheetReporter implements Reporter {
   }
 
   onTestEnd(test: TestCase, result: TestResult): void {
-    const today = new Date().toISOString().split('T')[0];
-    const timestamp = new Date().toISOString().replace('T', ' ').substring(0, 19);
+    const today = getLocalDateDMY();
+    const timestamp = getLocalTimestamp();
 
     const isPass = result.status === 'passed';
     const durationMs = result.duration || 0;
@@ -35,19 +41,22 @@ export default class PlaywrightSheetReporter implements Reporter {
     const suiteName = titlePath[1] || 'Playground Suite';
     const testTitle = test.title;
 
-    // Detect Category / Suite
-    let category = 'Backend API';
+    // Detect default module from suite path
+    let defaultModule = 'Backend API';
     if (titlePath.some((p) => p.includes('playground-ui') || p.includes('src/tests/ui'))) {
-      category = 'UI Suite';
+      defaultModule = 'UI Suite';
     } else if (titlePath.some((p) => p.includes('speechSynthesis') || p.includes('tts'))) {
-      category = 'TTS Speech Synthesis';
+      defaultModule = 'TTS Speech Synthesis';
     } else if (titlePath.some((p) => p.includes('transcriptionFeatures') || p.includes('Feature Matrix'))) {
-      category = 'ASR Features';
+      defaultModule = 'ASR Features';
     } else if (titlePath.some((p) => p.includes('transcriptionModels') || p.includes('Models Matrix'))) {
-      category = 'ASR Models';
+      defaultModule = 'ASR Models';
     } else if (titlePath.some((p) => p.includes('health'))) {
-      category = 'Health Checks';
+      defaultModule = 'Health Checks';
     }
+
+    // Extract structured Test ID, Module, Feature, and Scenario
+    const parsed = parseTestDetails(testTitle, defaultModule);
 
     // Detect Model & Language
     let model = 'zero-indic';
@@ -77,9 +86,11 @@ export default class PlaywrightSheetReporter implements Reporter {
     else if (testTitle.includes('silence')) audioFile = 'silence.wav';
 
     this.collectedResults.push({
+      test_id: parsed.testId,
       date: today,
-      feature: testTitle,
-      category: `${category} — ${suiteName}`,
+      module: parsed.module,
+      feature: parsed.feature,
+      scenario: parsed.scenario,
       audio_file: audioFile,
       language: lang,
       lang_code: langCode,
