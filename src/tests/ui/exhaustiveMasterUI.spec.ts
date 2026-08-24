@@ -212,7 +212,7 @@ test.describe('Exhaustive Master UI Suite (118 Scenarios)', () => {
       }
 
       // 9. Negative & Edge Cases (18 cases)
-      if (tc.module.includes('Negative') || tc.module.includes('Edge') || tc.scenarioType === 'Negative' || tc.scenarioType === 'Edge') {
+      if (tc.module.includes('Negative') || tc.module.includes('Edge') || tc.scenarioType !== 'Positive') {
         await page.goto(PLAYGROUND_URL, { waitUntil: 'domcontentloaded', timeout: 30000 });
 
         if (tc.title.includes('Rapid') || tc.title.includes('tab toggling')) {
