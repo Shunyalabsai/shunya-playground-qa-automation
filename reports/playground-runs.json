@@ -1,5 +1,41 @@
 [
   {
+    "runId": "run-1787601042491",
+    "timestamp": "2026-08-24T19:50:42.491Z",
+    "date": "2026-08-24",
+    "durationSeconds": 82.3,
+    "status": "PASS",
+    "totalTests": 38,
+    "passedTests": 38,
+    "failedTests": 0,
+    "passRate": 100,
+    "summary": {
+      "asrHealthy": true,
+      "ttsHealthy": true,
+      "zeroIndic": true,
+      "zeroCodeswitch": true,
+      "zeroMed": true
+    }
+  },
+  {
+    "runId": "run-1787600736523",
+    "timestamp": "2026-08-24T19:45:36.523Z",
+    "date": "2026-08-24",
+    "durationSeconds": 3599.9,
+    "status": "FAIL",
+    "totalTests": 395,
+    "passedTests": 384,
+    "failedTests": 11,
+    "passRate": 97.2,
+    "summary": {
+      "asrHealthy": true,
+      "ttsHealthy": true,
+      "zeroIndic": true,
+      "zeroCodeswitch": true,
+      "zeroMed": true
+    }
+  },
+  {
     "runId": "run-1787595637093",
     "timestamp": "2026-08-24T18:20:37.093Z",
     "date": "2026-08-24",

@@ -1,10 +1,14 @@
 /**
  * Playground Sheet Writer
- * Writes detailed playground test results to Google Sheets with:
- * 1. Top-of-run Summary Card (Total, Passed, Failed, Pass Rate)
- * 2. Neutral Grey Separator row between consecutive test runs
- * 3. Data Validation Dropdowns (PASS / FAIL) on Status column
- * 4. Distinct Green/Red status badge colors and Light Red failure_reason highlight
+ * Writes detailed playground test results to Google Sheets matching the clean,
+ * elegant UI/UX design of the Master Input Sheet:
+ * 1. Elegant Header & Run Summary Card at the TOP of the sheet (Row 2, beneath frozen Header).
+ * 2. Pastel Category & Suite column coloring (Soft Indigo, Mint, Amber, Pink, Cyan, Orange).
+ * 3. Pastel Model column coloring (zero-indic: soft green, zero-codeswitch: soft amber, zero-medasr: soft rose).
+ * 4. Clean Soft Status Badges (PASS in #DCFCE7 / #166534 text, FAIL in #FEE2E2 / #991B1B text) with native dropdown chips.
+ * 5. Failure reason cell highlighted in soft red ONLY when error text exists; clean white otherwise.
+ * 6. Neutral divider row (#94A3B8) between consecutive runs.
+ * 7. Subtly bordered grid with centered metrics and readable typography.
  */
 
 import { google, sheets_v4 } from 'googleapis';
@@ -15,7 +19,7 @@ import { GOOGLE_SHEETS_CONFIG } from '../config/api.config';
 export interface PlaygroundSuiteResult {
   date: string;
   feature: string; // e.g. "Baseline Transcription", "Translation", "Zero Med", etc.
-  category: string; // "UI", "Backend API", "Zero Indic Features"
+  category: string; // "Health Checks", "ASR Models", "ASR Features", "TTS", "Negative"
   audio_file: string;
   language: string;
   lang_code: string;
@@ -24,52 +28,38 @@ export interface PlaygroundSuiteResult {
   latency_ms: number;
   wer: number; // -1 if not applicable
   cer: number; // -1 if not applicable
-  api_response_preview: string; // first 200 chars of response
+  api_response_preview: string;
   timestamp: string;
-}
-
-export interface DailySuiteResult {
-  category: string;
-  name: string;
-  status: string;
-  duration_s: number;
-  failure_reason: string;
 }
 
 // ── Auth ───────────────────────────────────────────────────────────────────
 
 async function getSheetsClient(): Promise<sheets_v4.Sheets> {
-  let auth;
-
   if (GOOGLE_SHEETS_CONFIG.credentials) {
+    let credentials;
     try {
-      let credentials;
+      credentials = JSON.parse(GOOGLE_SHEETS_CONFIG.credentials);
+    } catch {
       try {
-        credentials = JSON.parse(GOOGLE_SHEETS_CONFIG.credentials);
+        credentials = JSON.parse(
+          Buffer.from(GOOGLE_SHEETS_CONFIG.credentials, 'base64').toString('utf-8')
+        );
       } catch {
-        try {
-          credentials = JSON.parse(
-            Buffer.from(GOOGLE_SHEETS_CONFIG.credentials, 'base64').toString('utf-8')
-          );
-        } catch {
-          auth = new google.auth.GoogleAuth({
-            keyFile: GOOGLE_SHEETS_CONFIG.credentials,
-            scopes: ['https://www.googleapis.com/auth/spreadsheets'],
-          });
-          const client = await auth.getClient();
-          return google.sheets({ version: 'v4', auth: client as Parameters<typeof google.sheets>[0]['auth'] });
-        }
+        const auth = new google.auth.GoogleAuth({
+          keyFile: GOOGLE_SHEETS_CONFIG.credentials,
+          scopes: ['https://www.googleapis.com/auth/spreadsheets'],
+        });
+        const client = await auth.getClient();
+        return google.sheets({ version: 'v4', auth: client as Parameters<typeof google.sheets>[0]['auth'] });
       }
-
-      auth = new google.auth.GoogleAuth({
-        credentials,
-        scopes: ['https://www.googleapis.com/auth/spreadsheets'],
-      });
-    } catch (error) {
-      throw new Error(
-        `Failed to parse Google Sheets credentials: ${error instanceof Error ? error.message : 'Unknown error'}`
-      );
     }
+
+    const auth = new google.auth.GoogleAuth({
+      credentials,
+      scopes: ['https://www.googleapis.com/auth/spreadsheets'],
+    });
+    const client = await auth.getClient();
+    return google.sheets({ version: 'v4', auth: client as Parameters<typeof google.sheets>[0]['auth'] });
   } else if (GOOGLE_SHEETS_CONFIG.clientEmail && GOOGLE_SHEETS_CONFIG.privateKey) {
     const jwtAuth = new google.auth.JWT(
       GOOGLE_SHEETS_CONFIG.clientEmail,
@@ -83,12 +73,9 @@ async function getSheetsClient(): Promise<sheets_v4.Sheets> {
       'Google Sheets credentials not configured. Please set GOOGLE_SERVICE_ACCOUNT_JSON in .env'
     );
   }
-
-  const client = await auth.getClient();
-  return google.sheets({ version: 'v4', auth: client as Parameters<typeof google.sheets>[0]['auth'] });
 }
 
-// ── Helpers ─────────────────────────────────────────────────────────────────
+// ── Helpers & Color Palette (Matching Master Input Sheet) ────────────────────
 
 function getPlaygroundSpreadsheetId(): string {
   return (
@@ -103,7 +90,6 @@ async function findOrCreateSheet(
   sheetName: string
 ): Promise<number> {
   const spreadsheet = await sheets.spreadsheets.get({ spreadsheetId });
-
   const existingSheet = spreadsheet.data.sheets?.find(
     (s) => s.properties?.title === sheetName
   );
@@ -112,7 +98,6 @@ async function findOrCreateSheet(
     return existingSheet.properties?.sheetId || 0;
   }
 
-  // Create new sheet
   const createResponse = await sheets.spreadsheets.batchUpdate({
     spreadsheetId,
     requestBody: {
@@ -152,15 +137,43 @@ function colLetter(colNum: number): string {
   return letter;
 }
 
-// ── Headers & Column Layout ─────────────────────────────────────────────────
+// Pastel Module / Category Palette
+const CATEGORY_PASTEL_COLORS: Record<string, { bg: string; text: string }> = {
+  'Health Checks': { bg: '#E0F7FA', text: '#006064' },       // Soft Cyan
+  'ASR Models': { bg: '#F3E5F5', text: '#4A148C' },          // Soft Purple
+  'ASR Features': { bg: '#FFF8E1', text: '#B45309' },        // Soft Amber
+  'TTS Speech Synthesis': { bg: '#FCE4EC', text: '#880E4F' },// Soft Rose/Pink
+  'UI Suite': { bg: '#E1F5FE', text: '#01579B' },            // Soft Sky Blue
+  'Negative & Auth': { bg: '#FFF3E0', text: '#C2410C' },     // Soft Warm Orange
+  'Backend API': { bg: '#E8F5E9', text: '#1B5E20' },         // Soft Mint Green
+};
+
+function getCategoryColor(category: string): { bg: string; text: string } {
+  for (const [key, color] of Object.entries(CATEGORY_PASTEL_COLORS)) {
+    if (category.toLowerCase().includes(key.toLowerCase())) {
+      return color;
+    }
+  }
+  return { bg: '#F1F5F9', text: '#334155' }; // Clean Slate fallback
+}
+
+// Pastel Model Palette
+const MODEL_PASTEL_COLORS: Record<string, { bg: string; text: string }> = {
+  'zero-indic': { bg: '#DCFCE7', text: '#166534' },       // Soft Pastel Green
+  'zero-codeswitch': { bg: '#FEF3C7', text: '#92400E' },  // Soft Pastel Amber
+  'zero-medasr': { bg: '#FEE2E2', text: '#991B1B' },      // Soft Pastel Rose
+};
+
+// ── Column Definitions ──────────────────────────────────────────────────────
+
 const PLAYGROUND_HEADERS = [
   'Date',
-  'Feature / Scenario',
-  'Category / Suite',
-  'Audio File / Input',
+  'Feature / Scenario Title',
+  'Module / Category',
+  'Audio / Input Payload',
   'Language',
   'Lang Code',
-  'Status (Dropdown)',
+  'Status (PASS/FAIL)',
   'Failure Reason',
   'Latency (ms)',
   'WER (%)',
@@ -169,14 +182,16 @@ const PLAYGROUND_HEADERS = [
   'Timestamp',
 ];
 const PLAYGROUND_COL_COUNT = PLAYGROUND_HEADERS.length; // 13
+const CATEGORY_COL_INDEX = 2;
 const STATUS_COL_INDEX = 6;
 const FAILURE_REASON_COL_INDEX = 7;
+const LATENCY_COL_INDEX = 8;
+const WER_COL_INDEX = 9;
+const CER_COL_INDEX = 10;
+const TIMESTAMP_COL_INDEX = 12;
 
-// ── writePlaygroundResults ──────────────────────────────────────────────────
+// ── Main Execution ──────────────────────────────────────────────────────────
 
-/**
- * Writes detailed playground test results with top run summary and grey separator between runs.
- */
 export async function writePlaygroundResults(
   results: PlaygroundSuiteResult[],
   sheetName: string = 'Playground-Execution-Results'
@@ -216,7 +231,7 @@ export async function writePlaygroundResults(
         },
       });
 
-      // Format Header Row (Navy Blue #0d1b2a with white bold text)
+      // Format Header Row (Navy Blue #0F172A with white bold text, centered, frozen)
       await sheets.spreadsheets.batchUpdate({
         spreadsheetId,
         requestBody: {
@@ -232,11 +247,11 @@ export async function writePlaygroundResults(
                 },
                 cell: {
                   userEnteredFormat: {
-                    backgroundColor: hexToColor('#0d1b2a'),
+                    backgroundColor: hexToColor('#0F172A'),
                     textFormat: {
                       foregroundColor: { red: 1, green: 1, blue: 1, alpha: 1 },
                       bold: true,
-                      fontSize: 11,
+                      fontSize: 10,
                     },
                     horizontalAlignment: 'CENTER',
                     verticalAlignment: 'MIDDLE',
@@ -261,11 +276,11 @@ export async function writePlaygroundResults(
       });
     }
 
-    // 3. Prepare Rows for insertion:
-    // Row 1 of run: Summary Banner
-    // Row 2..N: Test Data Rows
-    // Row N+1: Grey Separator Row between runs
-    const summaryBannerText = `🚀 RUN SUMMARY [ ${now} ]  |  TOTAL: ${total}  |  PASSED: ${passed} (${passRate}%)  |  FAILED: ${failed}  |  STATUS: ${failed === 0 ? 'ALL PASSED ✅' : 'FAILURES DETECTED ❌'}`;
+    // 3. Prepare Rows:
+    // Row 1 of run: Elegant Summary Card Banner
+    // Row 2..N: Data Rows
+    // Row N+1: Neutral Grey Divider Row
+    const summaryBannerText = `📊 RUN EXECUTION [ ${now} ]   |   TOTAL: ${total}   |   PASSED: ${passed} (${passRate}%)   |   FAILED: ${failed}   |   HEALTH: ${failed === 0 ? 'OPTIMAL (100% PASS) ✅' : 'ATTENTION REQUIRED ❌'}`;
 
     const summaryBannerRow = [
       summaryBannerText,
@@ -293,7 +308,7 @@ export async function writePlaygroundResults(
     const newRowsToInsert = [summaryBannerRow, ...dataRows, greySeparatorRow];
     const totalNewRows = newRowsToInsert.length;
 
-    // 4. Check if sheet already has rows below headers -> Insert empty rows at row index 1 to push existing down
+    // 4. ALWAYS insert new run at the TOP (push older runs down below row 1)
     const allData = await sheets.spreadsheets.values.get({
       spreadsheetId,
       range: `${sheetName}!A:${colLetter(PLAYGROUND_COL_COUNT)}`,
@@ -330,12 +345,12 @@ export async function writePlaygroundResults(
       },
     });
 
-    // 6. Apply Formatting & Validation Rules
+    // 6. Apply Batch Formatting & Styling
     const formatRequests: any[] = [];
 
-    // A. Format Summary Banner (Row index 1)
-    const bannerBg = failed === 0 ? hexToColor('#1b5e20') : hexToColor('#b71c1c');
-    // Merge summary banner across all columns
+    // A. Format Run Summary Banner (Row index 1)
+    // Elegant Dark Slate Navy with clean white typography
+    const bannerBg = failed === 0 ? hexToColor('#1E293B') : hexToColor('#881337');
     formatRequests.push(
       {
         mergeCells: {
@@ -364,7 +379,7 @@ export async function writePlaygroundResults(
               textFormat: {
                 foregroundColor: { red: 1, green: 1, blue: 1, alpha: 1 },
                 bold: true,
-                fontSize: 12,
+                fontSize: 11,
               },
               horizontalAlignment: 'CENTER',
               verticalAlignment: 'MIDDLE',
@@ -375,7 +390,7 @@ export async function writePlaygroundResults(
       }
     );
 
-    // B. Set Data Validation (Dropdown chips: PASS / FAIL) on Status Column for all data rows
+    // B. Set Data Validation (Dropdown chips: PASS / FAIL) on Status Column
     formatRequests.push({
       setDataValidation: {
         range: {
@@ -392,18 +407,88 @@ export async function writePlaygroundResults(
           },
           inputMessage: 'Select test status: PASS or FAIL',
           strict: true,
-          showCustomUi: true, // creates the dropdown chip in Google Sheets!
+          showCustomUi: true,
         },
       },
     });
 
-    // C. Format Data Rows (Status Green/Red and Failure Reason Highlight)
+    // C. Format Data Rows (Clean Pastel Colors, Soft Badges, Subtle Borders)
     results.forEach((r, idx) => {
       const rowIndex = 2 + idx; // Index 0=Header, Index 1=Banner, Index 2=First Data Row
 
-      // Status cell styling
-      const statusBg = r.status === 'PASS' ? hexToColor('#c8e6c9') : hexToColor('#ffcdd2');
-      const statusFg = r.status === 'PASS' ? hexToColor('#1b5e20') : hexToColor('#b71c1c');
+      // 1. Default Row Styling (White background, vertical middle, subtle font)
+      formatRequests.push({
+        repeatCell: {
+          range: {
+            sheetId,
+            startRowIndex: rowIndex,
+            endRowIndex: rowIndex + 1,
+            startColumnIndex: 0,
+            endColumnIndex: PLAYGROUND_COL_COUNT,
+          },
+          cell: {
+            userEnteredFormat: {
+              backgroundColor: { red: 1, green: 1, blue: 1, alpha: 1 },
+              textFormat: {
+                foregroundColor: hexToColor('#1E293B'),
+                fontSize: 10,
+              },
+              verticalAlignment: 'MIDDLE',
+              horizontalAlignment: 'LEFT',
+            },
+          },
+          fields: 'userEnteredFormat(backgroundColor,textFormat,verticalAlignment,horizontalAlignment)',
+        },
+      });
+
+      // 2. Date column centered
+      formatRequests.push({
+        repeatCell: {
+          range: {
+            sheetId,
+            startRowIndex: rowIndex,
+            endRowIndex: rowIndex + 1,
+            startColumnIndex: 0,
+            endColumnIndex: 1,
+          },
+          cell: {
+            userEnteredFormat: {
+              horizontalAlignment: 'CENTER',
+            },
+          },
+          fields: 'userEnteredFormat(horizontalAlignment)',
+        },
+      });
+
+      // 3. Module / Category Column (Soft Pastel Styling)
+      const catColor = getCategoryColor(r.category);
+      formatRequests.push({
+        repeatCell: {
+          range: {
+            sheetId,
+            startRowIndex: rowIndex,
+            endRowIndex: rowIndex + 1,
+            startColumnIndex: CATEGORY_COL_INDEX,
+            endColumnIndex: CATEGORY_COL_INDEX + 1,
+          },
+          cell: {
+            userEnteredFormat: {
+              backgroundColor: hexToColor(catColor.bg),
+              textFormat: {
+                foregroundColor: hexToColor(catColor.text),
+                bold: true,
+                fontSize: 10,
+              },
+              horizontalAlignment: 'CENTER',
+            },
+          },
+          fields: 'userEnteredFormat(backgroundColor,textFormat,horizontalAlignment)',
+        },
+      });
+
+      // 4. Status Cell (Soft Pastel Badge: PASS in #DCFCE7, FAIL in #FEE2E2)
+      const statusBg = r.status === 'PASS' ? hexToColor('#DCFCE7') : hexToColor('#FEE2E2');
+      const statusFg = r.status === 'PASS' ? hexToColor('#166534') : hexToColor('#991B1B');
 
       formatRequests.push({
         repeatCell: {
@@ -420,6 +505,7 @@ export async function writePlaygroundResults(
               textFormat: {
                 foregroundColor: statusFg,
                 bold: true,
+                fontSize: 10,
               },
               horizontalAlignment: 'CENTER',
             },
@@ -428,7 +514,7 @@ export async function writePlaygroundResults(
         },
       });
 
-      // Failure reason styling (light red highlight if error present)
+      // 5. Failure reason styling (Soft light red #FEF2F2 ONLY if error present)
       if (r.failure_reason) {
         formatRequests.push({
           repeatCell: {
@@ -441,10 +527,11 @@ export async function writePlaygroundResults(
             },
             cell: {
               userEnteredFormat: {
-                backgroundColor: hexToColor('#ffebee'),
+                backgroundColor: hexToColor('#FEF2F2'),
                 textFormat: {
-                  foregroundColor: hexToColor('#b71c1c'),
+                  foregroundColor: hexToColor('#991B1B'),
                   bold: true,
+                  fontSize: 10,
                 },
               },
             },
@@ -452,9 +539,46 @@ export async function writePlaygroundResults(
           },
         });
       }
+
+      // 6. Latency, WER, CER, Timestamp columns centered
+      formatRequests.push({
+        repeatCell: {
+          range: {
+            sheetId,
+            startRowIndex: rowIndex,
+            endRowIndex: rowIndex + 1,
+            startColumnIndex: LATENCY_COL_INDEX,
+            endColumnIndex: CER_COL_INDEX + 1,
+          },
+          cell: {
+            userEnteredFormat: {
+              horizontalAlignment: 'CENTER',
+            },
+          },
+          fields: 'userEnteredFormat(horizontalAlignment)',
+        },
+      });
+
+      formatRequests.push({
+        repeatCell: {
+          range: {
+            sheetId,
+            startRowIndex: rowIndex,
+            endRowIndex: rowIndex + 1,
+            startColumnIndex: TIMESTAMP_COL_INDEX,
+            endColumnIndex: TIMESTAMP_COL_INDEX + 1,
+          },
+          cell: {
+            userEnteredFormat: {
+              horizontalAlignment: 'CENTER',
+            },
+          },
+          fields: 'userEnteredFormat(horizontalAlignment)',
+        },
+      });
     });
 
-    // D. Format Grey Separator Row at the end of this run
+    // D. Format Neutral Grey Separator Row at the bottom of this run (#94A3B8)
     const separatorRowIndex = 2 + dataRows.length;
     formatRequests.push({
       repeatCell: {
@@ -467,7 +591,7 @@ export async function writePlaygroundResults(
         },
         cell: {
           userEnteredFormat: {
-            backgroundColor: hexToColor('#78909c'), // Neutral Grey
+            backgroundColor: hexToColor('#CBD5E1'), // Neutral Slate Grey
           },
         },
         fields: 'userEnteredFormat(backgroundColor)',
