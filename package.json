@@ -26,7 +26,9 @@
     "email:playground:daily": "bash scripts/send-playground-daily-email.sh",
     "email:playground:install": "bash scripts/install-playground-daily-email.sh",
     "schedule:playground:install": "bash scripts/install-playground-schedule.sh",
-    "sheet:master": "npx ts-node scripts/write-master-test-sheet.ts"
+    "sheet:master": "npx ts-node scripts/write-master-test-sheet.ts",
+    "sheet:populate-input": "npx ts-node scripts/populate-exhaustive-master-sheet.ts",
+    "sheet:record-run": "npx ts-node scripts/record-test-run-to-sheet.ts"
   },
   "keywords": [
     "playground",

@@ -14,3 +14,8 @@ reports/debug-8e4dc2.log
 Google_service_account.json
 auth/playground-auth.json
 .daily-run.lock/
+.DS_Store
+*/.DS_Store
+*/**/.DS_Store
+.cursor/
+test-results-summary.json

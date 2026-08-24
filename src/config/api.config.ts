@@ -255,16 +255,16 @@ const serviceAccountPath = process.env.GOOGLE_SERVICE_ACCOUNT_KEY_FILE || (fs.ex
 export const GOOGLE_SHEETS_CONFIG = {
   spreadsheetId:
     process.env.GOOGLE_SHEET_ID ||
-    '1ORoTQBcU273SzvwTwlJle78pN7rjyyF52svDKQUcGlM',
+    '1KWWMQN3ppFfux1mP8Wb34UmtrIEXhz2T6_1_goXI8JI',
   indicInputSpreadsheetId:
     process.env.GOOGLE_SHEET_ID_INDIC_INPUT ||
-    '1kFTumbmJKUEoy4gmscqwjiwK3TXNUeqNh49-p9x4NGk',
+    '1KWWMQN3ppFfux1mP8Wb34UmtrIEXhz2T6_1_goXI8JI',
   codeswitchInputSpreadsheetId:
     process.env.GOOGLE_SHEET_ID_CODESWITCH_INPUT ||
-    '1kFTumbmJKUEoy4gmscqwjiwK3TXNUeqNh49-p9x4NGk',
+    '1KWWMQN3ppFfux1mP8Wb34UmtrIEXhz2T6_1_goXI8JI',
   universalInputSpreadsheetId:
     process.env.GOOGLE_SHEET_ID_UNIVERSAL_INPUT ||
-    '1kFTumbmJKUEoy4gmscqwjiwK3TXNUeqNh49-p9x4NGk',
+    '1KWWMQN3ppFfux1mP8Wb34UmtrIEXhz2T6_1_goXI8JI',
   credentials: process.env.GOOGLE_SERVICE_ACCOUNT_JSON || serviceAccountPath || '',
   clientEmail: process.env.GOOGLE_CLIENT_EMAIL || '',
   privateKey: process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, '\n') || '',

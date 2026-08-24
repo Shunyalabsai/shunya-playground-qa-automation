@@ -1,7 +1,10 @@
 /**
  * Playground Sheet Writer
- * Writes detailed playground test results to a dedicated Google Sheet
- * with color formatting, conditional formatting, and daily summaries.
+ * Writes detailed playground test results to Google Sheets with:
+ * 1. Top-of-run Summary Card (Total, Passed, Failed, Pass Rate)
+ * 2. Neutral Grey Separator row between consecutive test runs
+ * 3. Data Validation Dropdowns (PASS / FAIL) on Status column
+ * 4. Distinct Green/Red status badge colors and Light Red failure_reason highlight
  */
 
 import { google, sheets_v4 } from 'googleapis';
@@ -11,7 +14,7 @@ import { GOOGLE_SHEETS_CONFIG } from '../config/api.config';
 
 export interface PlaygroundSuiteResult {
   date: string;
-  feature: string; // e.g. "Baseline Transcription", "Translation", etc.
+  feature: string; // e.g. "Baseline Transcription", "Translation", "Zero Med", etc.
   category: string; // "UI", "Backend API", "Zero Indic Features"
   audio_file: string;
   language: string;
@@ -33,25 +36,22 @@ export interface DailySuiteResult {
   failure_reason: string;
 }
 
-// ── Auth (same pattern as reporter.ts) ──────────────────────────────────────
+// ── Auth ───────────────────────────────────────────────────────────────────
 
 async function getSheetsClient(): Promise<sheets_v4.Sheets> {
   let auth;
 
-  // Try to use service account JSON if provided
   if (GOOGLE_SHEETS_CONFIG.credentials) {
     try {
       let credentials;
       try {
         credentials = JSON.parse(GOOGLE_SHEETS_CONFIG.credentials);
       } catch {
-        // If that fails, try base64 decode
         try {
           credentials = JSON.parse(
             Buffer.from(GOOGLE_SHEETS_CONFIG.credentials, 'base64').toString('utf-8')
           );
         } catch {
-          // If that also fails, treat it as a file path
           auth = new google.auth.GoogleAuth({
             keyFile: GOOGLE_SHEETS_CONFIG.credentials,
             scopes: ['https://www.googleapis.com/auth/spreadsheets'],
@@ -61,7 +61,6 @@ async function getSheetsClient(): Promise<sheets_v4.Sheets> {
         }
       }
 
-      // Use parsed credentials
       auth = new google.auth.GoogleAuth({
         credentials,
         scopes: ['https://www.googleapis.com/auth/spreadsheets'],
@@ -72,17 +71,16 @@ async function getSheetsClient(): Promise<sheets_v4.Sheets> {
       );
     }
   } else if (GOOGLE_SHEETS_CONFIG.clientEmail && GOOGLE_SHEETS_CONFIG.privateKey) {
-    // JWT is the client — no getClient() (unlike GoogleAuth)
     const jwtAuth = new google.auth.JWT(
       GOOGLE_SHEETS_CONFIG.clientEmail,
       undefined,
       GOOGLE_SHEETS_CONFIG.privateKey,
-      ['https://www.googleapis.com/auth/spreadsheets'],
+      ['https://www.googleapis.com/auth/spreadsheets']
     );
     return google.sheets({ version: 'v4', auth: jwtAuth });
   } else {
     throw new Error(
-      'Google Sheets credentials not configured. Please set GOOGLE_SERVICE_ACCOUNT_JSON or GOOGLE_CLIENT_EMAIL and GOOGLE_PRIVATE_KEY in .env'
+      'Google Sheets credentials not configured. Please set GOOGLE_SERVICE_ACCOUNT_JSON in .env'
     );
   }
 
@@ -95,13 +93,10 @@ async function getSheetsClient(): Promise<sheets_v4.Sheets> {
 function getPlaygroundSpreadsheetId(): string {
   return (
     process.env.GOOGLE_SHEET_ID_PLAYGROUND_OUTPUT ||
-    GOOGLE_SHEETS_CONFIG.spreadsheetId
+    '11leUutfqP4OXyIIaeTYqw_3gWc1w5fQLnQWuUHXPgW4'
   );
 }
 
-/**
- * Find or create a sheet tab by name. Returns the sheetId (numeric).
- */
 async function findOrCreateSheet(
   sheets: sheets_v4.Sheets,
   spreadsheetId: string,
@@ -136,9 +131,6 @@ async function findOrCreateSheet(
   return createResponse.data.replies?.[0]?.addSheet?.properties?.sheetId || 0;
 }
 
-/**
- * Convert a hex color string (e.g. "#1a237e") to a Google Sheets RGBA object.
- */
 function hexToColor(hex: string): { red: number; green: number; blue: number; alpha: number } {
   const h = hex.replace('#', '');
   return {
@@ -149,351 +141,64 @@ function hexToColor(hex: string): { red: number; green: number; blue: number; al
   };
 }
 
-// ── Column indices for PlaygroundSuiteResult ────────────────────────────────
-// date=0, feature=1, category=2, audio_file=3, language=4, lang_code=5,
-// status=6, failure_reason=7, latency_ms=8, wer=9, cer=10,
-// api_response_preview=11, timestamp=12
+function colLetter(colNum: number): string {
+  let letter = '';
+  let n = colNum;
+  while (n > 0) {
+    n--;
+    letter = String.fromCharCode((n % 26) + 65) + letter;
+    n = Math.floor(n / 26);
+  }
+  return letter;
+}
+
+// ── Headers & Column Layout ─────────────────────────────────────────────────
 const PLAYGROUND_HEADERS = [
-  'date',
-  'feature',
-  'category',
-  'audio_file',
-  'language',
-  'lang_code',
-  'status',
-  'failure_reason',
-  'latency_ms',
-  'wer',
-  'cer',
-  'api_response_preview',
-  'timestamp',
+  'Date',
+  'Feature / Scenario',
+  'Category / Suite',
+  'Audio File / Input',
+  'Language',
+  'Lang Code',
+  'Status (Dropdown)',
+  'Failure Reason',
+  'Latency (ms)',
+  'WER (%)',
+  'CER (%)',
+  'API Response Preview',
+  'Timestamp',
 ];
 const PLAYGROUND_COL_COUNT = PLAYGROUND_HEADERS.length; // 13
 const STATUS_COL_INDEX = 6;
 const FAILURE_REASON_COL_INDEX = 7;
-const WER_COL_INDEX = 9;
 
 // ── writePlaygroundResults ──────────────────────────────────────────────────
 
 /**
- * Write detailed playground test results to a dedicated sheet tab.
- *
- * @param results - Array of PlaygroundSuiteResult objects
- * @param sheetName - Tab name, e.g. "Playground-Daily-2026-03-25"
+ * Writes detailed playground test results with top run summary and grey separator between runs.
  */
 export async function writePlaygroundResults(
   results: PlaygroundSuiteResult[],
-  sheetName: string
+  sheetName: string = 'Playground-Execution-Results'
 ): Promise<void> {
   try {
     const sheets = await getSheetsClient();
     const spreadsheetId = getPlaygroundSpreadsheetId();
     const sheetId = await findOrCreateSheet(sheets, spreadsheetId, sheetName);
 
-    if (results.length > 0) {
-      const dates = [...new Set(results.map((r) => r.date))];
-      console.log(`\n[PlaygroundWriter] Writing ${results.length} results for dates: ${dates.join(', ')}`);
-    }
+    console.log(`\n[PlaygroundWriter] Writing ${results.length} results to sheet "${sheetName}" in ${spreadsheetId}...`);
 
-    // ── Write headers in row 1 ────────────────────────────────────────────
-    await sheets.spreadsheets.values.update({
-      spreadsheetId,
-      range: `${sheetName}!A1:${colLetter(PLAYGROUND_COL_COUNT)}1`,
-      valueInputOption: 'USER_ENTERED',
-      requestBody: {
-        values: [PLAYGROUND_HEADERS],
-      },
-    });
+    // 1. Calculate Run Summary
+    const total = results.length;
+    const passed = results.filter((r) => r.status === 'PASS').length;
+    const failed = results.filter((r) => r.status === 'FAIL').length;
+    const passRate = total > 0 ? ((passed / total) * 100).toFixed(1) : '0';
+    const now = new Date().toISOString().replace('T', ' ').substring(0, 19);
 
-    // ── Write data rows starting at row 2 ────────────────────────────────
-    const rows = results.map((r) => [
-      r.date,
-      r.feature,
-      r.category,
-      r.audio_file,
-      r.language,
-      r.lang_code,
-      r.status,
-      r.failure_reason || '',
-      r.latency_ms,
-      r.wer === -1 ? 'N/A' : `${(r.wer * 100).toFixed(2)}%`,
-      r.cer === -1 ? 'N/A' : `${(r.cer * 100).toFixed(2)}%`,
-      r.api_response_preview,
-      r.timestamp,
-    ]);
-
-    if (rows.length > 0) {
-      await sheets.spreadsheets.values.update({
-        spreadsheetId,
-        range: `${sheetName}!A2:${colLetter(PLAYGROUND_COL_COUNT)}${rows.length + 1}`,
-        valueInputOption: 'RAW',
-        requestBody: {
-          values: rows,
-        },
-      });
-    }
-
-    // ── Formatting requests ──────────────────────────────────────────────
-    const formatRequests: any[] = [];
-
-    // 1. Header row: dark blue background (#1a237e) with white bold text
-    const headerBg = hexToColor('#1a237e');
-    formatRequests.push({
-      repeatCell: {
-        range: {
-          sheetId,
-          startRowIndex: 0,
-          endRowIndex: 1,
-          startColumnIndex: 0,
-          endColumnIndex: PLAYGROUND_COL_COUNT,
-        },
-        cell: {
-          userEnteredFormat: {
-            backgroundColor: headerBg,
-            textFormat: {
-              foregroundColor: { red: 1.0, green: 1.0, blue: 1.0, alpha: 1.0 },
-              bold: true,
-            },
-          },
-        },
-        fields: 'userEnteredFormat.backgroundColor,userEnteredFormat.textFormat',
-      },
-    });
-
-    // 2. Freeze the header row
-    formatRequests.push({
-      updateSheetProperties: {
-        properties: {
-          sheetId,
-          gridProperties: {
-            frozenRowCount: 1,
-          },
-        },
-        fields: 'gridProperties.frozenRowCount',
-      },
-    });
-
-    // 3. Auto-resize all columns
-    formatRequests.push({
-      autoResizeDimensions: {
-        dimensions: {
-          sheetId,
-          dimension: 'COLUMNS',
-          startIndex: 0,
-          endIndex: PLAYGROUND_COL_COUNT,
-        },
-      },
-    });
-
-    // 4. Color-code the status column per row
-    results.forEach((result, index) => {
-      const rowIndex = index + 1; // 0-indexed; row 2 in sheet = index 1
-
-      // Status column: bright green (#c8e6c9) for PASS, bright red (#ffcdd2) for FAIL
-      const statusBg =
-        result.status === 'PASS' ? hexToColor('#c8e6c9') : hexToColor('#ffcdd2');
-
-      formatRequests.push({
-        repeatCell: {
-          range: {
-            sheetId,
-            startRowIndex: rowIndex,
-            endRowIndex: rowIndex + 1,
-            startColumnIndex: STATUS_COL_INDEX,
-            endColumnIndex: STATUS_COL_INDEX + 1,
-          },
-          cell: {
-            userEnteredFormat: {
-              backgroundColor: statusBg,
-            },
-          },
-          fields: 'userEnteredFormat.backgroundColor',
-        },
-      });
-
-      // Failure reason column: light red (#ffebee) when non-empty
-      if (result.failure_reason) {
-        formatRequests.push({
-          repeatCell: {
-            range: {
-              sheetId,
-              startRowIndex: rowIndex,
-              endRowIndex: rowIndex + 1,
-              startColumnIndex: FAILURE_REASON_COL_INDEX,
-              endColumnIndex: FAILURE_REASON_COL_INDEX + 1,
-            },
-            cell: {
-              userEnteredFormat: {
-                backgroundColor: hexToColor('#ffebee'),
-              },
-            },
-            fields: 'userEnteredFormat.backgroundColor',
-          },
-        });
-      }
-    });
-
-    // 5. Conditional formatting for WER column
-    //    WER > 100% => red background
-    formatRequests.push({
-      addConditionalFormatRule: {
-        rule: {
-          ranges: [
-            {
-              sheetId,
-              startRowIndex: 1,
-              endRowIndex: results.length + 1,
-              startColumnIndex: WER_COL_INDEX,
-              endColumnIndex: WER_COL_INDEX + 1,
-            },
-          ],
-          booleanRule: {
-            condition: {
-              type: 'TEXT_CONTAINS',
-              values: [{ userEnteredValue: '1' }],
-            },
-            // We use a custom formula instead for accurate numeric comparison
-            format: {
-              backgroundColor: hexToColor('#ffcdd2'), // red
-            },
-          },
-        },
-        index: 0,
-      },
-    });
-
-    // Replace the simple TEXT_CONTAINS rules with proper CUSTOM_FORMULA rules
-    // Remove the last request we just pushed (the TEXT_CONTAINS one)
-    formatRequests.pop();
-
-    // WER > 100% => red
-    formatRequests.push({
-      addConditionalFormatRule: {
-        rule: {
-          ranges: [
-            {
-              sheetId,
-              startRowIndex: 1,
-              endRowIndex: results.length + 1,
-              startColumnIndex: WER_COL_INDEX,
-              endColumnIndex: WER_COL_INDEX + 1,
-            },
-          ],
-          booleanRule: {
-            condition: {
-              type: 'CUSTOM_FORMULA',
-              values: [
-                {
-                  userEnteredValue: `=AND(${colLetter(WER_COL_INDEX + 1)}2<>"N/A",VALUE(SUBSTITUTE(${colLetter(WER_COL_INDEX + 1)}2,"%",""))>100)`,
-                },
-              ],
-            },
-            format: {
-              backgroundColor: hexToColor('#ffcdd2'), // red
-            },
-          },
-        },
-        index: 0,
-      },
-    });
-
-    // WER > 80% => orange (lower priority, so add after red)
-    formatRequests.push({
-      addConditionalFormatRule: {
-        rule: {
-          ranges: [
-            {
-              sheetId,
-              startRowIndex: 1,
-              endRowIndex: results.length + 1,
-              startColumnIndex: WER_COL_INDEX,
-              endColumnIndex: WER_COL_INDEX + 1,
-            },
-          ],
-          booleanRule: {
-            condition: {
-              type: 'CUSTOM_FORMULA',
-              values: [
-                {
-                  userEnteredValue: `=AND(${colLetter(WER_COL_INDEX + 1)}2<>"N/A",VALUE(SUBSTITUTE(${colLetter(WER_COL_INDEX + 1)}2,"%",""))>80)`,
-                },
-              ],
-            },
-            format: {
-              backgroundColor: { red: 1.0, green: 0.65, blue: 0.0, alpha: 1.0 }, // orange
-            },
-          },
-        },
-        index: 1,
-      },
-    });
-
-    // ── Apply all formatting in one batch ────────────────────────────────
-    if (formatRequests.length > 0) {
-      await sheets.spreadsheets.batchUpdate({
-        spreadsheetId,
-        requestBody: {
-          requests: formatRequests,
-        },
-      });
-    }
-
-    console.log(`[PlaygroundWriter] Sheet "${sheetName}" written with ${rows.length} data rows.`);
-    console.log(`   Sheet URL: https://docs.google.com/spreadsheets/d/${spreadsheetId}/edit`);
-  } catch (error: any) {
-    console.error(`[PlaygroundWriter] Error writing playground results:`, error.message);
-    if (error.message.includes('credentials')) {
-      console.error(
-        '   Please configure Google Sheets credentials in .env file:\n' +
-          '   - GOOGLE_SERVICE_ACCOUNT_JSON (base64 encoded JSON or file path)\n' +
-          '   OR\n' +
-          '   - GOOGLE_CLIENT_EMAIL and GOOGLE_PRIVATE_KEY'
-      );
-    }
-    throw error;
-  }
-}
-
-// ── Daily Summary columns ───────────────────────────────────────────────────
-// date=0, category=1, suite_name=2, status=3, duration=4, failure_reason=5
-const SUMMARY_HEADERS = [
-  'date',
-  'category',
-  'suite_name',
-  'status',
-  'duration_s',
-  'failure_reason',
-];
-const SUMMARY_COL_COUNT = SUMMARY_HEADERS.length; // 6
-const SUMMARY_STATUS_COL_INDEX = 3;
-
-// ── writeDailySummarySheet ──────────────────────────────────────────────────
-
-/**
- * Write (or append) a daily summary of suite results to the "Daily-Summary"
- * sheet tab. New runs are inserted at the top (below the header row), with
- * a gray separator row between runs.
- *
- * @param suiteResults - Array of per-suite summary objects
- * @param date - Date string for this run, e.g. "2026-03-25"
- */
-export async function writeDailySummarySheet(
-  suiteResults: DailySuiteResult[],
-  date: string
-): Promise<void> {
-  const SHEET_NAME = 'Daily-Summary';
-
-  try {
-    const sheets = await getSheetsClient();
-    const spreadsheetId = getPlaygroundSpreadsheetId();
-    const sheetId = await findOrCreateSheet(sheets, spreadsheetId, SHEET_NAME);
-
-    console.log(`\n[PlaygroundWriter] Writing daily summary for ${date} (${suiteResults.length} suites)`);
-
-    // ── Ensure headers exist ────────────────────────────────────────────
+    // 2. Ensure headers exist at row 1
     const existingData = await sheets.spreadsheets.values.get({
       spreadsheetId,
-      range: `${SHEET_NAME}!A1:${colLetter(SUMMARY_COL_COUNT)}1`,
+      range: `${sheetName}!A1:${colLetter(PLAYGROUND_COL_COUNT)}1`,
     });
 
     const hasHeaders =
@@ -504,15 +209,14 @@ export async function writeDailySummarySheet(
     if (!hasHeaders) {
       await sheets.spreadsheets.values.update({
         spreadsheetId,
-        range: `${SHEET_NAME}!A1:${colLetter(SUMMARY_COL_COUNT)}1`,
+        range: `${sheetName}!A1:${colLetter(PLAYGROUND_COL_COUNT)}1`,
         valueInputOption: 'USER_ENTERED',
         requestBody: {
-          values: [SUMMARY_HEADERS],
+          values: [PLAYGROUND_HEADERS],
         },
       });
 
-      // Format header row: dark blue + white bold
-      const headerBg = hexToColor('#1a237e');
+      // Format Header Row (Navy Blue #0d1b2a with white bold text)
       await sheets.spreadsheets.batchUpdate({
         spreadsheetId,
         requestBody: {
@@ -524,18 +228,21 @@ export async function writeDailySummarySheet(
                   startRowIndex: 0,
                   endRowIndex: 1,
                   startColumnIndex: 0,
-                  endColumnIndex: SUMMARY_COL_COUNT,
+                  endColumnIndex: PLAYGROUND_COL_COUNT,
                 },
                 cell: {
                   userEnteredFormat: {
-                    backgroundColor: headerBg,
+                    backgroundColor: hexToColor('#0d1b2a'),
                     textFormat: {
-                      foregroundColor: { red: 1.0, green: 1.0, blue: 1.0, alpha: 1.0 },
+                      foregroundColor: { red: 1, green: 1, blue: 1, alpha: 1 },
                       bold: true,
+                      fontSize: 11,
                     },
+                    horizontalAlignment: 'CENTER',
+                    verticalAlignment: 'MIDDLE',
                   },
                 },
-                fields: 'userEnteredFormat.backgroundColor,userEnteredFormat.textFormat',
+                fields: 'userEnteredFormat(backgroundColor,textFormat,horizontalAlignment,verticalAlignment)',
               },
             },
             {
@@ -554,28 +261,45 @@ export async function writeDailySummarySheet(
       });
     }
 
-    // ── Build rows: 1 gray separator + N data rows ──────────────────────
-    const separatorRow = Array(SUMMARY_COL_COUNT).fill('');
-    const dataRows = suiteResults.map((s) => [
-      date,
-      s.category,
-      s.name,
-      s.status,
-      s.duration_s,
-      s.failure_reason || '',
+    // 3. Prepare Rows for insertion:
+    // Row 1 of run: Summary Banner
+    // Row 2..N: Test Data Rows
+    // Row N+1: Grey Separator Row between runs
+    const summaryBannerText = `🚀 RUN SUMMARY [ ${now} ]  |  TOTAL: ${total}  |  PASSED: ${passed} (${passRate}%)  |  FAILED: ${failed}  |  STATUS: ${failed === 0 ? 'ALL PASSED ✅' : 'FAILURES DETECTED ❌'}`;
+
+    const summaryBannerRow = [
+      summaryBannerText,
+      ...Array(PLAYGROUND_COL_COUNT - 1).fill(''),
+    ];
+
+    const dataRows = results.map((r) => [
+      r.date,
+      r.feature,
+      r.category,
+      r.audio_file,
+      r.language,
+      r.lang_code,
+      r.status,
+      r.failure_reason || '',
+      r.latency_ms,
+      r.wer === -1 ? 'N/A' : `${(r.wer * 100).toFixed(2)}%`,
+      r.cer === -1 ? 'N/A' : `${(r.cer * 100).toFixed(2)}%`,
+      r.api_response_preview,
+      r.timestamp,
     ]);
 
-    const rowsToInsert = [separatorRow, ...dataRows];
-    const totalNewRows = rowsToInsert.length;
+    const greySeparatorRow = Array(PLAYGROUND_COL_COUNT).fill('');
 
-    // ── Check for existing data below headers ───────────────────────────
+    const newRowsToInsert = [summaryBannerRow, ...dataRows, greySeparatorRow];
+    const totalNewRows = newRowsToInsert.length;
+
+    // 4. Check if sheet already has rows below headers -> Insert empty rows at row index 1 to push existing down
     const allData = await sheets.spreadsheets.values.get({
       spreadsheetId,
-      range: `${SHEET_NAME}!A:${colLetter(SUMMARY_COL_COUNT)}`,
+      range: `${sheetName}!A:${colLetter(PLAYGROUND_COL_COUNT)}`,
     });
     const currentRowCount = allData.data.values?.length || 1;
 
-    // If there is data beyond the header, insert empty rows to push it down
     if (currentRowCount > 1) {
       await sheets.spreadsheets.batchUpdate({
         spreadsheetId,
@@ -586,7 +310,7 @@ export async function writeDailySummarySheet(
                 range: {
                   sheetId,
                   dimension: 'ROWS',
-                  startIndex: 1, // right below header (0-indexed)
+                  startIndex: 1, // Below header
                   endIndex: 1 + totalNewRows,
                 },
               },
@@ -596,44 +320,90 @@ export async function writeDailySummarySheet(
       });
     }
 
-    // ── Write the new rows at position 2 (index 1) ──────────────────────
+    // 5. Write the new run rows starting at row 2 (index 1)
     await sheets.spreadsheets.values.update({
       spreadsheetId,
-      range: `${SHEET_NAME}!A2:${colLetter(SUMMARY_COL_COUNT)}${1 + totalNewRows}`,
-      valueInputOption: 'RAW',
+      range: `${sheetName}!A2:${colLetter(PLAYGROUND_COL_COUNT)}${1 + totalNewRows}`,
+      valueInputOption: 'USER_ENTERED',
       requestBody: {
-        values: rowsToInsert,
+        values: newRowsToInsert,
       },
     });
 
-    // ── Formatting ──────────────────────────────────────────────────────
+    // 6. Apply Formatting & Validation Rules
     const formatRequests: any[] = [];
 
-    // Gray separator row (row 2 = index 1)
+    // A. Format Summary Banner (Row index 1)
+    const bannerBg = failed === 0 ? hexToColor('#1b5e20') : hexToColor('#b71c1c');
+    // Merge summary banner across all columns
+    formatRequests.push(
+      {
+        mergeCells: {
+          range: {
+            sheetId,
+            startRowIndex: 1,
+            endRowIndex: 2,
+            startColumnIndex: 0,
+            endColumnIndex: PLAYGROUND_COL_COUNT,
+          },
+          mergeType: 'MERGE_ALL',
+        },
+      },
+      {
+        repeatCell: {
+          range: {
+            sheetId,
+            startRowIndex: 1,
+            endRowIndex: 2,
+            startColumnIndex: 0,
+            endColumnIndex: PLAYGROUND_COL_COUNT,
+          },
+          cell: {
+            userEnteredFormat: {
+              backgroundColor: bannerBg,
+              textFormat: {
+                foregroundColor: { red: 1, green: 1, blue: 1, alpha: 1 },
+                bold: true,
+                fontSize: 12,
+              },
+              horizontalAlignment: 'CENTER',
+              verticalAlignment: 'MIDDLE',
+            },
+          },
+          fields: 'userEnteredFormat(backgroundColor,textFormat,horizontalAlignment,verticalAlignment)',
+        },
+      }
+    );
+
+    // B. Set Data Validation (Dropdown chips: PASS / FAIL) on Status Column for all data rows
     formatRequests.push({
-      repeatCell: {
+      setDataValidation: {
         range: {
           sheetId,
-          startRowIndex: 1,
-          endRowIndex: 2,
-          startColumnIndex: 0,
-          endColumnIndex: SUMMARY_COL_COUNT,
+          startRowIndex: 2,
+          endRowIndex: 2 + dataRows.length,
+          startColumnIndex: STATUS_COL_INDEX,
+          endColumnIndex: STATUS_COL_INDEX + 1,
         },
-        cell: {
-          userEnteredFormat: {
-            backgroundColor: { red: 0.7, green: 0.7, blue: 0.7, alpha: 1.0 },
+        rule: {
+          condition: {
+            type: 'ONE_OF_LIST',
+            values: [{ userEnteredValue: 'PASS' }, { userEnteredValue: 'FAIL' }],
           },
+          inputMessage: 'Select test status: PASS or FAIL',
+          strict: true,
+          showCustomUi: true, // creates the dropdown chip in Google Sheets!
         },
-        fields: 'userEnteredFormat.backgroundColor',
       },
     });
 
-    // Color-code status column for each data row
-    suiteResults.forEach((s, index) => {
-      const rowIndex = 2 + index; // separator is at index 1, first data row at index 2
+    // C. Format Data Rows (Status Green/Red and Failure Reason Highlight)
+    results.forEach((r, idx) => {
+      const rowIndex = 2 + idx; // Index 0=Header, Index 1=Banner, Index 2=First Data Row
 
-      const statusBg =
-        s.status === 'PASS' ? hexToColor('#c8e6c9') : hexToColor('#ffcdd2');
+      // Status cell styling
+      const statusBg = r.status === 'PASS' ? hexToColor('#c8e6c9') : hexToColor('#ffcdd2');
+      const statusFg = r.status === 'PASS' ? hexToColor('#1b5e20') : hexToColor('#b71c1c');
 
       formatRequests.push({
         repeatCell: {
@@ -641,68 +411,93 @@ export async function writeDailySummarySheet(
             sheetId,
             startRowIndex: rowIndex,
             endRowIndex: rowIndex + 1,
-            startColumnIndex: SUMMARY_STATUS_COL_INDEX,
-            endColumnIndex: SUMMARY_STATUS_COL_INDEX + 1,
+            startColumnIndex: STATUS_COL_INDEX,
+            endColumnIndex: STATUS_COL_INDEX + 1,
           },
           cell: {
             userEnteredFormat: {
               backgroundColor: statusBg,
+              textFormat: {
+                foregroundColor: statusFg,
+                bold: true,
+              },
+              horizontalAlignment: 'CENTER',
             },
           },
-          fields: 'userEnteredFormat.backgroundColor',
+          fields: 'userEnteredFormat(backgroundColor,textFormat,horizontalAlignment)',
         },
       });
+
+      // Failure reason styling (light red highlight if error present)
+      if (r.failure_reason) {
+        formatRequests.push({
+          repeatCell: {
+            range: {
+              sheetId,
+              startRowIndex: rowIndex,
+              endRowIndex: rowIndex + 1,
+              startColumnIndex: FAILURE_REASON_COL_INDEX,
+              endColumnIndex: FAILURE_REASON_COL_INDEX + 1,
+            },
+            cell: {
+              userEnteredFormat: {
+                backgroundColor: hexToColor('#ffebee'),
+                textFormat: {
+                  foregroundColor: hexToColor('#b71c1c'),
+                  bold: true,
+                },
+              },
+            },
+            fields: 'userEnteredFormat(backgroundColor,textFormat)',
+          },
+        });
+      }
     });
 
-    // Auto-resize columns
+    // D. Format Grey Separator Row at the end of this run
+    const separatorRowIndex = 2 + dataRows.length;
+    formatRequests.push({
+      repeatCell: {
+        range: {
+          sheetId,
+          startRowIndex: separatorRowIndex,
+          endRowIndex: separatorRowIndex + 1,
+          startColumnIndex: 0,
+          endColumnIndex: PLAYGROUND_COL_COUNT,
+        },
+        cell: {
+          userEnteredFormat: {
+            backgroundColor: hexToColor('#78909c'), // Neutral Grey
+          },
+        },
+        fields: 'userEnteredFormat(backgroundColor)',
+      },
+    });
+
+    // E. Auto-resize columns
     formatRequests.push({
       autoResizeDimensions: {
         dimensions: {
           sheetId,
           dimension: 'COLUMNS',
           startIndex: 0,
-          endIndex: SUMMARY_COL_COUNT,
+          endIndex: PLAYGROUND_COL_COUNT,
         },
       },
     });
 
-    if (formatRequests.length > 0) {
-      await sheets.spreadsheets.batchUpdate({
-        spreadsheetId,
-        requestBody: {
-          requests: formatRequests,
-        },
-      });
-    }
+    // Apply all batch formatting
+    await sheets.spreadsheets.batchUpdate({
+      spreadsheetId,
+      requestBody: {
+        requests: formatRequests,
+      },
+    });
 
-    console.log(`[PlaygroundWriter] Daily summary written to "${SHEET_NAME}" (${dataRows.length} suites).`);
-    console.log(`   Sheet URL: https://docs.google.com/spreadsheets/d/${spreadsheetId}/edit`);
+    console.log(`[PlaygroundWriter] Successfully recorded run to "${sheetName}": Total ${total} | Passed ${passed} | Failed ${failed}`);
+    console.log(`   Output URL: https://docs.google.com/spreadsheets/d/${spreadsheetId}/edit`);
   } catch (error: any) {
-    console.error(`[PlaygroundWriter] Error writing daily summary:`, error.message);
-    if (error.message.includes('credentials')) {
-      console.error(
-        '   Please configure Google Sheets credentials in .env file:\n' +
-          '   - GOOGLE_SERVICE_ACCOUNT_JSON (base64 encoded JSON or file path)\n' +
-          '   OR\n' +
-          '   - GOOGLE_CLIENT_EMAIL and GOOGLE_PRIVATE_KEY'
-      );
-    }
+    console.error(`[PlaygroundWriter] Error writing playground results:`, error.message);
     throw error;
   }
-}
-
-// ── Utility ─────────────────────────────────────────────────────────────────
-
-/**
- * Convert a 1-based column number to a spreadsheet column letter (1=A, 2=B, ... 26=Z, 27=AA).
- */
-function colLetter(colNum: number): string {
-  let letter = '';
-  let n = colNum;
-  while (n > 0) {
-    n--;
-    letter = String.fromCharCode((n % 26) + 65) + letter;
-    n = Math.floor(n / 26);
-  }
-  return letter;
 }

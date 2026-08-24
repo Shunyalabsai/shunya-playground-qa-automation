@@ -31,29 +31,23 @@ test.describe('Playground UI — Output Displays & Actions', () => {
     if (await featuresTab.isVisible() && await codeSampleTab.isVisible()) {
       await codeSampleTab.click();
       await page.waitForTimeout(500);
-      await expect(page.locator('pre, code').or(page.getByText(/curl|python|javascript/i)).first()).toBeVisible();
+      await expect(page.getByText('Copy Code').or(page.getByText('main.py')).first()).toBeVisible();
 
       await featuresTab.click();
       await page.waitForTimeout(500);
+      await expect(page.getByText(/Translation|Transliteration|Speaker Diarization/i).first()).toBeVisible();
     }
   });
 
-  test('TC-UI-OUT-003: Code snippet language selectors (cURL, Python, Node.js)', async ({ page }) => {
+  test('TC-UI-OUT-003: Code snippet copy control', async ({ page }) => {
     const codeSampleTab = page.getByRole('button', { name: /Code Sample/i }).first();
     if (await codeSampleTab.isVisible()) {
       await codeSampleTab.click();
       await page.waitForTimeout(500);
 
-      const curlBtn = page.getByRole('button', { name: /cURL|curl/i }).first();
-      const pythonBtn = page.getByRole('button', { name: /Python/i }).first();
-
-      if (await pythonBtn.isVisible()) {
-        await pythonBtn.click();
-        await page.waitForTimeout(300);
-      }
-      if (await curlBtn.isVisible()) {
-        await curlBtn.click();
-        await page.waitForTimeout(300);
+      const copyBtn = page.getByRole('button', { name: /Copy Code/i }).first();
+      if (await copyBtn.isVisible()) {
+        await expect(copyBtn).toBeEnabled();
       }
     }
   });
