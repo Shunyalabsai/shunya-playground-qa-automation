@@ -4,8 +4,8 @@
 import fs from 'fs';
 import path from 'path';
 import { expect, type Page, type Route } from '@playwright/test';
-import { API_CONFIG, getAuthHeaders } from '../config/api.config';
-import { PLAYGROUND_URL } from '../config/playground.config';
+import { API_CONFIG, getAuthHeaders } from '../../config/api.config';
+import { PLAYGROUND_URL } from '../../config/playground.config';
 
 const FEATURE_ROW_ACTIVE = 'border-blue-500';
 
@@ -361,12 +361,12 @@ export async function runFeatureAndCaptureResponse(
   await page.waitForTimeout(1500);
   const uiJson = await readTranscriptionJsonFromUi(page);
   if (uiJson) {
-    responseBody = responseBody ? { ...responseBody, ...uiJson } : uiJson;
+    responseBody = responseBody ? Object.assign({}, responseBody, uiJson) : uiJson;
   }
 
-  const requestFields = extractMultipartTextFields(requestBuffer);
+  const requestFields = extractMultipartTextFields(requestBuffer as any);
   const paramMarkers = FEATURE_API_PARAM[featureLabel] ?? [];
-  const featureInRequest = multipartContainsAny(requestBuffer, paramMarkers)
+  const featureInRequest = multipartContainsAny(requestBuffer as any, paramMarkers)
     || paramMarkers.some((m) => Object.keys(requestFields).some((k) => k.toLowerCase().includes(m.toLowerCase())));
 
   if (
@@ -385,9 +385,10 @@ export async function runFeatureAndCaptureResponse(
     }
   }
 
-  const requestFieldsFinal = extractMultipartTextFields(requestBuffer);
-  const requestPreview = requestBuffer
-    ? requestBuffer.toString('latin1', 0, Math.min(requestBuffer.length, 8000))
+  const requestFieldsFinal = extractMultipartTextFields(requestBuffer as any);
+  const rawBuf = requestBuffer as Buffer | null;
+  const requestPreview = rawBuf && Buffer.isBuffer(rawBuf)
+    ? rawBuf.toString('latin1', 0, Math.min(rawBuf.length, 8000))
     : null;
 
   await page.unroute('**/*', routeHandler).catch(() => {});

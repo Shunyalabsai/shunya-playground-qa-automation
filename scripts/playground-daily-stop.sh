@@ -42,6 +42,6 @@ sleep 2
 for pid in $PIDS; do
   _kill_tree "$pid" KILL
 done
-pkill -f "$PROJECT_DIR/node_modules/.bin/playwright test src/tests/playgroundUI" 2>/dev/null || true
+pkill -f "$PROJECT_DIR/node_modules/.bin/playwright test src/tests" 2>/dev/null || true
 
 echo "Done. Verify with: npm run test:playground-daily:status"

@@ -22,7 +22,7 @@ PARENT_PID=$$
 (
   sleep "$RUN_DEADLINE_SECS"
   echo "[deadline] $RUN_DEADLINE_SECS s exceeded — killing run tree" >&2
-  pkill -KILL -f "playwright test src/tests/playgroundUI.spec.ts" 2>/dev/null
+  pkill -KILL -f "playwright test src/tests/ui/playgroundUI.spec.ts" 2>/dev/null
   pkill -KILL -f "node_modules/playwright/lib/common/process.js" 2>/dev/null
   pkill -KILL -P "$PARENT_PID" 2>/dev/null
   kill -KILL "$PARENT_PID" 2>/dev/null
@@ -35,7 +35,7 @@ cleanup() {
 trap cleanup EXIT INT TERM
 
 # ── Orphan sweep ────────────────────────────────────────────────────────────
-pkill -KILL -f "playwright test src/tests/playgroundUI.spec.ts" 2>/dev/null || true
+pkill -KILL -f "playwright test src/tests/ui/playgroundUI.spec.ts" 2>/dev/null || true
 pkill -KILL -f "node_modules/playwright/lib/common/process.js" 2>/dev/null || true
 
 echo "════════════════════════════════════════════════════"

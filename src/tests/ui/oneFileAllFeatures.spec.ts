@@ -1,5 +1,5 @@
 import { test } from '@playwright/test';
-import { TEST_AUDIO_FILES } from '../config/playground.config';
+import { TEST_AUDIO_FILES } from '../../config/playground.config';
 import {
   pickFeatureOutput,
   runFeatureAndCaptureResponse,

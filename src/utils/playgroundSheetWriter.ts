@@ -57,8 +57,7 @@ async function getSheetsClient(): Promise<sheets_v4.Sheets> {
             scopes: ['https://www.googleapis.com/auth/spreadsheets'],
           });
           const client = await auth.getClient();
-          const sheets = google.sheets({ version: 'v4', auth: client as any });
-          return sheets;
+          return google.sheets({ version: 'v4', auth: client as Parameters<typeof google.sheets>[0]['auth'] });
         }
       }
 

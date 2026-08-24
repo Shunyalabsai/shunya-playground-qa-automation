@@ -42,11 +42,10 @@ async function getSheetsClient() {
             scopes: ['https://www.googleapis.com/auth/spreadsheets'],
           });
           const client = await auth.getClient();
-          const sheets = google.sheets({ version: 'v4', auth: client });
-          return sheets;
+          return google.sheets({ version: 'v4', auth: client as Parameters<typeof google.sheets>[0]['auth'] });
         }
       }
-      
+
       auth = new google.auth.GoogleAuth({
         credentials,
         scopes: ['https://www.googleapis.com/auth/spreadsheets'],
@@ -57,12 +56,13 @@ async function getSheetsClient() {
       );
     }
   } else if (GOOGLE_SHEETS_CONFIG.clientEmail && GOOGLE_SHEETS_CONFIG.privateKey) {
-    auth = new google.auth.JWT(
+    const jwtAuth = new google.auth.JWT(
       GOOGLE_SHEETS_CONFIG.clientEmail,
       undefined,
       GOOGLE_SHEETS_CONFIG.privateKey,
       ['https://www.googleapis.com/auth/spreadsheets']
     );
+    return google.sheets({ version: 'v4', auth: jwtAuth });
   } else {
     throw new Error(
       'Google Sheets credentials not configured. Please set GOOGLE_SERVICE_ACCOUNT_JSON or GOOGLE_CLIENT_EMAIL and GOOGLE_PRIVATE_KEY in .env'
@@ -70,8 +70,7 @@ async function getSheetsClient() {
   }
 
   const client = await auth.getClient();
-  const sheets = google.sheets({ version: 'v4', auth: client as any });
-  return sheets;
+  return google.sheets({ version: 'v4', auth: client as Parameters<typeof google.sheets>[0]['auth'] });
 }
 
 /**

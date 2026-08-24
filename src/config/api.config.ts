@@ -9,6 +9,7 @@
 
 import dotenv from 'dotenv';
 import * as path from 'path';
+import * as fs from 'fs';
 
 dotenv.config({ path: path.resolve(process.cwd(), '.env') });
 
@@ -210,6 +211,9 @@ export const TEST_THRESHOLDS = {
 
 // ── Google Sheets Config ─────────────────────────────────────────────────────
 
+const defaultKeyFilePath = path.resolve(process.cwd(), 'Google_service_account.json');
+const serviceAccountPath = process.env.GOOGLE_SERVICE_ACCOUNT_KEY_FILE || (fs.existsSync(defaultKeyFilePath) ? defaultKeyFilePath : '');
+
 export const GOOGLE_SHEETS_CONFIG = {
   spreadsheetId:
     process.env.GOOGLE_SHEET_ID ||
@@ -223,7 +227,7 @@ export const GOOGLE_SHEETS_CONFIG = {
   universalInputSpreadsheetId:
     process.env.GOOGLE_SHEET_ID_UNIVERSAL_INPUT ||
     '1kFTumbmJKUEoy4gmscqwjiwK3TXNUeqNh49-p9x4NGk',
-  credentials: process.env.GOOGLE_SERVICE_ACCOUNT_JSON || '',
+  credentials: process.env.GOOGLE_SERVICE_ACCOUNT_JSON || serviceAccountPath || '',
   clientEmail: process.env.GOOGLE_CLIENT_EMAIL || '',
   privateKey: process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, '\n') || '',
 };

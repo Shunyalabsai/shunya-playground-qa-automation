@@ -39,12 +39,14 @@ export default defineConfig({
   projects: [
     {
       name: 'api-tests',
-      // Browser UI specs need `storageState` (playground-ui project). Running them here
-      // hits Clerk/Cloudflare unauthenticated and produces false failures (see debug-8e4dc2.log).
-      testIgnore: '**/playgroundUI.spec.ts',
+      testDir: './src/tests/backend',
+      testMatch: /.*\.spec\.ts/,
+      timeout: 120000,
     },
     {
       name: 'playground-ui',
+      testDir: './src/tests/ui',
+      testMatch: /.*\.spec\.ts/,
       fullyParallel: false,
       use: {
         ...devices['Desktop Chrome'],
@@ -52,7 +54,6 @@ export default defineConfig({
         baseURL: process.env.PLAYGROUND_URL || 'https://playground.shunyalabs.ai',
         storageState: path.resolve(__dirname, 'auth', 'playground-auth.json'),
       },
-      testMatch: /playground.*\.spec\.ts/,
       timeout: 120000, // 2 min per UI test (prevents long timeouts from blocking others)
       retries: 0, // No retries — failures should fail fast so the daily run fits the 3h cadence
     },

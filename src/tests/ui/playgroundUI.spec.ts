@@ -9,7 +9,7 @@ import {
   PLAYGROUND_MODELS,
   TEST_AUDIO_FILES,
   PLAYGROUND_TIMEOUTS,
-} from '../config/playground.config';
+} from '../../config/playground.config';
 import * as fs from 'fs';
 import {
   assertFeatureRequestAndResponse,
