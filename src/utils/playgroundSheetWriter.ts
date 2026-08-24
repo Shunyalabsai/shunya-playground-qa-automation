@@ -28,8 +28,6 @@ export interface PlaygroundSuiteResult {
   status: 'PASS' | 'FAIL';
   failure_reason: string;
   latency_ms: number;
-  wer: number; // -1 if not applicable
-  cer: number; // -1 if not applicable
   api_response_preview: string;
   timestamp: string;
 }
@@ -275,12 +273,10 @@ const PLAYGROUND_HEADERS = [
   'Status (PASS/FAIL)',
   'Failure Reason',
   'Latency (ms)',
-  'WER (%)',
-  'CER (%)',
   'API Response Preview',
   'Timestamp',
 ];
-const PLAYGROUND_COL_COUNT = PLAYGROUND_HEADERS.length; // 15
+const PLAYGROUND_COL_COUNT = PLAYGROUND_HEADERS.length; // 13
 const TEST_ID_COL_INDEX = 0;
 const DATE_COL_INDEX = 1;
 const MODULE_COL_INDEX = 2;
@@ -292,10 +288,8 @@ const LANG_CODE_COL_INDEX = 7;
 const STATUS_COL_INDEX = 8;
 const FAILURE_REASON_COL_INDEX = 9;
 const LATENCY_COL_INDEX = 10;
-const WER_COL_INDEX = 11;
-const CER_COL_INDEX = 12;
-const API_PREVIEW_COL_INDEX = 13;
-const TIMESTAMP_COL_INDEX = 14;
+const API_PREVIEW_COL_INDEX = 11;
+const TIMESTAMP_COL_INDEX = 12;
 
 const COLUMN_WIDTHS = [
   130, // 0: Test Case ID
@@ -303,16 +297,14 @@ const COLUMN_WIDTHS = [
   170, // 2: Module / Category
   180, // 3: Feature
   340, // 4: Scenario Description
-  170, // 5: Audio / Input Payload
+  180, // 5: Audio / Input Payload
   120, // 6: Language
   90,  // 7: Lang Code
   110, // 8: Status (PASS/FAIL)
   200, // 9: Failure Reason
   100, // 10: Latency (ms)
-  85,  // 11: WER (%)
-  85,  // 12: CER (%)
-  250, // 13: API Response Preview
-  150, // 14: Timestamp
+  260, // 11: API Response Preview
+  150, // 12: Timestamp
 ];
 
 // ── Main Execution ──────────────────────────────────────────────────────────
@@ -336,6 +328,14 @@ export async function writePlaygroundResults(
     const now = getLocalTimestamp();
 
     // 2. Ensure headers exist at row 1 and are up-to-date
+    // Clear any extra columns beyond column 13 (N:Z) to keep sheet pristine
+    try {
+      await sheets.spreadsheets.values.clear({
+        spreadsheetId,
+        range: `${sheetName}!N1:Z1000`,
+      });
+    } catch {}
+
     await sheets.spreadsheets.values.update({
       spreadsheetId,
       range: `${sheetName}!A1:${colLetter(PLAYGROUND_COL_COUNT)}1`,
@@ -400,23 +400,29 @@ export async function writePlaygroundResults(
       ...Array(PLAYGROUND_COL_COUNT - 1).fill(''),
     ];
 
-    const dataRows = results.map((r) => [
-      r.test_id || '',
-      r.date,
-      r.module,
-      r.feature,
-      r.scenario,
-      r.audio_file,
-      r.language,
-      r.lang_code,
-      r.status,
-      r.failure_reason || '',
-      r.latency_ms,
-      r.wer === -1 ? 'N/A' : `${(r.wer * 100).toFixed(2)}%`,
-      r.cer === -1 ? 'N/A' : `${(r.cer * 100).toFixed(2)}%`,
-      r.api_response_preview,
-      r.timestamp,
-    ]);
+    const dataRows = results.map((r) => {
+      const audioDisplay = r.audio_file && r.audio_file !== 'N/A' && r.audio_file !== 'Standard Audio Sample' && r.audio_file !== 'Standard Test Dataset'
+        ? r.audio_file
+        : '—';
+      const langDisplay = r.language && r.language !== 'N/A' ? r.language : '—';
+      const codeDisplay = r.lang_code && r.lang_code !== 'N/A' ? r.lang_code : '—';
+
+      return [
+        r.test_id || '—',
+        r.date,
+        r.module,
+        r.feature,
+        r.scenario,
+        audioDisplay,
+        langDisplay,
+        codeDisplay,
+        r.status,
+        r.failure_reason || '',
+        r.latency_ms,
+        r.api_response_preview,
+        r.timestamp,
+      ];
+    });
 
     const greySeparatorRow = Array(PLAYGROUND_COL_COUNT).fill('');
 
@@ -744,7 +750,7 @@ export async function writePlaygroundResults(
         });
       }
 
-      // 10. Latency, WER, CER, Timestamp columns centered
+      // 10. Latency & Timestamp columns centered
       formatRequests.push({
         repeatCell: {
           range: {
@@ -752,7 +758,7 @@ export async function writePlaygroundResults(
             startRowIndex: rowIndex,
             endRowIndex: rowIndex + 1,
             startColumnIndex: LATENCY_COL_INDEX,
-            endColumnIndex: CER_COL_INDEX + 1,
+            endColumnIndex: LATENCY_COL_INDEX + 1,
           },
           cell: {
             userEnteredFormat: {

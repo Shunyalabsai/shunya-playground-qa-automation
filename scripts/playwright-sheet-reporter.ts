@@ -17,15 +17,23 @@ import {
   getLocalTimestamp,
   parseTestDetails,
 } from '../src/utils/playgroundSheetWriter';
+import { generateTestCases, DeepTestCase } from './populate-exhaustive-master-sheet';
 import { generateStakeholderDashboard } from './generate-stakeholder-dashboard';
 
 export default class PlaywrightSheetReporter implements Reporter {
   private collectedResults: PlaygroundSuiteResult[] = [];
   private runStartTime: number = Date.now();
+  private testCaseMap: Map<string, DeepTestCase> = new Map();
 
   onBegin(_config: FullConfig, _suite: Suite): void {
     this.runStartTime = Date.now();
     this.collectedResults = [];
+    try {
+      const allCases = generateTestCases();
+      this.testCaseMap = new Map(allCases.map((c) => [c.id, c]));
+    } catch {
+      this.testCaseMap = new Map();
+    }
     console.log('\n[PlaywrightSheetReporter] 🚀 Starting test execution run...');
   }
 
@@ -38,67 +46,59 @@ export default class PlaywrightSheetReporter implements Reporter {
     const errorMsg = result.error?.message ? result.error.message.split('\n')[0].replace(/\x1B\[[0-9;]*[a-zA-Z]/g, '') : '';
 
     const titlePath = test.titlePath();
-    const suiteName = titlePath[1] || 'Playground Suite';
     const testTitle = test.title;
 
-    // Detect default module from suite path
-    let defaultModule = 'Backend API';
-    if (titlePath.some((p) => p.includes('playground-ui') || p.includes('src/tests/ui'))) {
-      defaultModule = 'UI Suite';
-    } else if (titlePath.some((p) => p.includes('speechSynthesis') || p.includes('tts'))) {
-      defaultModule = 'TTS Speech Synthesis';
-    } else if (titlePath.some((p) => p.includes('transcriptionFeatures') || p.includes('Feature Matrix'))) {
-      defaultModule = 'ASR Features';
-    } else if (titlePath.some((p) => p.includes('transcriptionModels') || p.includes('Models Matrix'))) {
-      defaultModule = 'ASR Models';
-    } else if (titlePath.some((p) => p.includes('health'))) {
-      defaultModule = 'Health Checks';
-    }
-
     // Extract structured Test ID, Module, Feature, and Scenario
-    const parsed = parseTestDetails(testTitle, defaultModule);
+    const parsed = parseTestDetails(testTitle, 'General');
+    const masterCase = this.testCaseMap.get(parsed.testId);
 
-    // Detect Model & Language
-    let model = 'zero-indic';
-    let lang = 'Hindi';
-    let langCode = 'hi';
-
-    if (testTitle.toLowerCase().includes('codeswitch') || testTitle.toLowerCase().includes('hinglish')) {
-      model = 'zero-codeswitch';
-      lang = 'Hinglish';
-      langCode = 'auto';
-    } else if (testTitle.toLowerCase().includes('medasr') || testTitle.toLowerCase().includes('medical')) {
-      model = 'zero-medasr';
-      lang = 'English (Medical)';
-      langCode = 'en';
-    } else if (testTitle.toLowerCase().includes('tts') || testTitle.toLowerCase().includes('speech')) {
-      model = 'N/A';
-      lang = 'Hindi/English';
-      langCode = 'hi/en';
+    // Accurate Module, Feature, and Scenario mapping
+    const moduleName = masterCase ? masterCase.module : parsed.module;
+    let featureName = parsed.feature;
+    if (masterCase && masterCase.featuresEnabled && masterCase.featuresEnabled !== 'N/A') {
+      featureName = masterCase.featuresEnabled;
     }
 
-    // Detect Audio file if applicable
-    let audioFile = 'Standard Audio Sample';
-    if (testTitle.includes('WAV')) audioFile = 'sample.wav';
-    else if (testTitle.includes('MP3')) audioFile = 'sample.mp3';
-    else if (testTitle.includes('corrupted')) audioFile = 'corrupted.wav';
-    else if (testTitle.includes('empty')) audioFile = 'empty.wav';
-    else if (testTitle.includes('silence')) audioFile = 'silence.wav';
+    // Accurate Audio Path (only when required)
+    let audioDisplay = '—';
+    if (masterCase) {
+      if (masterCase.audioPath && masterCase.audioPath !== 'N/A' && masterCase.audioPath !== '') {
+        audioDisplay = masterCase.audioPath;
+      } else if (masterCase.ttsInputText && masterCase.ttsInputText !== 'N/A' && masterCase.ttsInputText !== '') {
+        audioDisplay = `TTS Text: "${masterCase.ttsInputText.slice(0, 30)}..."`;
+      }
+    } else {
+      if (testTitle.includes('WAV')) audioDisplay = 'sample.wav';
+      else if (testTitle.includes('MP3')) audioDisplay = 'sample.mp3';
+      else if (testTitle.includes('corrupted')) audioDisplay = 'corrupted.wav';
+      else if (testTitle.includes('empty')) audioDisplay = 'empty.wav';
+      else if (testTitle.includes('silence')) audioDisplay = 'silence.wav';
+    }
+
+    // Accurate Language & Code (only when required)
+    let langDisplay = '—';
+    let langCodeDisplay = '—';
+    if (masterCase) {
+      if (masterCase.languageName && masterCase.languageName !== 'N/A' && masterCase.languageName !== '') {
+        langDisplay = masterCase.languageName;
+      }
+      if (masterCase.languageCode && masterCase.languageCode !== 'N/A' && masterCase.languageCode !== '') {
+        langCodeDisplay = masterCase.languageCode;
+      }
+    }
 
     this.collectedResults.push({
-      test_id: parsed.testId,
+      test_id: parsed.testId || '—',
       date: today,
-      module: parsed.module,
-      feature: parsed.feature,
-      scenario: parsed.scenario,
-      audio_file: audioFile,
-      language: lang,
-      lang_code: langCode,
+      module: moduleName,
+      feature: featureName,
+      scenario: masterCase ? masterCase.title : parsed.scenario,
+      audio_file: audioDisplay,
+      language: langDisplay,
+      lang_code: langCodeDisplay,
       status: isPass ? 'PASS' : 'FAIL',
       failure_reason: isPass ? '' : errorMsg,
       latency_ms: durationMs,
-      wer: isPass ? 0.05 : -1,
-      cer: isPass ? 0.02 : -1,
       api_response_preview: isPass ? 'HTTP 200 OK — Assertion Verified' : `Failed: ${errorMsg.slice(0, 150)}`,
       timestamp,
     });
