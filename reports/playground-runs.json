@@ -1,5 +1,271 @@
 [
   {
+    "id": "run-1787829272348",
+    "startedAt": "2026-08-27T11:14:32.347Z",
+    "durationMs": 46800,
+    "passRate": 100,
+    "browsersTested": [
+      "chromium",
+      "safari"
+    ],
+    "summary": {
+      "total": 280,
+      "passed": 280,
+      "failed": 0,
+      "timedOut": 0,
+      "skipped": 0
+    },
+    "modules": {
+      "Authentication & Session": {
+        "label": "Authentication & Session",
+        "passed": 8,
+        "failed": 0,
+        "total": 8
+      },
+      "Onboarding Journey": {
+        "label": "Onboarding Journey",
+        "passed": 5,
+        "failed": 0,
+        "total": 5
+      },
+      "UI - Layout & Navigation": {
+        "label": "UI - Layout & Navigation",
+        "passed": 3,
+        "failed": 0,
+        "total": 3
+      },
+      "UI - Model & Language Selection": {
+        "label": "UI - Model & Language Selection",
+        "passed": 49,
+        "failed": 0,
+        "total": 49
+      },
+      "UI - Intelligence Features": {
+        "label": "UI - Intelligence Features",
+        "passed": 16,
+        "failed": 0,
+        "total": 16
+      },
+      "Backend API - Intelligence Feature Matrix": {
+        "label": "Backend API - Intelligence Feature Matrix",
+        "passed": 17,
+        "failed": 0,
+        "total": 17
+      },
+      "UI - Negative & Edge Cases": {
+        "label": "UI - Negative & Edge Cases",
+        "passed": 28,
+        "failed": 0,
+        "total": 28
+      },
+      "UI - Text to Speech": {
+        "label": "UI - Text to Speech",
+        "passed": 65,
+        "failed": 0,
+        "total": 65
+      },
+      "Backend API - TTS Speech Synthesis": {
+        "label": "Backend API - TTS Speech Synthesis",
+        "passed": 66,
+        "failed": 0,
+        "total": 66
+      },
+      "Backend API - Negative, Auth & Stress": {
+        "label": "Backend API - Negative, Auth & Stress",
+        "passed": 7,
+        "failed": 0,
+        "total": 7
+      },
+      "Backend API - Health Checks": {
+        "label": "Backend API - Health Checks",
+        "passed": 2,
+        "failed": 0,
+        "total": 2
+      },
+      "Backend API - Authentication & Session": {
+        "label": "Backend API - Authentication & Session",
+        "passed": 1,
+        "failed": 0,
+        "total": 1
+      },
+      "Backend API - STT Transcription Models": {
+        "label": "Backend API - STT Transcription Models",
+        "passed": 3,
+        "failed": 0,
+        "total": 3
+      },
+      "Playground UI - Layout & Navigation": {
+        "label": "Playground UI - Layout & Navigation",
+        "passed": 3,
+        "failed": 0,
+        "total": 3
+      },
+      "Playground UI - STT Models": {
+        "label": "Playground UI - STT Models",
+        "passed": 1,
+        "failed": 0,
+        "total": 1
+      },
+      "Playground UI - STT Language Selection": {
+        "label": "Playground UI - STT Language Selection",
+        "passed": 1,
+        "failed": 0,
+        "total": 1
+      },
+      "Playground UI - STT Audio Upload": {
+        "label": "Playground UI - STT Audio Upload",
+        "passed": 1,
+        "failed": 0,
+        "total": 1
+      },
+      "Playground UI - STT Output Actions": {
+        "label": "Playground UI - STT Output Actions",
+        "passed": 1,
+        "failed": 0,
+        "total": 1
+      },
+      "Playground UI - TTS Speech Synthesis": {
+        "label": "Playground UI - TTS Speech Synthesis",
+        "passed": 3,
+        "failed": 0,
+        "total": 3
+      }
+    }
+  },
+  {
+    "id": "run-1787829270584",
+    "startedAt": "2026-08-27T11:14:23.569Z",
+    "durationMs": 46800,
+    "passRate": 100,
+    "browsersTested": [
+      "chromium",
+      "safari"
+    ],
+    "summary": {
+      "total": 21,
+      "passed": 21,
+      "failed": 0,
+      "timedOut": 0,
+      "skipped": 0
+    },
+    "modules": {
+      "Authentication & Session": {
+        "label": "Authentication & Session",
+        "passed": 8,
+        "failed": 0,
+        "total": 8
+      },
+      "Onboarding Journey": {
+        "label": "Onboarding Journey",
+        "passed": 5,
+        "failed": 0,
+        "total": 5
+      },
+      "UI - Layout & Navigation": {
+        "label": "UI - Layout & Navigation",
+        "passed": 3,
+        "failed": 0,
+        "total": 3
+      },
+      "UI - Model & Language Selection": {
+        "label": "UI - Model & Language Selection",
+        "passed": 49,
+        "failed": 0,
+        "total": 49
+      },
+      "UI - Intelligence Features": {
+        "label": "UI - Intelligence Features",
+        "passed": 16,
+        "failed": 0,
+        "total": 16
+      },
+      "Backend API - Intelligence Feature Matrix": {
+        "label": "Backend API - Intelligence Feature Matrix",
+        "passed": 17,
+        "failed": 0,
+        "total": 17
+      },
+      "UI - Negative & Edge Cases": {
+        "label": "UI - Negative & Edge Cases",
+        "passed": 28,
+        "failed": 0,
+        "total": 28
+      },
+      "UI - Text to Speech": {
+        "label": "UI - Text to Speech",
+        "passed": 65,
+        "failed": 0,
+        "total": 65
+      },
+      "Backend API - TTS Speech Synthesis": {
+        "label": "Backend API - TTS Speech Synthesis",
+        "passed": 66,
+        "failed": 0,
+        "total": 66
+      },
+      "Backend API - Negative, Auth & Stress": {
+        "label": "Backend API - Negative, Auth & Stress",
+        "passed": 7,
+        "failed": 0,
+        "total": 7
+      },
+      "Backend API - Health Checks": {
+        "label": "Backend API - Health Checks",
+        "passed": 2,
+        "failed": 0,
+        "total": 2
+      },
+      "Backend API - Authentication & Session": {
+        "label": "Backend API - Authentication & Session",
+        "passed": 1,
+        "failed": 0,
+        "total": 1
+      },
+      "Backend API - STT Transcription Models": {
+        "label": "Backend API - STT Transcription Models",
+        "passed": 3,
+        "failed": 0,
+        "total": 3
+      },
+      "Playground UI - Layout & Navigation": {
+        "label": "Playground UI - Layout & Navigation",
+        "passed": 3,
+        "failed": 0,
+        "total": 3
+      },
+      "Playground UI - STT Models": {
+        "label": "Playground UI - STT Models",
+        "passed": 1,
+        "failed": 0,
+        "total": 1
+      },
+      "Playground UI - STT Language Selection": {
+        "label": "Playground UI - STT Language Selection",
+        "passed": 1,
+        "failed": 0,
+        "total": 1
+      },
+      "Playground UI - STT Audio Upload": {
+        "label": "Playground UI - STT Audio Upload",
+        "passed": 1,
+        "failed": 0,
+        "total": 1
+      },
+      "Playground UI - STT Output Actions": {
+        "label": "Playground UI - STT Output Actions",
+        "passed": 1,
+        "failed": 0,
+        "total": 1
+      },
+      "Playground UI - TTS Speech Synthesis": {
+        "label": "Playground UI - TTS Speech Synthesis",
+        "passed": 3,
+        "failed": 0,
+        "total": 3
+      }
+    }
+  },
+  {
     "id": "run-1787829134175",
     "startedAt": "2026-08-27T11:12:14.174Z",
     "durationMs": 46800,
@@ -7721,164 +7987,6 @@
     "startedAt": "2026-06-14T23:16:35.535Z",
     "durationMs": 46800,
     "passRate": 78.3,
-    "browsersTested": [
-      "chromium",
-      "safari"
-    ],
-    "summary": {
-      "total": 151,
-      "passed": 151,
-      "failed": 0,
-      "timedOut": 0,
-      "skipped": 0
-    },
-    "modules": {
-      "Authentication & Session": {
-        "label": "Authentication & Session",
-        "passed": 8,
-        "failed": 0,
-        "total": 8
-      },
-      "Onboarding Journey": {
-        "label": "Onboarding Journey",
-        "passed": 5,
-        "failed": 0,
-        "total": 5
-      },
-      "UI - Layout & Navigation": {
-        "label": "UI - Layout & Navigation",
-        "passed": 3,
-        "failed": 0,
-        "total": 3
-      },
-      "UI - Model & Language Selection": {
-        "label": "UI - Model & Language Selection",
-        "passed": 49,
-        "failed": 0,
-        "total": 49
-      },
-      "UI - Intelligence Features": {
-        "label": "UI - Intelligence Features",
-        "passed": 16,
-        "failed": 0,
-        "total": 16
-      },
-      "Backend API - Intelligence Feature Matrix": {
-        "label": "Backend API - Intelligence Feature Matrix",
-        "passed": 16,
-        "failed": 0,
-        "total": 16
-      },
-      "UI - Negative & Edge Cases": {
-        "label": "UI - Negative & Edge Cases",
-        "passed": 28,
-        "failed": 0,
-        "total": 28
-      },
-      "UI - Text to Speech": {
-        "label": "UI - Text to Speech",
-        "passed": 10,
-        "failed": 0,
-        "total": 10
-      },
-      "Backend API - TTS Speech Synthesis": {
-        "label": "Backend API - TTS Speech Synthesis",
-        "passed": 10,
-        "failed": 0,
-        "total": 10
-      },
-      "Backend API - Negative, Auth & Stress": {
-        "label": "Backend API - Negative, Auth & Stress",
-        "passed": 6,
-        "failed": 0,
-        "total": 6
-      }
-    }
-  },
-  {
-    "id": "run-1781392595535",
-    "startedAt": "2026-06-13T23:16:35.535Z",
-    "durationMs": 46800,
-    "passRate": 61.7,
-    "browsersTested": [
-      "chromium",
-      "safari"
-    ],
-    "summary": {
-      "total": 151,
-      "passed": 151,
-      "failed": 0,
-      "timedOut": 0,
-      "skipped": 0
-    },
-    "modules": {
-      "Authentication & Session": {
-        "label": "Authentication & Session",
-        "passed": 8,
-        "failed": 0,
-        "total": 8
-      },
-      "Onboarding Journey": {
-        "label": "Onboarding Journey",
-        "passed": 5,
-        "failed": 0,
-        "total": 5
-      },
-      "UI - Layout & Navigation": {
-        "label": "UI - Layout & Navigation",
-        "passed": 3,
-        "failed": 0,
-        "total": 3
-      },
-      "UI - Model & Language Selection": {
-        "label": "UI - Model & Language Selection",
-        "passed": 49,
-        "failed": 0,
-        "total": 49
-      },
-      "UI - Intelligence Features": {
-        "label": "UI - Intelligence Features",
-        "passed": 16,
-        "failed": 0,
-        "total": 16
-      },
-      "Backend API - Intelligence Feature Matrix": {
-        "label": "Backend API - Intelligence Feature Matrix",
-        "passed": 16,
-        "failed": 0,
-        "total": 16
-      },
-      "UI - Negative & Edge Cases": {
-        "label": "UI - Negative & Edge Cases",
-        "passed": 28,
-        "failed": 0,
-        "total": 28
-      },
-      "UI - Text to Speech": {
-        "label": "UI - Text to Speech",
-        "passed": 10,
-        "failed": 0,
-        "total": 10
-      },
-      "Backend API - TTS Speech Synthesis": {
-        "label": "Backend API - TTS Speech Synthesis",
-        "passed": 10,
-        "failed": 0,
-        "total": 10
-      },
-      "Backend API - Negative, Auth & Stress": {
-        "label": "Backend API - Negative, Auth & Stress",
-        "passed": 6,
-        "failed": 0,
-        "total": 6
-      }
-    }
-  },
-  {
-    "id": "run-1781306195535",
-    "startedAt": "2026-06-12T23:16:35.535Z",
-    "durationMs": 46800,
-    "passRate": 91.7,
     "browsersTested": [
       "chromium",
       "safari"
