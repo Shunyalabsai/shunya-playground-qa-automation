@@ -44,6 +44,7 @@
     "dashboard:open": "npx ts-node scripts/generate-stakeholder-dashboard.ts && open reports/Stakeholder-Dashboard.html",
     "sheet:master": "npx ts-node scripts/write-master-test-sheet.ts",
     "sheet:populate-input": "npx ts-node scripts/populate-exhaustive-master-sheet.ts",
+    "sheet:smoke": "npx ts-node scripts/populate-smoke-test-sheet.ts",
     "sheet:record-run": "npx ts-node scripts/record-test-run-to-sheet.ts"
   },
   "keywords": [
