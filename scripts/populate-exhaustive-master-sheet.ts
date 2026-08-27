@@ -24,9 +24,9 @@ export interface DeepTestCase {
   featuresEnabled: string;
   featureConfig: string;
   audioPath: string;
-  ttsInputText: string;
-  translatedText: string; // ShunyaLabs Translated Output (English Translation)
-  ttsVoiceAndSpeed: string;
+  ttsInputText?: string;
+  translatedText?: string; // ShunyaLabs Translated Output (English Translation)
+  ttsVoiceAndSpeed?: string;
   preconditions: string;
   testSteps: string;
   expectedResult: string;
@@ -1765,16 +1765,17 @@ async function run() {
       tc.languageCode,
       tc.languageName,
       tc.featuresEnabled,
-      tc.featureConfig,
-      tc.audioPath,
-      tc.ttsInputText,
-      tc.ttsVoiceAndSpeed,
-      tc.preconditions,
-      tc.testSteps,
-      tc.expectedResult,
-      tc.expectedStatus,
-      tc.priority,
-      tc.automated,
+      tc.featureConfig || '{}',
+      tc.audioPath || 'N/A',
+      tc.ttsInputText || 'N/A',
+      tc.translatedText || 'N/A',
+      tc.ttsVoiceAndSpeed || 'N/A',
+      tc.preconditions || 'N/A',
+      tc.testSteps || 'N/A',
+      tc.expectedResult || 'N/A',
+      tc.expectedStatus || 'N/A',
+      tc.priority || 'P1',
+      tc.automated || 'Automated',
     ]);
   }
 

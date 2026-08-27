@@ -35,7 +35,7 @@ export default defineConfig({
     trace: 'on-first-retry',
   },
 
-  /* Configure projects for API testing and UI testing */
+  /* Configure projects for API testing, UI testing, and Smoke testing */
   projects: [
     {
       name: 'api-tests',
@@ -56,6 +56,26 @@ export default defineConfig({
       },
       timeout: 120000, // 2 min per UI test (prevents long timeouts from blocking others)
       retries: 0, // No retries — failures should fail fast so the daily run fits the 3h cadence
+    },
+    {
+      name: 'smoke-api',
+      testDir: './src/tests/smoke',
+      testMatch: 'smokeBackend.spec.ts',
+      timeout: 60000,
+    },
+    {
+      name: 'smoke-ui',
+      testDir: './src/tests/smoke',
+      testMatch: 'smokeUI.spec.ts',
+      fullyParallel: false,
+      use: {
+        ...devices['Desktop Chrome'],
+        channel: 'chrome',
+        baseURL: process.env.PLAYGROUND_URL || 'https://playground.shunyalabs.ai',
+        storageState: path.resolve(__dirname, 'auth', 'playground-auth.json'),
+      },
+      timeout: 60000,
+      retries: 0,
     },
   ],
 
