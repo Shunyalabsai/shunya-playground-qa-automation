@@ -18,6 +18,7 @@ import {
   parseTestDetails,
 } from '../src/utils/playgroundSheetWriter';
 import { generateTestCases, DeepTestCase } from './populate-exhaustive-master-sheet';
+import { generateSmokeTestCases } from './populate-smoke-test-sheet';
 import { generateStakeholderDashboard } from './generate-stakeholder-dashboard';
 
 export default class PlaywrightSheetReporter implements Reporter {
@@ -29,7 +30,9 @@ export default class PlaywrightSheetReporter implements Reporter {
     this.runStartTime = Date.now();
     this.collectedResults = [];
     try {
-      const allCases = generateTestCases();
+      const canonicalCases = generateTestCases();
+      const smokeCases = generateSmokeTestCases();
+      const allCases = [...canonicalCases, ...smokeCases];
       this.testCaseMap = new Map(allCases.map((c) => [c.id, c]));
     } catch {
       this.testCaseMap = new Map();
@@ -132,10 +135,12 @@ export default class PlaywrightSheetReporter implements Reporter {
     const dateStr = runIso.split('T')[0];
 
     // 1. Save individual run JSON
+    const isSmokeRun = this.collectedResults.some(r => r.test_id?.startsWith('SMOKE-')) || totalTests <= 25;
     const runRecord = {
       runId: `run-${Date.now()}`,
       timestamp: runIso,
       date: dateStr,
+      runType: isSmokeRun ? 'Smoke Test Run' : 'Full Regression Run',
       durationSeconds: parseFloat(totalDuration),
       status: result.status === 'passed' && failedTests === 0 ? 'PASS' : 'FAIL',
       totalTests,
@@ -167,6 +172,7 @@ export default class PlaywrightSheetReporter implements Reporter {
         runId: runRecord.runId,
         timestamp: runRecord.timestamp,
         date: runRecord.date,
+        runType: runRecord.runType,
         durationSeconds: runRecord.durationSeconds,
         status: runRecord.status,
         totalTests: runRecord.totalTests,

@@ -53,7 +53,7 @@ export function parseTestDetails(testTitle: string, defaultModule: string = 'Bac
   scenario: string;
 } {
   let testId = '';
-  const idMatch = testTitle.match(/^(TC-[A-Z0-9-]+)/i);
+  const idMatch = testTitle.match(/^(TC-[A-Z0-9-]+|SMOKE-[A-Z0-9-]+)/i);
   if (idMatch) {
     testId = idMatch[1];
   }

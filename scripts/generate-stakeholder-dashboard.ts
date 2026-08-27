@@ -905,11 +905,14 @@ function renderHistory(runs) {
       <div class="history-cards">
         \${dateRuns.map(r => \`
           <div class="history-card" onclick="openRunModal('\${r.id}')">
-            <div class="time">\${formatTime(r.startedAt)}</div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+              <div class="time">\${formatTime(r.startedAt)}</div>
+              \${(r.runType === 'Smoke Test Run' || (r.totalTests <= 25 && r.totalTests > 0) || (r.summary && r.summary.total <= 25 && r.summary.total > 0)) ? \`<span class="pill-smoke" style="font-size:9px;padding:2px 7px"><span class="smoke-flame">🔥</span> Smoke Run</span>\` : \`<span class="pill" style="font-size:9px;padding:2px 7px;background:rgba(139,92,246,.2);color:#c4b5fd">Full Suite</span>\`}
+            </div>
             <div class="run-id">Run \${r.id.substring(0, 12)}</div>
             <div class="meta">
-              <span class="pill pill-pass">\${r.summary.passed} passed</span>
-              \${r.summary.failed > 0 ? \`<span class="pill pill-fail">\${r.summary.failed} failed</span>\` : ''}
+              <span class="pill pill-pass">\${r.summary ? r.summary.passed : (r.passedTests || 0)} passed</span>
+              \${(r.summary ? r.summary.failed : (r.failedTests || 0)) > 0 ? \`<span class="pill pill-fail">\${r.summary ? r.summary.failed : r.failedTests} failed</span>\` : ''}
               <span style="color:\${(r.passRate||100) >= 80 ? 'var(--pass)' : 'var(--warn)'}; font-size:13px; font-weight:700">\${r.passRate || 100}%</span>
               <span style="font-size:11px;color:var(--muted)">Chromium + Safari</span>
             </div>
