@@ -190,7 +190,7 @@ test.describe('Exhaustive Master UI Suite (118 Scenarios)', () => {
         return;
       }
 
-      // 8. TTS Speech Synthesis UI (10 cases)
+      // 8. TTS Speech Synthesis UI (Model, Language, Mode, Voices, Synthesis)
       if (tc.module.includes('Text to Speech') || tc.module.includes('TTS')) {
         await page.goto(PLAYGROUND_URL, { waitUntil: 'domcontentloaded', timeout: 30000 });
 
@@ -199,12 +199,60 @@ test.describe('Exhaustive Master UI Suite (118 Scenarios)', () => {
           await ttsTab.click({ timeout: 2000 }).catch(() => {});
           await page.waitForTimeout(300);
 
+          const selects = await page.locator('select').all();
+          const modeSelect = selects.length > 0 ? selects[0] : null;
+          const modelSelect = selects.length > 1 ? selects[1] : null;
+          const langSelect = selects.length > 2 ? selects[2] : null;
+
+          // Model Selection (Zero Oriental, Zero Universal, Zero Indic)
+          if (modelSelect && tc.model && tc.model !== 'N/A') {
+            await modelSelect.selectOption(tc.model).catch(() => {});
+            await page.waitForTimeout(200);
+
+            // If it's a dropdown cascade verification test case
+            if (tc.title.includes('Cascade') || tc.title.includes('Verify 4 Languages') || tc.title.includes('Verify 45')) {
+              if (langSelect) {
+                const availableLangs = await langSelect.locator('option').allTextContents();
+                if (tc.model === 'Zero Oriental') {
+                  expect(availableLangs).toContain('Japanese');
+                  expect(availableLangs).toContain('Korean');
+                  expect(availableLangs).toContain('Chinese');
+                  expect(availableLangs).toContain('Bhojpuri');
+                } else if (tc.model === 'Zero Universal') {
+                  expect(availableLangs.length).toBeGreaterThanOrEqual(40);
+                } else if (tc.model === 'Zero Indic') {
+                  expect(availableLangs.length).toBeGreaterThanOrEqual(20);
+                }
+              }
+              return;
+            }
+          }
+
+          // Language Selection in TTS dropdown
+          if (langSelect && tc.languageName && tc.languageName !== 'N/A' && tc.languageName !== 'Auto') {
+            await langSelect.selectOption(tc.languageName).catch(() => {});
+          }
+
+          // Synthesis Mode (Batch vs Streaming)
+          if (modeSelect && tc.title.includes('Streaming')) {
+            await modeSelect.selectOption('Streaming').catch(() => {});
+          }
+
+          // Voice Mode (Preset vs Clone Voice)
+          if (tc.title.includes('Clone Voice')) {
+            const cloneBtn = page.getByRole('button', { name: /clone voice/i }).first();
+            if ((await cloneBtn.count()) > 0) {
+              await cloneBtn.click().catch(() => {});
+            }
+          }
+
+          // Textarea Input
           const textarea = page.locator('textarea').first();
           if ((await textarea.count()) > 0) {
             if (tc.scenarioType === 'Negative') {
               await textarea.fill('');
-            } else {
-              await textarea.fill(tc.ttsInputText || 'नमस्ते, शून्या लैब्स में आपका स्वागत है।');
+            } else if (tc.ttsInputText && tc.ttsInputText !== 'N/A') {
+              await textarea.fill(tc.ttsInputText);
             }
           }
         }

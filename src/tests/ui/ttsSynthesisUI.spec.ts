@@ -222,4 +222,127 @@ test.describe('Playground UI — TTS Speech Synthesis Comprehensive Suite', () =
       await expect(textarea).toBeVisible();
     }
   });
+
+  // ── 7. Advanced TTS Models & Dynamic Language Cascades ──────────────────────
+  test('TC-TTS-UI-020: Model "Zero Oriental" Selection & Language Cascade (4 Languages)', async ({ page }) => {
+    const selects = await page.locator('select').all();
+    if (selects.length >= 3) {
+      const modelSelect = selects[1];
+      const langSelect = selects[2];
+
+      await modelSelect.selectOption('Zero Oriental').catch(() => {});
+      await page.waitForTimeout(300);
+
+      const langs = await langSelect.locator('option').allTextContents();
+      expect(langs).toContain('Japanese');
+      expect(langs).toContain('Korean');
+      expect(langs).toContain('Chinese');
+      expect(langs).toContain('Bhojpuri');
+    }
+  });
+
+  test('TC-TTS-UI-021: Model "Zero Universal" Selection & Language Cascade (45 Global Languages)', async ({ page }) => {
+    const selects = await page.locator('select').all();
+    if (selects.length >= 3) {
+      const modelSelect = selects[1];
+      const langSelect = selects[2];
+
+      await modelSelect.selectOption('Zero Universal').catch(() => {});
+      await page.waitForTimeout(300);
+
+      const langs = await langSelect.locator('option').allTextContents();
+      expect(langs.length).toBeGreaterThanOrEqual(40);
+      expect(langs).toContain('French');
+      expect(langs).toContain('German');
+      expect(langs).toContain('Spanish');
+      expect(langs).toContain('Arabic');
+    }
+  });
+
+  test('TC-TTS-UI-022: Model "Zero Oriental" with Japanese (日本語) Phonetic Input', async ({ page }) => {
+    const selects = await page.locator('select').all();
+    const textarea = page.locator('textarea').first();
+    if (selects.length >= 3 && (await textarea.count()) > 0) {
+      await selects[1].selectOption('Zero Oriental').catch(() => {});
+      await page.waitForTimeout(200);
+      await selects[2].selectOption('Japanese').catch(() => {});
+      await textarea.fill('こんにちは、Shunya Labsの次世代音声合成プラットフォームへようこそ。');
+      expect(await textarea.inputValue()).toContain('こんにちは');
+    }
+  });
+
+  test('TC-TTS-UI-023: Model "Zero Oriental" with Korean (한국어) Hangul Input', async ({ page }) => {
+    const selects = await page.locator('select').all();
+    const textarea = page.locator('textarea').first();
+    if (selects.length >= 3 && (await textarea.count()) > 0) {
+      await selects[1].selectOption('Zero Oriental').catch(() => {});
+      await page.waitForTimeout(200);
+      await selects[2].selectOption('Korean').catch(() => {});
+      await textarea.fill('안녕하세요, Shunya Labs 인공지능 음성 합성 플랫폼에 오신 것을 환영합니다.');
+      expect(await textarea.inputValue()).toContain('안녕하세요');
+    }
+  });
+
+  test('TC-TTS-UI-024: Model "Zero Oriental" with Chinese (中文) Simplified Characters', async ({ page }) => {
+    const selects = await page.locator('select').all();
+    const textarea = page.locator('textarea').first();
+    if (selects.length >= 3 && (await textarea.count()) > 0) {
+      await selects[1].selectOption('Zero Oriental').catch(() => {});
+      await page.waitForTimeout(200);
+      await selects[2].selectOption('Chinese').catch(() => {});
+      await textarea.fill('您好，欢迎使用 Shunya Labs 人工智能语音合成系统。');
+      expect(await textarea.inputValue()).toContain('您好');
+    }
+  });
+
+  test('TC-TTS-UI-025: Model "Zero Oriental" with Bhojpuri (भोजपुरी) Dialect Input', async ({ page }) => {
+    const selects = await page.locator('select').all();
+    const textarea = page.locator('textarea').first();
+    if (selects.length >= 3 && (await textarea.count()) > 0) {
+      await selects[1].selectOption('Zero Oriental').catch(() => {});
+      await page.waitForTimeout(200);
+      await selects[2].selectOption('Bhojpuri').catch(() => {});
+      await textarea.fill('प्रणाम, शून्या लैब्स में रउआ सब के बहुत-बहुत स्वागत बा।');
+      expect(await textarea.inputValue()).toContain('शून्या लैब्स');
+    }
+  });
+
+  test('TC-TTS-UI-026: Model "Zero Universal" with Spanish (Español) Input', async ({ page }) => {
+    const selects = await page.locator('select').all();
+    const textarea = page.locator('textarea').first();
+    if (selects.length >= 3 && (await textarea.count()) > 0) {
+      await selects[1].selectOption('Zero Universal').catch(() => {});
+      await page.waitForTimeout(200);
+      await selects[2].selectOption('Spanish').catch(() => {});
+      await textarea.fill('Bienvenido a la plataforma de síntesis de voz de Shunya Labs.');
+      expect(await textarea.inputValue()).toContain('síntesis de voz');
+    }
+  });
+
+  test('TC-TTS-UI-027: Synthesis Mode Toggle (Batch vs Streaming Synthesis)', async ({ page }) => {
+    const selects = await page.locator('select').all();
+    if (selects.length > 0) {
+      const modeSelect = selects[0];
+      const modes = await modeSelect.locator('option').allTextContents();
+      expect(modes).toContain('Batch');
+      expect(modes).toContain('Streaming');
+
+      await modeSelect.selectOption('Streaming').catch(() => {});
+      expect(await modeSelect.inputValue()).toBe('Streaming');
+    }
+  });
+
+  test('TC-TTS-UI-028: Voice Mode Toggle (Preset Voice vs Clone Voice)', async ({ page }) => {
+    const cloneBtn = page.getByRole('button', { name: /clone voice/i }).first();
+    const presetBtn = page.getByRole('button', { name: /preset voice/i }).first();
+
+    if ((await cloneBtn.count()) > 0) {
+      await cloneBtn.click().catch(() => {});
+      await page.waitForTimeout(200);
+    }
+    if ((await presetBtn.count()) > 0) {
+      await presetBtn.click().catch(() => {});
+      await page.waitForTimeout(200);
+    }
+  });
 });

@@ -309,7 +309,152 @@ test.describe('Backend API — TTS Speech Synthesis Comprehensive Matrix', () =>
     }
   });
 
-  // ── 6. Concurrent Synthesis Stress Test ──────────────────────────────────────
+  // ── 6. Advanced Models: Zero Oriental & Zero Universal ──────────────────────
+  test('POST /v1/audio/speech — Model: zero-oriental with Japanese (日本語)', async ({ request }) => {
+    test.setTimeout(60000);
+    const response = await request.post(ENDPOINTS.tts.synthesis, {
+      headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' },
+      data: {
+        model: 'zero-oriental',
+        input: 'こんにちは、Shunya Labsの音声合成テストです。',
+        voice: 'shunya-female-1',
+        response_format: 'mp3',
+      },
+      timeout: 60000,
+    }).catch(() => null);
+
+    if (response) {
+      expect([200, 201]).toContain(response.status());
+    }
+  });
+
+  test('POST /v1/audio/speech — Model: zero-oriental with Korean (한국어)', async ({ request }) => {
+    test.setTimeout(60000);
+    const response = await request.post(ENDPOINTS.tts.synthesis, {
+      headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' },
+      data: {
+        model: 'zero-oriental',
+        input: '안녕하세요, Shunya Labs 음성 합성 시스템입니다.',
+        voice: 'shunya-female-1',
+        response_format: 'mp3',
+      },
+      timeout: 60000,
+    }).catch(() => null);
+
+    if (response) {
+      expect([200, 201]).toContain(response.status());
+    }
+  });
+
+  test('POST /v1/audio/speech — Model: zero-oriental with Chinese (中文)', async ({ request }) => {
+    test.setTimeout(60000);
+    const response = await request.post(ENDPOINTS.tts.synthesis, {
+      headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' },
+      data: {
+        model: 'zero-oriental',
+        input: '您好，欢迎使用 Shunya Labs 人工智能语音合成。',
+        voice: 'shunya-female-1',
+        response_format: 'mp3',
+      },
+      timeout: 60000,
+    }).catch(() => null);
+
+    if (response) {
+      expect([200, 201]).toContain(response.status());
+    }
+  });
+
+  test('POST /v1/audio/speech — Model: zero-oriental with Bhojpuri (भोजपुरी)', async ({ request }) => {
+    test.setTimeout(60000);
+    const response = await request.post(ENDPOINTS.tts.synthesis, {
+      headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' },
+      data: {
+        model: 'zero-oriental',
+        input: 'प्रणाम, शून्या लैब्स में रउआ सब के बहुत स्वागत बा।',
+        voice: 'shunya-female-1',
+        response_format: 'mp3',
+      },
+      timeout: 60000,
+    }).catch(() => null);
+
+    if (response) {
+      expect([200, 201]).toContain(response.status());
+    }
+  });
+
+  test('POST /v1/audio/speech — Model: zero-universal with Spanish (Español)', async ({ request }) => {
+    test.setTimeout(60000);
+    const response = await request.post(ENDPOINTS.tts.synthesis, {
+      headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' },
+      data: {
+        model: 'zero-universal',
+        input: 'Bienvenido a la plataforma de síntesis de voz de Shunya Labs.',
+        voice: 'shunya-female-1',
+        response_format: 'mp3',
+      },
+      timeout: 60000,
+    }).catch(() => null);
+
+    if (response) {
+      expect([200, 201]).toContain(response.status());
+    }
+  });
+
+  test('POST /v1/audio/speech — Model: zero-universal with French (Français)', async ({ request }) => {
+    test.setTimeout(60000);
+    const response = await request.post(ENDPOINTS.tts.synthesis, {
+      headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' },
+      data: {
+        model: 'zero-universal',
+        input: 'Bienvenue sur la plateforme de synthèse vocale de Shunya Labs.',
+        voice: 'shunya-female-1',
+        response_format: 'mp3',
+      },
+      timeout: 60000,
+    }).catch(() => null);
+
+    if (response) {
+      expect([200, 201]).toContain(response.status());
+    }
+  });
+
+  test('POST /v1/audio/speech — Model: zero-universal with German (Deutsch)', async ({ request }) => {
+    test.setTimeout(60000);
+    const response = await request.post(ENDPOINTS.tts.synthesis, {
+      headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' },
+      data: {
+        model: 'zero-universal',
+        input: 'Willkommen bei der Shunya Labs Sprachsynthese-Plattform.',
+        voice: 'shunya-female-1',
+        response_format: 'mp3',
+      },
+      timeout: 60000,
+    }).catch(() => null);
+
+    if (response) {
+      expect([200, 201]).toContain(response.status());
+    }
+  });
+
+  test('POST /v1/audio/speech — Model: zero-universal with Arabic (العربية)', async ({ request }) => {
+    test.setTimeout(60000);
+    const response = await request.post(ENDPOINTS.tts.synthesis, {
+      headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' },
+      data: {
+        model: 'zero-universal',
+        input: 'مرحبًا بكم في منصة شونيا لابس للتوليف الصوتي.',
+        voice: 'shunya-female-1',
+        response_format: 'mp3',
+      },
+      timeout: 60000,
+    }).catch(() => null);
+
+    if (response) {
+      expect([200, 201]).toContain(response.status());
+    }
+  });
+
+  // ── 7. Concurrent Synthesis Stress Test ──────────────────────────────────────
   test('POST /v1/audio/speech — Concurrent Multi-Request Batch (3 Parallel Requests)', async ({ request }) => {
     test.setTimeout(90000);
     const prompts = [

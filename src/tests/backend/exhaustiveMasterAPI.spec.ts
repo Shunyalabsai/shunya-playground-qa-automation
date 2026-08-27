@@ -41,7 +41,7 @@ test.describe('Exhaustive Master Backend API Suite (33 Scenarios)', () => {
         return;
       }
 
-      // 2. TTS Speech Synthesis
+      // 2. TTS Speech Synthesis (Zero Indic, Zero Oriental, Zero Universal)
       if (tc.module.includes('Text to Speech') || tc.module.includes('TTS')) {
         if (!API_CONFIG.apiKey) {
           test.skip(true, 'ASR_API_KEY required for TTS test');
@@ -51,17 +51,22 @@ test.describe('Exhaustive Master Backend API Suite (33 Scenarios)', () => {
           config = JSON.parse(tc.featureConfig || '{}');
         } catch {}
 
+        const postData: any = {
+          input: tc.ttsInputText || 'Welcome to Shunya Labs speech synthesis.',
+          voice: config.voice || 'shunya-female-1',
+          speed: parseFloat(config.speed || '1.0'),
+          response_format: config.format || config.response_format || 'mp3',
+        };
+        if (config.model && config.model !== 'N/A') {
+          postData.model = config.model;
+        }
+
         const res = await request.post(ENDPOINTS.tts.synthesis, {
           headers: {
             ...getAuthHeaders(),
             'Content-Type': 'application/json',
           },
-          data: {
-            input: tc.ttsInputText || 'Welcome to Shunya Labs speech synthesis.',
-            voice: config.voice || 'shunya-female-1',
-            speed: parseFloat(config.speed || '1.0'),
-            response_format: config.format || 'mp3',
-          },
+          data: postData,
           timeout: 60000,
         }).catch(() => null);
 
