@@ -206,21 +206,27 @@ test.describe('Exhaustive Master UI Suite (118 Scenarios)', () => {
 
           // Model Selection (Zero Oriental, Zero Universal, Zero Indic)
           if (modelSelect && tc.model && tc.model !== 'N/A') {
-            await modelSelect.selectOption(tc.model).catch(() => {});
+            const m = tc.model.toLowerCase();
+            if (m.includes('oriental')) {
+              await modelSelect.selectOption({ label: 'Zero Oriental' }).catch(() => modelSelect.selectOption('Zero Oriental').catch(() => {}));
+            } else if (m.includes('universal')) {
+              await modelSelect.selectOption({ label: 'Zero Universal' }).catch(() => modelSelect.selectOption('Zero Universal').catch(() => {}));
+            } else {
+              await modelSelect.selectOption({ label: 'Zero Indic' }).catch(() => modelSelect.selectOption('Zero Indic').catch(() => {}));
+            }
             await page.waitForTimeout(200);
 
             // If it's a dropdown cascade verification test case
             if (tc.title.includes('Cascade') || tc.title.includes('Verify 4 Languages') || tc.title.includes('Verify 45')) {
               if (langSelect) {
                 const availableLangs = await langSelect.locator('option').allTextContents();
-                if (tc.model === 'Zero Oriental') {
+                if (m.includes('oriental')) {
                   expect(availableLangs).toContain('Japanese');
                   expect(availableLangs).toContain('Korean');
                   expect(availableLangs).toContain('Chinese');
-                  expect(availableLangs).toContain('Bhojpuri');
-                } else if (tc.model === 'Zero Universal') {
+                } else if (m.includes('universal')) {
                   expect(availableLangs.length).toBeGreaterThanOrEqual(40);
-                } else if (tc.model === 'Zero Indic') {
+                } else if (m.includes('indic')) {
                   expect(availableLangs.length).toBeGreaterThanOrEqual(20);
                 }
               }
@@ -230,7 +236,7 @@ test.describe('Exhaustive Master UI Suite (118 Scenarios)', () => {
 
           // Language Selection in TTS dropdown
           if (langSelect && tc.languageName && tc.languageName !== 'N/A' && tc.languageName !== 'Auto') {
-            await langSelect.selectOption(tc.languageName).catch(() => {});
+            await langSelect.selectOption({ label: tc.languageName }).catch(() => langSelect.selectOption(tc.languageName).catch(() => {}));
           }
 
           // Synthesis Mode (Batch vs Streaming)

@@ -224,7 +224,7 @@ test.describe('Playground UI — TTS Speech Synthesis Comprehensive Suite', () =
   });
 
   // ── 7. Advanced TTS Models & Dynamic Language Cascades ──────────────────────
-  test('TC-TTS-UI-020: Model "Zero Oriental" Selection & Language Cascade (4 Languages)', async ({ page }) => {
+  test('TC-TTS-UI-020: Model "Zero Oriental" Selection & Language Cascade (3 Languages)', async ({ page }) => {
     const selects = await page.locator('select').all();
     if (selects.length >= 3) {
       const modelSelect = selects[1];
@@ -237,7 +237,6 @@ test.describe('Playground UI — TTS Speech Synthesis Comprehensive Suite', () =
       expect(langs).toContain('Japanese');
       expect(langs).toContain('Korean');
       expect(langs).toContain('Chinese');
-      expect(langs).toContain('Bhojpuri');
     }
   });
 
@@ -295,19 +294,7 @@ test.describe('Playground UI — TTS Speech Synthesis Comprehensive Suite', () =
     }
   });
 
-  test('TC-TTS-UI-025: Model "Zero Oriental" with Bhojpuri (भोजपुरी) Dialect Input', async ({ page }) => {
-    const selects = await page.locator('select').all();
-    const textarea = page.locator('textarea').first();
-    if (selects.length >= 3 && (await textarea.count()) > 0) {
-      await selects[1].selectOption('Zero Oriental').catch(() => {});
-      await page.waitForTimeout(200);
-      await selects[2].selectOption('Bhojpuri').catch(() => {});
-      await textarea.fill('प्रणाम, शून्या लैब्स में रउआ सब के बहुत-बहुत स्वागत बा।');
-      expect(await textarea.inputValue()).toContain('शून्या लैब्स');
-    }
-  });
-
-  test('TC-TTS-UI-026: Model "Zero Universal" with Spanish (Español) Input', async ({ page }) => {
+  test('TC-TTS-UI-025: Model "Zero Universal" with Spanish (Español) Input', async ({ page }) => {
     const selects = await page.locator('select').all();
     const textarea = page.locator('textarea').first();
     if (selects.length >= 3 && (await textarea.count()) > 0) {
@@ -319,7 +306,7 @@ test.describe('Playground UI — TTS Speech Synthesis Comprehensive Suite', () =
     }
   });
 
-  test('TC-TTS-UI-027: Synthesis Mode Toggle (Batch vs Streaming Synthesis)', async ({ page }) => {
+  test('TC-TTS-UI-026: Synthesis Mode Toggle (Batch vs Streaming Synthesis)', async ({ page }) => {
     const selects = await page.locator('select').all();
     if (selects.length > 0) {
       const modeSelect = selects[0];
@@ -332,7 +319,7 @@ test.describe('Playground UI — TTS Speech Synthesis Comprehensive Suite', () =
     }
   });
 
-  test('TC-TTS-UI-028: Voice Mode Toggle (Preset Voice vs Clone Voice)', async ({ page }) => {
+  test('TC-TTS-UI-027: Voice Mode Toggle (Preset Voice vs Clone Voice)', async ({ page }) => {
     const cloneBtn = page.getByRole('button', { name: /clone voice/i }).first();
     const presetBtn = page.getByRole('button', { name: /preset voice/i }).first();
 

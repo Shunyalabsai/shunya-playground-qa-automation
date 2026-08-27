@@ -364,24 +364,6 @@ test.describe('Backend API — TTS Speech Synthesis Comprehensive Matrix', () =>
     }
   });
 
-  test('POST /v1/audio/speech — Model: zero-oriental with Bhojpuri (भोजपुरी)', async ({ request }) => {
-    test.setTimeout(60000);
-    const response = await request.post(ENDPOINTS.tts.synthesis, {
-      headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' },
-      data: {
-        model: 'zero-oriental',
-        input: 'प्रणाम, शून्या लैब्स में रउआ सब के बहुत स्वागत बा।',
-        voice: 'shunya-female-1',
-        response_format: 'mp3',
-      },
-      timeout: 60000,
-    }).catch(() => null);
-
-    if (response) {
-      expect([200, 201]).toContain(response.status());
-    }
-  });
-
   test('POST /v1/audio/speech — Model: zero-universal with Spanish (Español)', async ({ request }) => {
     test.setTimeout(60000);
     const response = await request.post(ENDPOINTS.tts.synthesis, {

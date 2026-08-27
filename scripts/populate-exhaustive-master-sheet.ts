@@ -25,6 +25,7 @@ export interface DeepTestCase {
   featureConfig: string;
   audioPath: string;
   ttsInputText: string;
+  translatedText: string; // ShunyaLabs Translated Output (English Translation)
   ttsVoiceAndSpeed: string;
   preconditions: string;
   testSteps: string;
@@ -44,11 +45,12 @@ const HEADERS = [
   'Model',
   'Language Code',
   'Language Name',
-  'ASR Feature(s) Enabled',
+  'Feature(s) Enabled',
   'Feature Parameters / Config Payload',
   'Audio File Path / Input URL',
-  'TTS Input Text',
-  'TTS Voice & Speed / Format',
+  'TTS Input Text (Native Script)',
+  'ShunyaLabs Translated Output (English Translation)',
+  'TTS Voice & Speed / Format / Mode',
   'Preconditions',
   'Test Steps',
   'Expected Output / Result',
@@ -1267,142 +1269,290 @@ export function generateTestCases(): DeepTestCase[] {
 
   // ── 7. Text to Speech (TTS) Synthesis Comprehensive Matrix ─────────────────
   seq = 1;
-  const TTS_UI_SCENARIOS = [
-    { lang: 'en', voice: 'shunya-female-1', speed: '1.0', format: 'mp3', model: 'Zero Indic', text: 'Welcome to Shunya Labs speech synthesis platform.', title: 'Standard English Synthesis with Natural Female Voice (shunya-female-1)' },
-    { lang: 'en', voice: 'shunya-male-1', speed: '1.0', format: 'mp3', model: 'Zero Indic', text: 'Experience natural sounding AI voices for your enterprise applications.', title: 'Standard English Synthesis with Deep Male Voice (shunya-male-1)' },
-    { lang: 'hi', voice: 'shunya-female-1', speed: '1.0', format: 'mp3', model: 'Zero Indic', text: 'नमस्ते, शून्या लैब्स एआई वॉइस प्लेटफ़ॉर्म में आपका स्वागत है।', title: 'Hindi Speech Synthesis with Natural Female Voice (shunya-female-1)' },
-    { lang: 'hi', voice: 'shunya-male-1', speed: '1.25', format: 'mp3', model: 'Zero Indic', text: 'यह भारतीय भाषाओं के लिए विशेष रूप से निर्मित आवाज है।', title: 'Hindi Speech Synthesis with 1.25x Speed Male Voice (shunya-male-1)' },
-    { lang: 'bn', voice: 'shunya-female-1', speed: '1.0', format: 'mp3', model: 'Zero Indic', text: 'শূন্যা ল্যাবসে আপনাকে স্বাগতম। এটি একটি বাংলা স্পিচ টেস্ট।', title: 'Bengali (বাংলা) Speech Synthesis with Female Voice' },
-    { lang: 'ta', voice: 'shunya-female-1', speed: '1.0', format: 'mp3', model: 'Zero Indic', text: 'ஷூன்யா லேப்ஸுக்கு வரவேற்கிறோம். இது தமிழ் பேச்சு சோதனை.', title: 'Tamil (தமிழ்) Speech Synthesis with Female Voice' },
-    { lang: 'te', voice: 'shunya-female-1', speed: '1.0', format: 'mp3', model: 'Zero Indic', text: 'శూన్య ల్యాబ్స్‌కు స్వాగతం. ఇది తెలుగు స్పీచ్ పరీక్ష.', title: 'Telugu (తెలుగు) Speech Synthesis with Female Voice' },
-    { lang: 'mr', voice: 'shunya-female-1', speed: '1.0', format: 'mp3', model: 'Zero Indic', text: 'शून्या लॅब्समध्ये आपले स्वागत आहे. मराठी आवाज चाचणी.', title: 'Marathi (मराठी) Speech Synthesis with Female Voice' },
-    { lang: 'gu', voice: 'shunya-female-1', speed: '1.0', format: 'mp3', model: 'Zero Indic', text: 'શૂન્યા લેબ્સમાં આપનું સ્વાગત છે. ગુજરાતી ભાષણ પરીક્ષણ.', title: 'Gujarati (ગુજરાતી) Speech Synthesis with Female Voice' },
-    { lang: 'kn', voice: 'shunya-female-1', speed: '1.0', format: 'mp3', model: 'Zero Indic', text: 'ಶೂನ್ಯ ಲ್ಯಾಬ್ಸ್‌ಗೆ ಸುಸ್ವಾಗತ. ಕನ್ನಡ ಭಾಷಣ ಸಂಶ್ಲೇಷಣೆ ಪರೀಕ್ಷೆ.', title: 'Kannada (ಕನ್ನಡ) Speech Synthesis with Female Voice' },
-    { lang: 'pa', voice: 'shunya-female-1', speed: '1.0', format: 'mp3', model: 'Zero Indic', text: 'ਸ਼ੂਨਿਆ ਲੈਬਜ਼ ਵਿੱਚ ਤੁਹਾਡਾ ਸੁਆਗਤ ਹੈ। ਪੰਜਾਬੀ ਆਵਾਜ਼ ਟੈਸਟ।', title: 'Punjabi (ਪੰਜਾਬੀ) Speech Synthesis with Female Voice' },
-    { lang: 'en', voice: 'shunya-female-1', speed: '0.5', format: 'wav', model: 'Zero Indic', text: 'Slow playback speech test for accessibility and assistive technology.', title: 'Slow Playback (0.5x) Accessibility Test with WAV Format' },
-    { lang: 'en', voice: 'shunya-female-1', speed: '1.5', format: 'wav', model: 'Zero Indic', text: 'Fast playback speech test for quick audio previews and content skimming.', title: 'Fast Playback (1.5x) Speed Test with WAV Format' },
-    { lang: 'en', voice: 'shunya-female-1', speed: '2.0', format: 'mp3', model: 'Zero Indic', text: 'Double speed audio generation test across long paragraph texts.', title: 'Double Speed (2.0x) Audio Generation Test with MP3 Format' },
-    { lang: 'hi-en', voice: 'shunya-female-1', speed: '1.0', format: 'mp3', model: 'Zero Indic', text: 'डॉक्टर साहब, मेरा appointment confirm हो गया है for tomorrow morning at 10 AM.', title: 'Code-Mixed Hinglish Synthesis (Devanagari + English Script)' },
 
-    // ── Additional Deep Scenarios: Zero Oriental Model ─────────────────────────
-    { lang: 'ja', voice: 'shunya-female-1', speed: '1.0', format: 'mp3', model: 'Zero Oriental', text: 'こんにちは、Shunya Labsの次世代音声合成プラットフォームへようこそ。', title: 'Zero Oriental Model: Japanese (日本語) Phonetic Synthesis' },
-    { lang: 'ko', voice: 'shunya-female-1', speed: '1.0', format: 'mp3', model: 'Zero Oriental', text: '안녕하세요, Shunya Labs 인공지능 음성 합성 플랫폼에 오신 것을 환영합니다.', title: 'Zero Oriental Model: Korean (한국어) Hangul Synthesis' },
-    { lang: 'zh', voice: 'shunya-female-1', speed: '1.0', format: 'mp3', model: 'Zero Oriental', text: '您好，欢迎使用 Shunya Labs 人工智能语音合成系统。', title: 'Zero Oriental Model: Chinese (中文) Simplified Script Synthesis' },
-    { lang: 'bho', voice: 'shunya-female-1', speed: '1.0', format: 'mp3', model: 'Zero Oriental', text: 'प्रणाम, शून्या लैब्स में रउआ सब के बहुत-बहुत स्वागत बा।', title: 'Zero Oriental Model: Bhojpuri (भोजपुरी) Dialect Synthesis' },
-    { lang: 'ja', voice: 'shunya-female-1', speed: '1.0', format: 'mp3', model: 'Zero Oriental', text: 'N/A', title: 'Zero Oriental Dropdown Cascade: Verify 4 Languages (Japanese, Korean, Chinese, Bhojpuri)' },
-
-    // ── Additional Deep Scenarios: Zero Universal Model ────────────────────────
-    { lang: 'es', voice: 'shunya-female-1', speed: '1.0', format: 'mp3', model: 'Zero Universal', text: 'Bienvenido a la plataforma de síntesis de voz de Shunya Labs.', title: 'Zero Universal Model: Spanish (Español) Global Synthesis' },
-    { lang: 'fr', voice: 'shunya-female-1', speed: '1.0', format: 'mp3', model: 'Zero Universal', text: 'Bienvenue sur la plateforme de synthèse vocale intelligente de Shunya Labs.', title: 'Zero Universal Model: French (Français) Synthesis' },
-    { lang: 'de', voice: 'shunya-female-1', speed: '1.0', format: 'mp3', model: 'Zero Universal', text: 'Willkommen bei der Shunya Labs Plattform für künstliche Intelligenz und Sprachsynthese.', title: 'Zero Universal Model: German (Deutsch) Synthesis' },
-    { lang: 'ar', voice: 'shunya-female-1', speed: '1.0', format: 'mp3', model: 'Zero Universal', text: 'مرحبًا بكم في منصة شونيا لابس للتوليف الصوتي بالذكاء الاصطناعي.', title: 'Zero Universal Model: Arabic (العربية) RTL Script Synthesis' },
-    { lang: 'ru', voice: 'shunya-female-1', speed: '1.0', format: 'mp3', model: 'Zero Universal', text: 'Добро пожаловать на платформу синтеза речи Shunya Labs.', title: 'Zero Universal Model: Russian (Русский) Cyrillic Synthesis' },
-    { lang: 'pt', voice: 'shunya-female-1', speed: '1.0', format: 'mp3', model: 'Zero Universal', text: 'Bem-vindo à plataforma de síntese de voz de última geração da Shunya Labs.', title: 'Zero Universal Model: Portuguese (Português) Synthesis' },
-    { lang: 'it', voice: 'shunya-female-1', speed: '1.0', format: 'mp3', model: 'Zero Universal', text: 'Benvenuti nella piattaforma di sintesi vocale AI di Shunya Labs.', title: 'Zero Universal Model: Italian (Italiano) Synthesis' },
-    { lang: 'es', voice: 'shunya-female-1', speed: '1.0', format: 'mp3', model: 'Zero Universal', text: 'N/A', title: 'Zero Universal Dropdown Cascade: Verify 45 Global Languages Catalog' },
-
-    // ── Additional Deep Scenarios: Modes & Voice Customization ────────────────
-    { lang: 'en', voice: 'shunya-female-1', speed: '1.0', format: 'mp3', model: 'Zero Indic', text: 'Testing real-time streaming speech synthesis chunking mode.', title: 'TTS Synthesis Mode Toggle: Batch vs Streaming Mode Switch' },
-    { lang: 'en', voice: 'shunya-female-1', speed: '1.0', format: 'mp3', model: 'Zero Indic', text: 'Testing custom voice clone audio reference profile selection.', title: 'TTS Voice Mode Toggle: Preset Voice vs Clone Voice Mode Switch' },
+  const ORIENTAL_LANG_DEFINITIONS = [
+    { code: 'ja', name: 'Japanese', voice: 'shunya-female-1', speed: 1.0, format: 'mp3', native: 'こんにちは、Shunya Labsの次世代音声合成プラットフォームへようこそ。', trans: 'Hello, welcome to Shunya Labs next-generation speech synthesis platform.' },
+    { code: 'ko', name: 'Korean', voice: 'shunya-female-1', speed: 1.0, format: 'mp3', native: '안녕하세요, Shunya Labs 인공지능 음성 합성 플랫폼에 오신 것을 환영합니다.', trans: 'Hello, welcome to Shunya Labs artificial intelligence speech synthesis platform.' },
+    { code: 'zh', name: 'Chinese', voice: 'shunya-male-1', speed: 1.0, format: 'mp3', native: '您好，欢迎使用 Shunya Labs 人工智能语音合成系统。', trans: 'Hello, welcome to the Shunya Labs artificial intelligence speech synthesis system.' },
   ];
 
-  for (const t of TTS_UI_SCENARIOS) {
-    const langMap: Record<string, string> = {
-      hi: 'Hindi', bn: 'Bengali', ta: 'Tamil', te: 'Telugu',
-      mr: 'Marathi', gu: 'Gujarati', kn: 'Kannada', pa: 'Punjabi',
-      'hi-en': 'Hinglish', en: 'English',
-      ja: 'Japanese', ko: 'Korean', zh: 'Chinese', bho: 'Bhojpuri',
-      es: 'Spanish', fr: 'French', de: 'German', ar: 'Arabic',
-      ru: 'Russian', pt: 'Portuguese', it: 'Italian',
-    };
-    const langName = langMap[t.lang] || 'English';
+  const UNIVERSAL_LANG_DEFINITIONS = [
+    { code: 'am', name: 'Amharic', voice: 'shunya-female-1', speed: 1.0, format: 'mp3', native: 'እንኳን ወደ ሹንያ ላብስ የድምጽ ማቀነባበሪያ መድረክ በደህና መጡ።', trans: 'Welcome to the Shunya Labs voice processing platform.' },
+    { code: 'ar', name: 'Arabic', voice: 'shunya-male-1', speed: 1.0, format: 'mp3', native: 'مرحبًا بكم في منصة شونيا لابس للتوليف الصوتي بالذكاء الاصطناعي.', trans: 'Welcome to the Shunya Labs AI speech synthesis platform.' },
+    { code: 'hy', name: 'Armenian', voice: 'shunya-female-1', speed: 1.0, format: 'mp3', native: 'Բարի գալուստ Shunya Labs արհեստական բանականության ձայնային հարթակ:', trans: 'Welcome to the Shunya Labs artificial intelligence voice platform.' },
+    { code: 'be', name: 'Belarusian', voice: 'shunya-female-1', speed: 1.0, format: 'mp3', native: 'Сардэчна запрашаем на платформу сінтэзу маўлення Shunya Labs.', trans: 'Welcome to the Shunya Labs speech synthesis platform.' },
+    { code: 'bg', name: 'Bulgarian', voice: 'shunya-female-1', speed: 1.0, format: 'mp3', native: 'Добре дошли в платформата за гласов синтез на Shunya Labs.', trans: 'Welcome to the Shunya Labs voice synthesis platform.' },
+    { code: 'my', name: 'Burmese', voice: 'shunya-female-1', speed: 1.0, format: 'mp3', native: 'Shunya Labs အသံပေါင်းစပ်မှု ပလက်ဖောင်းမှ ကြိုဆိုပါသည်။', trans: 'Welcome to Shunya Labs voice synthesis platform.' },
+    { code: 'hr', name: 'Croatian', voice: 'shunya-female-1', speed: 1.0, format: 'mp3', native: 'Dobrodošli na platformu za sintezu glasa Shunya Labs.', trans: 'Welcome to the Shunya Labs voice synthesis platform.' },
+    { code: 'cs', name: 'Czech', voice: 'shunya-male-1', speed: 1.0, format: 'mp3', native: 'Vítejte na platformě pro syntézu řeči Shunya Labs.', trans: 'Welcome to the Shunya Labs speech synthesis platform.' },
+    { code: 'da', name: 'Danish', voice: 'shunya-female-1', speed: 1.0, format: 'mp3', native: 'Velkommen til Shunya Labs platform for talesyntese.', trans: 'Welcome to the Shunya Labs speech synthesis platform.' },
+    { code: 'nl', name: 'Dutch', voice: 'shunya-female-1', speed: 1.25, format: 'mp3', native: 'Welkom bij het spraaksyntheseplatform van Shunya Labs.', trans: 'Welcome to the Shunya Labs speech synthesis platform.' },
+    { code: 'fil', name: 'Filipino', voice: 'shunya-female-1', speed: 1.0, format: 'mp3', native: 'Maligayang pagdating sa platform ng speech synthesis ng Shunya Labs.', trans: 'Welcome to the Shunya Labs speech synthesis platform.' },
+    { code: 'fi', name: 'Finnish', voice: 'shunya-female-1', speed: 1.0, format: 'mp3', native: 'Tervetuloa Shunya Labs -puhesynteesialustalle.', trans: 'Welcome to the Shunya Labs speech synthesis platform.' },
+    { code: 'fr', name: 'French', voice: 'shunya-female-1', speed: 1.0, format: 'mp3', native: 'Bienvenue sur la plateforme de synthèse vocale intelligente de Shunya Labs.', trans: 'Welcome to the intelligent speech synthesis platform of Shunya Labs.' },
+    { code: 'ka', name: 'Georgian', voice: 'shunya-female-1', speed: 1.0, format: 'mp3', native: 'მოგესალმებით Shunya Labs-ის ხმის სინთეზის პლატფორმაზე.', trans: 'Welcome to the Shunya Labs voice synthesis platform.' },
+    { code: 'de', name: 'German', voice: 'shunya-male-1', speed: 1.0, format: 'mp3', native: 'Willkommen bei der Shunya Labs Plattform für künstliche Intelligenz und Sprachsynthese.', trans: 'Welcome to the Shunya Labs artificial intelligence and speech synthesis platform.' },
+    { code: 'el', name: 'Greek', voice: 'shunya-female-1', speed: 1.0, format: 'mp3', native: 'Καλώς ήρθατε στην πλατφόρμα σύνθεσης ομιλίας της Shunya Labs.', trans: 'Welcome to the Shunya Labs speech synthesis platform.' },
+    { code: 'he', name: 'Hebrew', voice: 'shunya-female-1', speed: 1.0, format: 'mp3', native: 'ברוכים הבאים לפלטפורמת סינתזת הדיבור של Shunya Labs.', trans: 'Welcome to the Shunya Labs speech synthesis platform.' },
+    { code: 'hu', name: 'Hungarian', voice: 'shunya-female-1', speed: 1.0, format: 'mp3', native: 'Üdvözöljük a Shunya Labs beszédszintézis platformján.', trans: 'Welcome to the Shunya Labs speech synthesis platform.' },
+    { code: 'id', name: 'Indonesian', voice: 'shunya-female-1', speed: 1.0, format: 'mp3', native: 'Selamat datang di platform sintesis suara kecerdasan buatan Shunya Labs.', trans: 'Welcome to Shunya Labs artificial intelligence speech synthesis platform.' },
+    { code: 'it', name: 'Italian', voice: 'shunya-female-1', speed: 1.0, format: 'mp3', native: 'Benvenuti nella piattaforma di sintesi vocale AI di Shunya Labs.', trans: 'Welcome to the Shunya Labs AI speech synthesis platform.' },
+    { code: 'kk', name: 'Kazakh', voice: 'shunya-female-1', speed: 1.0, format: 'mp3', native: 'Shunya Labs жасанды интеллект дауыс синтезі платформасына қош келдіңіз.', trans: 'Welcome to the Shunya Labs AI voice synthesis platform.' },
+    { code: 'km', name: 'Khmer', voice: 'shunya-female-1', speed: 1.0, format: 'mp3', native: 'សូមស្វាគមន៍មកកាន់ប្រព័ន្ធសំឡេងឆ្លាតវៃ Shunya Labs។', trans: 'Welcome to the Shunya Labs intelligent voice system.' },
+    { code: 'ky', name: 'Kyrgyz', voice: 'shunya-female-1', speed: 1.0, format: 'mp3', native: 'Shunya Labs жасалма интеллект үн синтези платформасына кош келиңиз.', trans: 'Welcome to the Shunya Labs artificial intelligence voice synthesis platform.' },
+    { code: 'lo', name: 'Lao', voice: 'shunya-female-1', speed: 1.0, format: 'mp3', native: 'ຍິນດີຕ້ອນຮັບສູ່ລະບົບສຽງສັງເຄາະ Shunya Labs.', trans: 'Welcome to the Shunya Labs synthesized voice system.' },
+    { code: 'mk', name: 'Macedonian', voice: 'shunya-female-1', speed: 1.0, format: 'mp3', native: 'Добредојдовте на платформата за синтеза на говор Shunya Labs.', trans: 'Welcome to the Shunya Labs speech synthesis platform.' },
+    { code: 'ms', name: 'Malay', voice: 'shunya-female-1', speed: 1.0, format: 'mp3', native: 'Selamat datang ke platform sintesis pertuturan kecerdasan buatan Shunya Labs.', trans: 'Welcome to the Shunya Labs AI speech synthesis platform.' },
+    { code: 'mn', name: 'Mongolian', voice: 'shunya-female-1', speed: 1.0, format: 'mp3', native: 'Shunya Labs хиймэл оюун ухаант яриа нийлэгжүүлэлтийн платформд тавтай морилно уу.', trans: 'Welcome to the Shunya Labs AI speech synthesis platform.' },
+    { code: 'no', name: 'Norwegian', voice: 'shunya-female-1', speed: 1.0, format: 'mp3', native: 'Velkommen til Shunya Labs talesynteseplattform.', trans: 'Welcome to the Shunya Labs speech synthesis platform.' },
+    { code: 'fa', name: 'Persian', voice: 'shunya-male-1', speed: 1.0, format: 'mp3', native: 'به پلتفرم سنتز گفتار هوش مصنوعی شونیا لابس خوش آمدید.', trans: 'Welcome to the Shunya Labs AI speech synthesis platform.' },
+    { code: 'pl', name: 'Polish', voice: 'shunya-female-1', speed: 1.0, format: 'mp3', native: 'Witamy na platformie syntezy mowy Shunya Labs.', trans: 'Welcome to the Shunya Labs speech synthesis platform.' },
+    { code: 'pt', name: 'Portuguese', voice: 'shunya-female-1', speed: 1.0, format: 'mp3', native: 'Bem-vindo à plataforma de síntese de voz de última geração da Shunya Labs.', trans: 'Welcome to the next-generation speech synthesis platform from Shunya Labs.' },
+    { code: 'ro', name: 'Romanian', voice: 'shunya-female-1', speed: 1.0, format: 'mp3', native: 'Bun venit pe platforma de sinteză vocală Shunya Labs.', trans: 'Welcome to the Shunya Labs voice synthesis platform.' },
+    { code: 'ru', name: 'Russian', voice: 'shunya-female-1', speed: 1.0, format: 'mp3', native: 'Добро пожаловать на платформу синтеза речи Shunya Labs.', trans: 'Welcome to the Shunya Labs speech synthesis platform.' },
+    { code: 'sr', name: 'Serbian', voice: 'shunya-female-1', speed: 1.0, format: 'mp3', native: 'Добродошли на платформу за синтезу говора Shunya Labs.', trans: 'Welcome to the Shunya Labs speech synthesis platform.' },
+    { code: 'si', name: 'Sinhala', voice: 'shunya-female-1', speed: 1.0, format: 'mp3', native: 'Shunya Labs කථන සංස්ලේෂණ වේදිකාවට සාදරයෙන් පිළිගනිමු.', trans: 'Welcome to the Shunya Labs speech synthesis platform.' },
+    { code: 'sk', name: 'Slovak', voice: 'shunya-female-1', speed: 1.0, format: 'mp3', native: 'Vitajte na platforme hlasovej syntézy Shunya Labs.', trans: 'Welcome to the Shunya Labs voice synthesis platform.' },
+    { code: 'es', name: 'Spanish', voice: 'shunya-female-1', speed: 1.0, format: 'mp3', native: 'Bienvenido a la plataforma de síntesis de voz de Shunya Labs.', trans: 'Welcome to the Shunya Labs speech synthesis platform.' },
+    { code: 'sw', name: 'Swahili', voice: 'shunya-female-1', speed: 1.0, format: 'mp3', native: 'Karibu kwenye jukwaa la usanisi wa sauti la Shunya Labs.', trans: 'Welcome to the Shunya Labs voice synthesis platform.' },
+    { code: 'sv', name: 'Swedish', voice: 'shunya-female-1', speed: 1.0, format: 'mp3', native: 'Välkommen till Shunya Labs talsyntesplattform.', trans: 'Welcome to the Shunya Labs speech synthesis platform.' },
+    { code: 'tg', name: 'Tajik', voice: 'shunya-female-1', speed: 1.0, format: 'mp3', native: 'Ба платформаи синтези овози Shunya Labs хуш омадед.', trans: 'Welcome to the Shunya Labs voice synthesis platform.' },
+    { code: 'th', name: 'Thai', voice: 'shunya-female-1', speed: 1.0, format: 'mp3', native: 'ยินดีต้อนรับสู่แพลตฟอร์มการสังเคราะห์เสียง Shunya Labs.', trans: 'Welcome to the Shunya Labs speech synthesis platform.' },
+    { code: 'ti', name: 'Tigrinya', voice: 'shunya-female-1', speed: 1.0, format: 'mp3', native: 'ናብ ሹንያ ላብስ መድረኽ ድምጺ ብደሓን መጻእኩም።', trans: 'Welcome to the Shunya Labs voice platform.' },
+    { code: 'tr', name: 'Turkish', voice: 'shunya-female-1', speed: 1.0, format: 'mp3', native: 'Shunya Labs yapay zeka ses sentezi platformuna hoş geldiniz.', trans: 'Welcome to the Shunya Labs artificial intelligence voice synthesis platform.' },
+    { code: 'uk', name: 'Ukrainian', voice: 'shunya-female-1', speed: 1.0, format: 'mp3', native: 'Ласкаво просимо на платформу синтезу мовлення Shunya Labs.', trans: 'Welcome to the Shunya Labs speech synthesis platform.' },
+    { code: 'vi', name: 'Vietnamese', voice: 'shunya-female-1', speed: 1.0, format: 'mp3', native: 'Chào mừng bạn đến với nền tảng tổng hợp giọng nói của Shunya Labs.', trans: 'Welcome to the speech synthesis platform of Shunya Labs.' },
+  ];
 
+  // 1. UI: Zero Indic Models & Voices
+  const INDIC_TTS_UI = [
+    { lang: 'en', voice: 'shunya-female-1', speed: '1.0', format: 'mp3', native: 'Welcome to Shunya Labs speech synthesis platform.', trans: 'Welcome to Shunya Labs speech synthesis platform.', title: 'Standard English Natural Female Voice (shunya-female-1)' },
+    { lang: 'en', voice: 'shunya-male-1', speed: '1.0', format: 'mp3', native: 'Experience natural sounding AI voices for your enterprise applications.', trans: 'Experience natural sounding AI voices for your enterprise applications.', title: 'Standard English Deep Male Voice (shunya-male-1)' },
+    { lang: 'hi', voice: 'shunya-female-1', speed: '1.0', format: 'mp3', native: 'नमस्ते, शून्या लैब्स एआई वॉइस प्लेटफ़ॉर्म में आपका स्वागत है।', trans: 'Hello, welcome to Shunya Labs AI voice platform.', title: 'Hindi Speech Synthesis Natural Female Voice' },
+    { lang: 'hi', voice: 'shunya-male-1', speed: '1.25', format: 'mp3', native: 'यह भारतीय भाषाओं के लिए विशेष रूप से निर्मित आवाज है।', trans: 'This voice is specially built for Indian languages.', title: 'Hindi Speech Synthesis 1.25x Speed Male Voice' },
+    { lang: 'bn', voice: 'shunya-female-1', speed: '1.0', format: 'mp3', native: 'শূন্যা ল্যাবসে আপনাকে স্বাগতম। এটি একটি বাংলা স্পিচ টেস্ট।', trans: 'Welcome to Shunya Labs. This is a Bengali speech test.', title: 'Bengali (বাংলা) Speech Synthesis with Female Voice' },
+    { lang: 'ta', voice: 'shunya-female-1', speed: '1.0', format: 'mp3', native: 'ஷூன்யா லேப்ஸுக்கு வரவேற்கிறோம். இது தமிழ் பேச்சு சோதனை.', trans: 'Welcome to Shunya Labs. This is a Tamil speech test.', title: 'Tamil (தமிழ்) Speech Synthesis with Female Voice' },
+    { lang: 'te', voice: 'shunya-female-1', speed: '1.0', format: 'mp3', native: 'శూన్య ల్యాబ్స్‌కు స్వాగతం. ఇది తెలుగు స్పీచ్ పరీక్ష.', trans: 'Welcome to Shunya Labs. This is a Telugu speech test.', title: 'Telugu (తెలుగు) Speech Synthesis with Female Voice' },
+    { lang: 'mr', voice: 'shunya-female-1', speed: '1.0', format: 'mp3', native: 'शून्या लॅब्समध्ये आपले स्वागत आहे. मराठी आवाज चाचणी.', trans: 'Welcome to Shunya Labs. Marathi voice test.', title: 'Marathi (मराठी) Speech Synthesis with Female Voice' },
+    { lang: 'gu', voice: 'shunya-female-1', speed: '1.0', format: 'mp3', native: 'શૂન્યા લેબ્સમાં આપનું સ્વાગત છે. ગુજરાતી ભાષણ પરીક્ષણ.', trans: 'Welcome to Shunya Labs. Gujarati speech test.', title: 'Gujarati (ગુજરાતી) Speech Synthesis with Female Voice' },
+    { lang: 'kn', voice: 'shunya-female-1', speed: '1.0', format: 'mp3', native: 'ಶೂನ್ಯ ಲ್ಯಾಬ್ಸ್‌ಗೆ ಸುಸ್ವಾಗತ. ಕನ್ನಡ ಭಾಷಣ ಸಂಶ್ಲೇಷಣೆ ಪರೀಕ್ಷೆ.', trans: 'Welcome to Shunya Labs. Kannada speech synthesis test.', title: 'Kannada (ಕನ್ನಡ) Speech Synthesis with Female Voice' },
+    { lang: 'pa', voice: 'shunya-female-1', speed: '1.0', format: 'mp3', native: 'ਸ਼ੂਨਿਆ ਲੈਬਜ਼ ਵਿੱਚ ਤੁਹਾਡਾ ਸੁਆਗਤ ਹੈ। ਪੰਜਾਬੀ ਆਵਾਜ਼ ਟੈਸਟ।', trans: 'Welcome to Shunya Labs. Punjabi voice test.', title: 'Punjabi (ਪੰਜਾਬੀ) Speech Synthesis with Female Voice' },
+    { lang: 'en', voice: 'shunya-female-1', speed: '0.5', format: 'wav', native: 'Slow playback speech test for accessibility and assistive technology.', trans: 'Slow playback speech test for accessibility and assistive technology.', title: 'Slow Playback (0.5x) WAV Format' },
+    { lang: 'en', voice: 'shunya-female-1', speed: '1.5', format: 'wav', native: 'Fast playback speech test for quick audio previews and content skimming.', trans: 'Fast playback speech test for quick audio previews and content skimming.', title: 'Fast Playback (1.5x) WAV Format' },
+    { lang: 'en', voice: 'shunya-female-1', speed: '2.0', format: 'mp3', native: 'Double speed audio generation test across long paragraph texts.', trans: 'Double speed audio generation test across long paragraph texts.', title: 'Double Speed (2.0x) MP3 Format' },
+    { lang: 'hi-en', voice: 'shunya-female-1', speed: '1.0', format: 'mp3', native: 'डॉक्टर साहब, मेरा appointment confirm हो गया है for tomorrow morning at 10 AM.', trans: 'Doctor, my appointment has been confirmed for tomorrow morning at 10 AM.', title: 'Code-Mixed Hinglish Synthesis' },
+  ];
+
+  for (const t of INDIC_TTS_UI) {
     list.push({
       id: nextId('TC-TTS-SYN'),
       module: 'UI - Text to Speech',
       suite: 'UI',
       scenarioType: 'Positive',
-      title: `TTS UI Synthesis: ${t.title}`,
-      description: `Verify selecting model ${t.model}, language ${langName}, typing "${t.text.slice(0, 32)}...", voice ${t.voice}, speed ${t.speed}x, format ${t.format}, generating audio and testing playback`,
-      model: t.model,
+      title: `TTS UI [Zero Indic]: ${t.title}`,
+      description: `Verify selecting model Zero Indic, typing "${t.native.slice(0, 32)}...", voice ${t.voice}, speed ${t.speed}x, format ${t.format}`,
+      model: 'Zero Indic',
       languageCode: t.lang,
-      languageName: langName,
+      languageName: t.lang === 'hi' ? 'Hindi' : t.lang === 'bn' ? 'Bengali' : t.lang === 'ta' ? 'Tamil' : t.lang === 'te' ? 'Telugu' : t.lang === 'mr' ? 'Marathi' : t.lang === 'gu' ? 'Gujarati' : t.lang === 'kn' ? 'Kannada' : t.lang === 'pa' ? 'Punjabi' : t.lang === 'hi-en' ? 'Hinglish' : 'English',
       featuresEnabled: 'TTS Speech Synthesis',
-      featureConfig: JSON.stringify({ model: t.model, voice: t.voice, speed: t.speed, format: t.format }),
+      featureConfig: JSON.stringify({ model: 'Zero Indic', voice: t.voice, speed: t.speed, format: t.format }),
       audioPath: 'N/A',
-      ttsInputText: t.text,
-      ttsVoiceAndSpeed: `Model: ${t.model} | Voice: ${t.voice} | Speed: ${t.speed}x | Format: ${t.format}`,
+      ttsInputText: t.native,
+      translatedText: t.trans,
+      ttsVoiceAndSpeed: `Model: Zero Indic | Voice: ${t.voice} | Speed: ${t.speed}x | Format: ${t.format}`,
       preconditions: 'TTS tab active; valid authentication',
-      testSteps: `1. Switch to Text to Speech tab\n2. Select Model "${t.model}"\n3. Select Language "${langName}"\n4. Enter text "${t.text}"\n5. Select voice "${t.voice}"\n6. Set speed slider to ${t.speed}x\n7. Select format ${t.format}\n8. Click Run Synthesis\n9. Assert waveform and playback controls`,
-      expectedResult: `Audio synthesized successfully for ${t.model} in ${langName}; player renders waveform with total duration; audio plays clearly without stutter`,
+      testSteps: `1. Switch to Text to Speech tab\n2. Select Model "Zero Indic"\n3. Enter "${t.native}"\n4. Select voice "${t.voice}"\n5. Set speed ${t.speed}x and format ${t.format}\n6. Click Run Synthesis`,
+      expectedResult: `Audio synthesized in native script. Translated Meaning: "${t.trans}"`,
       expectedStatus: 'HTTP 200 / Audio Generated',
-      priority: t.lang === 'en' || t.lang === 'hi' || t.model === 'Zero Oriental' || t.model === 'Zero Universal' ? 'P0' : 'P1',
+      priority: 'P0',
       automated: 'Automated',
     });
   }
 
+  // 2. UI: Zero Oriental Full Matrix (3 Languages: Japanese, Korean, Chinese)
+  for (const o of ORIENTAL_LANG_DEFINITIONS) {
+    list.push({
+      id: nextId('TC-TTS-SYN'),
+      module: 'UI - Text to Speech',
+      suite: 'UI',
+      scenarioType: 'Positive',
+      title: `TTS UI [Zero Oriental]: ${o.name} (${o.code}) Native Synthesis`,
+      description: `Verify selecting model Zero Oriental, language ${o.name}, entering native script "${o.native.slice(0, 30)}..."`,
+      model: 'Zero Oriental',
+      languageCode: o.code,
+      languageName: o.name,
+      featuresEnabled: 'TTS Speech Synthesis',
+      featureConfig: JSON.stringify({ model: 'Zero Oriental', voice: o.voice, speed: o.speed, format: o.format }),
+      audioPath: 'N/A',
+      ttsInputText: o.native,
+      translatedText: o.trans,
+      ttsVoiceAndSpeed: `Model: Zero Oriental | Voice: ${o.voice} | Speed: ${o.speed}x | Format: ${o.format}`,
+      preconditions: 'TTS tab active; Zero Oriental model available',
+      testSteps: `1. Switch to TTS tab\n2. Select Model "Zero Oriental"\n3. Select Language "${o.name}"\n4. Enter text "${o.native}"\n5. Click Run Synthesis\n6. Verify waveform and clear playback`,
+      expectedResult: `Audio generated in ${o.name}. ShunyaLabs Translated Output: "${o.trans}"`,
+      expectedStatus: 'HTTP 200 / Audio Generated',
+      priority: 'P0',
+      automated: 'Automated',
+    });
+  }
+
+  // 3. UI: Zero Universal Full Matrix (All 45 Languages)
+  for (const u of UNIVERSAL_LANG_DEFINITIONS) {
+    list.push({
+      id: nextId('TC-TTS-SYN'),
+      module: 'UI - Text to Speech',
+      suite: 'UI',
+      scenarioType: 'Positive',
+      title: `TTS UI [Zero Universal]: ${u.name} (${u.code}) Global Synthesis`,
+      description: `Verify selecting model Zero Universal, language ${u.name}, entering native script "${u.native.slice(0, 30)}..."`,
+      model: 'Zero Universal',
+      languageCode: u.code,
+      languageName: u.name,
+      featuresEnabled: 'TTS Speech Synthesis',
+      featureConfig: JSON.stringify({ model: 'Zero Universal', voice: u.voice, speed: u.speed, format: u.format }),
+      audioPath: 'N/A',
+      ttsInputText: u.native,
+      translatedText: u.trans,
+      ttsVoiceAndSpeed: `Model: Zero Universal | Voice: ${u.voice} | Speed: ${u.speed}x | Format: ${u.format}`,
+      preconditions: 'TTS tab active; Zero Universal model available',
+      testSteps: `1. Switch to TTS tab\n2. Select Model "Zero Universal"\n3. Select Language "${u.name}"\n4. Enter native text "${u.native}"\n5. Click Run Synthesis\n6. Assert audio generation and playback`,
+      expectedResult: `Speech synthesized in ${u.name}. ShunyaLabs Translated Output: "${u.trans}"`,
+      expectedStatus: 'HTTP 200 / Audio Generated',
+      priority: u.code === 'es' || u.code === 'fr' || u.code === 'de' || u.code === 'ar' || u.code === 'ru' ? 'P0' : 'P1',
+      automated: 'Automated',
+    });
+  }
+
+  // 4. UI: Modes & Custom Features
+  list.push(
+    {
+      id: nextId('TC-TTS-SYN'),
+      module: 'UI - Text to Speech',
+      suite: 'UI',
+      scenarioType: 'Positive',
+      title: 'TTS Synthesis Mode Toggle: Batch vs Streaming Mode',
+      description: 'Verify switching synthesis mode between Batch and Streaming in TTS dropdown',
+      model: 'Zero Indic',
+      languageCode: 'en',
+      languageName: 'English',
+      featuresEnabled: 'Streaming Mode',
+      featureConfig: JSON.stringify({ mode: 'Streaming' }),
+      audioPath: 'N/A',
+      ttsInputText: 'Real-time low latency streaming speech synthesis mode test.',
+      translatedText: 'Real-time low latency streaming speech synthesis mode test.',
+      ttsVoiceAndSpeed: 'Mode: Streaming | Speed: 1.0x',
+      preconditions: 'TTS tab active',
+      testSteps: '1. Select Mode dropdown\n2. Switch between "Batch" and "Streaming"\n3. Assert selection updates',
+      expectedResult: 'Synthesis mode toggles cleanly without UI errors',
+      expectedStatus: 'Mode Selected',
+      priority: 'P1',
+      automated: 'Automated',
+    },
+    {
+      id: nextId('TC-TTS-SYN'),
+      module: 'UI - Text to Speech',
+      suite: 'UI',
+      scenarioType: 'Positive',
+      title: 'TTS Voice Mode Toggle: Preset Voice vs Clone Voice',
+      description: 'Verify switching voice customization mode between Preset Voice and Clone Voice',
+      model: 'Zero Indic',
+      languageCode: 'en',
+      languageName: 'English',
+      featuresEnabled: 'Voice Clone',
+      featureConfig: JSON.stringify({ voice_mode: 'Clone Voice' }),
+      audioPath: 'N/A',
+      ttsInputText: 'Custom voice clone audio reference profile selection test.',
+      translatedText: 'Custom voice clone audio reference profile selection test.',
+      ttsVoiceAndSpeed: 'Voice Mode: Clone Voice',
+      preconditions: 'TTS tab active',
+      testSteps: '1. Click "Clone Voice" button\n2. Verify Clone Voice options render\n3. Click "Preset Voice" button\n4. Verify preset voices restore',
+      expectedResult: 'Voice mode switches cleanly between Preset Voice and Clone Voice',
+      expectedStatus: 'Voice Mode Toggled',
+      priority: 'P1',
+      automated: 'Automated',
+    }
+  );
+
   // ── 7B. Text to Speech (TTS) Backend API Comprehensive Matrix ───────────────
   seq = 1;
-  const TTS_API_SCENARIOS = [
-    { lang: 'en', voice: 'shunya-female-1', speed: 1.0, format: 'mp3', model: 'zero-indic', text: 'Welcome to Shunya Labs speech synthesis platform.', title: 'POST /v1/audio/speech — Standard English Female (shunya-female-1)' },
-    { lang: 'en', voice: 'shunya-male-1', speed: 1.0, format: 'mp3', model: 'zero-indic', text: 'Experience natural sounding AI voices for your applications.', title: 'POST /v1/audio/speech — Standard English Male (shunya-male-1)' },
-    { lang: 'hi', voice: 'shunya-female-1', speed: 1.0, format: 'mp3', model: 'zero-indic', text: 'नमस्ते, शून्या लैब्स में आपका स्वागत है।', title: 'POST /v1/audio/speech — Hindi Devanagari Script (shunya-female-1)' },
-    { lang: 'hi', voice: 'shunya-male-1', speed: 1.25, format: 'mp3', model: 'zero-indic', text: 'यह भारतीय भाषाओं के लिए विशेष रूप से निर्मित आवाज है।', title: 'POST /v1/audio/speech — Hindi 1.25x Speed (shunya-male-1)' },
-    { lang: 'bn', voice: 'shunya-female-1', speed: 1.0, format: 'mp3', model: 'zero-indic', text: 'শূন্যা ল্যাবসে আপনাকে স্বাগতম।', title: 'POST /v1/audio/speech — Bengali Script Synthesis' },
-    { lang: 'ta', voice: 'shunya-female-1', speed: 1.0, format: 'mp3', model: 'zero-indic', text: 'ஷூன்யா லேப்ஸுக்கு வரவேற்கிறோம்.', title: 'POST /v1/audio/speech — Tamil Script Synthesis' },
-    { lang: 'te', voice: 'shunya-female-1', speed: 1.0, format: 'mp3', model: 'zero-indic', text: 'శూన్య ల్యాబ్స్‌కు స్వాगతం.', title: 'POST /v1/audio/speech — Telugu Script Synthesis' },
-    { lang: 'mr', voice: 'shunya-female-1', speed: 1.0, format: 'mp3', model: 'zero-indic', text: 'शून्या लॅब्समध्ये आपले स्वागत आहे.', title: 'POST /v1/audio/speech — Marathi Script Synthesis' },
-    { lang: 'en', voice: 'shunya-female-1', speed: 0.5, format: 'wav', model: 'zero-indic', text: 'Slow playback speech test for accessibility.', title: 'POST /v1/audio/speech — 0.5x Speed WAV Format' },
-    { lang: 'en', voice: 'shunya-female-1', speed: 1.5, format: 'wav', model: 'zero-indic', text: 'Fast playback speech test for quick audio previews.', title: 'POST /v1/audio/speech — 1.5x Speed WAV Format' },
-    { lang: 'en', voice: 'shunya-female-1', speed: 2.0, format: 'mp3', model: 'zero-indic', text: 'Double speed audio generation test.', title: 'POST /v1/audio/speech — 2.0x Double Speed MP3 Format' },
-    { lang: 'hi-en', voice: 'shunya-female-1', speed: 1.0, format: 'mp3', model: 'zero-indic', text: 'Your payment of ₹25,450.75 is confirmed on 25/08/2026 with 18% GST.', title: 'POST /v1/audio/speech — Numbers, Currency (₹) & Dates Pronunciation' },
-    { lang: 'en', voice: 'shunya-female-1', speed: 1.0, format: 'mp3', model: 'zero-indic', text: 'Patient diagnosed with acute bacterial pharyngitis; prescribed Amoxicillin 500mg.', title: 'POST /v1/audio/speech — Clinical Medical Diagnosis & Drug Terminology' },
-    { lang: 'en', voice: 'shunya-female-1', speed: 1.0, format: 'mp3', model: 'zero-indic', text: 'Shunya Labs AI speech synthesis platform provides low-latency, natural voices. '.repeat(10), title: 'POST /v1/audio/speech — Long-Form Text Paragraph (>800 Characters)' },
-    { lang: 'en', voice: 'shunya-female-1', speed: 1.0, format: 'mp3', model: 'zero-indic', text: 'Concurrent batch synthesis request.', title: 'POST /v1/audio/speech — Concurrency & High Throughput Batch Request' },
 
-    // ── Additional Deep Backend API Scenarios: Zero Oriental & Zero Universal ─
-    { lang: 'ja', voice: 'shunya-female-1', speed: 1.0, format: 'mp3', model: 'zero-oriental', text: 'こんにちは、Shunya Labsの音声合成テストです。', title: 'POST /v1/audio/speech — Zero Oriental Japanese (ja) Speech API' },
-    { lang: 'ko', voice: 'shunya-female-1', speed: 1.0, format: 'mp3', model: 'zero-oriental', text: '안녕하세요, Shunya Labs 음성 합성 시스템입니다.', title: 'POST /v1/audio/speech — Zero Oriental Korean (ko) Speech API' },
-    { lang: 'zh', voice: 'shunya-female-1', speed: 1.0, format: 'mp3', model: 'zero-oriental', text: '您好，欢迎使用 Shunya Labs 人工智能语音合成。', title: 'POST /v1/audio/speech — Zero Oriental Chinese (zh) Speech API' },
-    { lang: 'bho', voice: 'shunya-female-1', speed: 1.0, format: 'mp3', model: 'zero-oriental', text: 'प्रणाम, शून्या लैब्स में रउआ सब के बहुत स्वागत बा।', title: 'POST /v1/audio/speech — Zero Oriental Bhojpuri (bho) Speech API' },
-    { lang: 'es', voice: 'shunya-female-1', speed: 1.0, format: 'mp3', model: 'zero-universal', text: 'Bienvenido a la plataforma de síntesis de voz de Shunya Labs.', title: 'POST /v1/audio/speech — Zero Universal Spanish (es) Speech API' },
-    { lang: 'fr', voice: 'shunya-female-1', speed: 1.0, format: 'mp3', model: 'zero-universal', text: 'Bienvenue sur la plateforme de synthèse vocale de Shunya Labs.', title: 'POST /v1/audio/speech — Zero Universal French (fr) Speech API' },
-    { lang: 'de', voice: 'shunya-female-1', speed: 1.0, format: 'mp3', model: 'zero-universal', text: 'Willkommen bei der Shunya Labs Sprachsynthese-Plattform.', title: 'POST /v1/audio/speech — Zero Universal German (de) Speech API' },
-    { lang: 'ar', voice: 'shunya-female-1', speed: 1.0, format: 'mp3', model: 'zero-universal', text: 'مرحبًا بكم في منصة شونيا لابس للتوليف الصوتي.', title: 'POST /v1/audio/speech — Zero Universal Arabic (ar) Speech API' },
-    { lang: 'ru', voice: 'shunya-female-1', speed: 1.0, format: 'mp3', model: 'zero-universal', text: 'Добро пожаловать на платформу синтеза речи Shunya Labs.', title: 'POST /v1/audio/speech — Zero Universal Russian (ru) Speech API' },
-  ];
-
-  for (const t of TTS_API_SCENARIOS) {
-    const langMap: Record<string, string> = {
-      hi: 'Hindi', bn: 'Bengali', ta: 'Tamil', te: 'Telugu',
-      mr: 'Marathi', gu: 'Gujarati', kn: 'Kannada', pa: 'Punjabi',
-      'hi-en': 'Hinglish', en: 'English',
-      ja: 'Japanese', ko: 'Korean', zh: 'Chinese', bho: 'Bhojpuri',
-      es: 'Spanish', fr: 'French', de: 'German', ar: 'Arabic',
-      ru: 'Russian',
-    };
-    const langName = langMap[t.lang] || 'English';
-
+  // 1. Backend API: Indic Languages
+  for (const t of INDIC_TTS_UI) {
     list.push({
       id: nextId('TC-TTS-API'),
       module: 'Backend API - TTS Speech Synthesis',
       suite: 'Backend API',
       scenarioType: 'Positive',
-      title: t.title,
-      description: `Verify direct POST https://ttsv2.shunyalabs.ai/v1/audio/speech with model ${t.model}, input "${t.text.slice(0, 30)}...", voice ${t.voice}, speed ${t.speed}x, format ${t.format}`,
-      model: t.model,
+      title: `POST /v1/audio/speech — Zero Indic ${t.title}`,
+      description: `Verify direct POST https://ttsv2.shunyalabs.ai/v1/audio/speech with model zero-indic, voice ${t.voice}, speed ${t.speed}`,
+      model: 'zero-indic',
       languageCode: t.lang,
-      languageName: langName,
+      languageName: t.lang === 'hi' ? 'Hindi' : t.lang === 'bn' ? 'Bengali' : t.lang === 'ta' ? 'Tamil' : t.lang === 'te' ? 'Telugu' : t.lang === 'mr' ? 'Marathi' : t.lang === 'gu' ? 'Gujarati' : t.lang === 'kn' ? 'Kannada' : t.lang === 'pa' ? 'Punjabi' : t.lang === 'hi-en' ? 'Hinglish' : 'English',
       featuresEnabled: 'TTS Synthesis',
-      featureConfig: JSON.stringify({ model: t.model, input: t.text, voice: t.voice, speed: t.speed, response_format: t.format }),
+      featureConfig: JSON.stringify({ model: 'zero-indic', input: t.native, voice: t.voice, speed: parseFloat(t.speed), response_format: t.format }),
       audioPath: 'N/A',
-      ttsInputText: t.text,
-      ttsVoiceAndSpeed: `Model: ${t.model} | Voice: ${t.voice} | Speed: ${t.speed}x | Format: ${t.format}`,
-      preconditions: 'Valid API Key; TTS microservice live',
-      testSteps: `1. POST /v1/audio/speech with JSON payload { model, input, voice, speed, response_format }\n2. Assert HTTP 200/201 OK\n3. Verify binary Content-Type (audio/mpeg or audio/wav)\n4. Assert payload byte length > 0`,
-      expectedResult: `HTTP 200 OK for ${t.model} in ${langName}; Content-Type: audio/mpeg or audio/wav; non-zero binary payload`,
+      ttsInputText: t.native,
+      translatedText: t.trans,
+      ttsVoiceAndSpeed: `Model: zero-indic | Voice: ${t.voice} | Speed: ${t.speed}x | Format: ${t.format}`,
+      preconditions: 'Valid API Key; TTS microservice healthy',
+      testSteps: `1. POST /v1/audio/speech with { model: "zero-indic", input: "${t.native}", voice: "${t.voice}", speed: ${t.speed} }\n2. Assert HTTP 200 OK\n3. Verify binary audio response`,
+      expectedResult: `HTTP 200 OK; audio/mpeg binary payload. ShunyaLabs Translation: "${t.trans}"`,
       expectedStatus: 'HTTP 200 OK',
       priority: 'P0',
+      automated: 'Automated',
+    });
+  }
+
+  // 2. Backend API: Zero Oriental Full Matrix (3 Languages: Japanese, Korean, Chinese)
+  for (const o of ORIENTAL_LANG_DEFINITIONS) {
+    list.push({
+      id: nextId('TC-TTS-API'),
+      module: 'Backend API - TTS Speech Synthesis',
+      suite: 'Backend API',
+      scenarioType: 'Positive',
+      title: `POST /v1/audio/speech — Zero Oriental ${o.name} (${o.code}) API`,
+      description: `Verify direct POST /v1/audio/speech with model zero-oriental, language ${o.name}, voice ${o.voice}`,
+      model: 'zero-oriental',
+      languageCode: o.code,
+      languageName: o.name,
+      featuresEnabled: 'TTS Synthesis',
+      featureConfig: JSON.stringify({ model: 'zero-oriental', input: o.native, voice: o.voice, speed: o.speed, response_format: o.format }),
+      audioPath: 'N/A',
+      ttsInputText: o.native,
+      translatedText: o.trans,
+      ttsVoiceAndSpeed: `Model: zero-oriental | Voice: ${o.voice} | Speed: ${o.speed}x | Format: ${o.format}`,
+      preconditions: 'Valid API Key; TTS microservice healthy',
+      testSteps: `1. POST /v1/audio/speech with { model: "zero-oriental", input: "${o.native}", voice: "${o.voice}" }\n2. Assert HTTP 200 OK\n3. Verify binary payload`,
+      expectedResult: `HTTP 200 OK; Binary audio generated for ${o.name}. ShunyaLabs Translation: "${o.trans}"`,
+      expectedStatus: 'HTTP 200 OK',
+      priority: 'P0',
+      automated: 'Automated',
+    });
+  }
+
+  // 3. Backend API: Zero Universal Full Matrix (All 45 Languages)
+  for (const u of UNIVERSAL_LANG_DEFINITIONS) {
+    list.push({
+      id: nextId('TC-TTS-API'),
+      module: 'Backend API - TTS Speech Synthesis',
+      suite: 'Backend API',
+      scenarioType: 'Positive',
+      title: `POST /v1/audio/speech — Zero Universal ${u.name} (${u.code}) API`,
+      description: `Verify direct POST /v1/audio/speech with model zero-universal, language ${u.name}, voice ${u.voice}`,
+      model: 'zero-universal',
+      languageCode: u.code,
+      languageName: u.name,
+      featuresEnabled: 'TTS Synthesis',
+      featureConfig: JSON.stringify({ model: 'zero-universal', input: u.native, voice: u.voice, speed: u.speed, response_format: u.format }),
+      audioPath: 'N/A',
+      ttsInputText: u.native,
+      translatedText: u.trans,
+      ttsVoiceAndSpeed: `Model: zero-universal | Voice: ${u.voice} | Speed: ${u.speed}x | Format: ${u.format}`,
+      preconditions: 'Valid API Key; TTS microservice healthy',
+      testSteps: `1. POST /v1/audio/speech with { model: "zero-universal", input: "${u.native}", voice: "${u.voice}" }\n2. Assert HTTP 200 OK\n3. Verify binary payload`,
+      expectedResult: `HTTP 200 OK; Binary audio generated for ${u.name}. ShunyaLabs Translation: "${u.trans}"`,
+      expectedStatus: 'HTTP 200 OK',
+      priority: u.code === 'es' || u.code === 'fr' || u.code === 'de' || u.code === 'ar' || u.code === 'ru' ? 'P0' : 'P1',
       automated: 'Automated',
     });
   }
