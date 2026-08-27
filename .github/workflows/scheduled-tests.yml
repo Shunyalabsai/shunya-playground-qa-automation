@@ -98,7 +98,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add reports/Stakeholder-Dashboard.html reports/Playground-Report.html reports/playground-runs.json reports/playground-summary-*.json 2>/dev/null || true
+          git add index.html docs/index.html .nojekyll reports/Stakeholder-Dashboard.html reports/Playground-Report.html reports/playground-runs.json reports/playground-summary-*.json reports/playground-today-summary.json 2>/dev/null || true
           if ! git diff --staged --quiet; then
             git commit -m "Cloud run dashboard update — $(date -u '+%Y-%m-%d %H:%M UTC')"
             git push origin main

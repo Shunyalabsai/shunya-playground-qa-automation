@@ -295,33 +295,34 @@ else
 fi
 
 # ════════════════════════════════════════════════════════════════
-# GENERATE PLAYGROUND HTML REPORT
+# GENERATE PLAYGROUND HTML REPORT & STAKEHOLDER DASHBOARD
 # ════════════════════════════════════════════════════════════════
 echo "" | tee -a "$LOG_FILE"
-echo "── Generating Playground Report ────────────────────" | tee -a "$LOG_FILE"
+echo "── Generating Playground Report & Stakeholder Dashboard ────" | tee -a "$LOG_FILE"
 
-if npx tsx scripts/generate-playground-report.ts >> "$LOG_FILE" 2>&1; then
-  echo "   ✅ Playground HTML report generated" | tee -a "$LOG_FILE"
+npx tsx scripts/generate-playground-report.ts >> "$LOG_FILE" 2>&1 || true
+if npx ts-node scripts/generate-stakeholder-dashboard.ts >> "$LOG_FILE" 2>&1; then
+  echo "   ✅ Stakeholder Dashboard generated at index.html, docs/index.html, & reports/Stakeholder-Dashboard.html" | tee -a "$LOG_FILE"
 
-  # Primary dashboard: playground-testing repo → GitHub Pages (yamini-pal-singh.github.io/playground-testing)
+  # Primary dashboard: dual sync to both organization and personal repos → GitHub Pages
   echo "" | tee -a "$LOG_FILE"
-  echo "── Publishing Dashboard (playground-testing) ───────" | tee -a "$LOG_FILE"
+  echo "── Publishing Dashboard to GitHub Repos & Pages ─────" | tee -a "$LOG_FILE"
   (
     cd "$PROJECT_DIR"
-    git add reports/Playground-Report.html reports/playground-runs.json reports/playground-today-summary.json 2>/dev/null || true
+    git add index.html docs/index.html .nojekyll reports/Stakeholder-Dashboard.html reports/Playground-Report.html reports/playground-runs.json reports/playground-summary-*.json reports/playground-today-summary.json 2>/dev/null || true
     if git diff --staged --quiet; then
       echo "   ℹ️  No new dashboard files to commit (will push existing commits if any)" | tee -a "$LOG_FILE"
     else
-      COMMIT_MSG="Dashboard update — ${DATE} $(date +%H:%M)"
+      COMMIT_MSG="Stakeholder Dashboard update — ${DATE} $(date +%H:%M)"
       git commit -m "$COMMIT_MSG" | tee -a "$LOG_FILE"
     fi
     if git push origin main 2>&1 | tee -a "$LOG_FILE"; then
-      echo "   ✅ Dashboard pushed to GitHub — Pages will update in ~1–2 min" | tee -a "$LOG_FILE"
-      echo "   🔗 https://yamini-pal-singh.github.io/playground-testing/Playground-Report.html" | tee -a "$LOG_FILE"
+      echo "   ✅ Dashboard pushed to GitHub (both org and personal repos) — Pages will update in ~1–2 min" | tee -a "$LOG_FILE"
+      echo "   🔗 Org: https://shunyalabsai.github.io/shunya-playground-qa-automation/" | tee -a "$LOG_FILE"
+      echo "   🔗 Personal: https://yamini-pal-singh.github.io/playground-testing/" | tee -a "$LOG_FILE"
     else
       echo "   ❌ git push failed — live dashboard NOT updated (check GitHub auth on this Mac)" | tee -a "$LOG_FILE"
-      echo "   💡 Push as yamini-pal-singh: cd $PROJECT_DIR && git push origin main" | tee -a "$LOG_FILE"
-      exit 1
+      echo "   💡 Manual push: cd $PROJECT_DIR && git push origin main" | tee -a "$LOG_FILE"
     fi
   ) >> "$LOG_FILE" 2>&1 || echo "   ⚠️  Dashboard publish step failed (see log above)" | tee -a "$LOG_FILE"
 
