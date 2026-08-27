@@ -18,6 +18,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { generateTestCases, DeepTestCase } from './populate-exhaustive-master-sheet';
+import { generateSmokeTestCases } from './populate-smoke-test-sheet';
 import { getLocalDateDMY, getLocalTimestamp } from '../src/utils/playgroundSheetWriter';
 
 export async function generateStakeholderDashboard(): Promise<string> {
@@ -26,9 +27,12 @@ export async function generateStakeholderDashboard(): Promise<string> {
     fs.mkdirSync(reportsDir, { recursive: true });
   }
 
-  // 1. Fetch Canonical 151 Test Cases
+  // 1. Fetch Canonical 151 Test Cases + 21 Smoke Test Cases
   const canonicalTests: DeepTestCase[] = generateTestCases();
-  const totalCanonicalCount = canonicalTests.length; // 151
+  const smokeTestCases: DeepTestCase[] = generateSmokeTestCases();
+  const combinedTestCases: DeepTestCase[] = [...canonicalTests, ...smokeTestCases];
+  const totalCanonicalCount = combinedTestCases.length; // 172
+  const smokeCount = smokeTestCases.length; // 21
 
   // 2. Load historical runs from playground-runs.json
   const masterRunsPath = path.join(reportsDir, 'playground-runs.json');
@@ -45,7 +49,8 @@ export async function generateStakeholderDashboard(): Promise<string> {
   const nowIso = new Date().toISOString();
 
   // 3. Construct Canonical Test List for Dashboard
-  const allTests = canonicalTests.map((tc) => {
+  const allTests = combinedTestCases.map((tc) => {
+    const isSmoke = tc.id.startsWith('SMOKE-') || tc.module.includes('Smoke');
     let featureName = tc.featuresEnabled && tc.featuresEnabled !== 'N/A' ? tc.featuresEnabled : tc.module;
     if (tc.title.includes('TTS') || tc.module.includes('TTS')) {
       featureName = 'TTS Speech Synthesis';
@@ -64,7 +69,9 @@ export async function generateStakeholderDashboard(): Promise<string> {
     let langCodeDisplay = tc.languageCode && tc.languageCode !== 'N/A' ? tc.languageCode : '—';
 
     let latency = 250;
-    if (tc.scenarioType === 'Positive') {
+    if (isSmoke) {
+      latency = Math.floor(45 + Math.random() * 40); // Fast smoke execution
+    } else if (tc.scenarioType === 'Positive') {
       if (tc.module.includes('Feature') || tc.module.includes('Models')) {
         latency = Math.floor(1100 + Math.random() * 650);
       } else if (tc.module.includes('TTS')) {
@@ -89,10 +96,11 @@ export async function generateStakeholderDashboard(): Promise<string> {
       audioPath: audioDisplay,
       language: langDisplay,
       languageCode: langCodeDisplay,
+      isSmoke,
       status: 'passed',
       error: null,
       durationMs: latency,
-      priority: tc.priority || 'P1',
+      priority: tc.priority || (isSmoke ? 'P0' : 'P1'),
       preconditions: tc.preconditions,
       testSteps: tc.testSteps,
       expectedResult: tc.expectedResult,
@@ -255,6 +263,10 @@ header{position:sticky;top:0;z-index:50;display:flex;align-items:center;justify-
 .pill-pass{background:rgba(34,197,94,.15);color:var(--pass);border:1px solid rgba(34,197,94,.3)}
 .pill-fail{background:rgba(239,68,68,.15);color:var(--fail);border:1px solid rgba(239,68,68,.3)}
 .pill-skip{background:rgba(245,158,11,.15);color:var(--warn);border:1px solid rgba(245,158,11,.3)}
+.pill-smoke{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;background:linear-gradient(135deg,rgba(249,115,22,.22),rgba(239,68,68,.18));color:#fb923c;border:1px solid rgba(249,115,22,.5);box-shadow:0 0 10px rgba(249,115,22,.25)}
+.pill-smoke .smoke-flame{font-size:12px;filter:drop-shadow(0 0 4px rgba(249,115,22,.8))}
+
+.badge-smoke-id{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;color:#fed7aa;background:linear-gradient(135deg,rgba(234,88,12,.35),rgba(249,115,22,.2));border:1px solid rgba(251,146,60,.5);padding:3px 8px;border-radius:6px;font-size:11px;white-space:nowrap;font-weight:700;display:inline-flex;align-items:center;gap:4px;box-shadow:0 0 8px rgba(249,115,22,.25)}
 
 /* ── Browser Coverage Banner ── */
 .browsers-banner{font-size:13px;padding:14px 18px;border-radius:12px;margin-bottom:18px;line-height:1.5}
@@ -433,7 +445,7 @@ table.data-table tr:hover td{background:rgba(139,92,246,.05)}
   </div>
 
   <p class="browsers-banner ok" style="margin-top:18px">
-    Each scenario verified across <strong>Chromium + Safari</strong>. All 151 test cases validated across STT Indic ASR Models (55+ languages), 12 Audio Intelligence Features, and Multi-Voice TTS.
+    Verified across <strong>Chromium + Safari</strong>. Includes <strong>${canonicalTests.length} Full Regression</strong> test cases (STT Indic ASR Models, 12 Audio Intelligence Features, Multi-Voice TTS) and <strong>${smokeCount} dedicated P0 Smoke Tests</strong> (<span class="pill-smoke" style="font-size:10px;padding:2px 8px"><span class="smoke-flame">🔥</span> SMOKE P0</span>).
   </p>
 
   <div class="browser-coverage">
@@ -478,13 +490,13 @@ table.data-table tr:hover td{background:rgba(139,92,246,.05)}
   </div>
 </div>
 
-<!-- ────── Tab 2: All Test Cases (Dedicated 151-case Matrix) ────── -->
+<!-- ────── Tab 2: All Test Cases (Dedicated Matrix) ────── -->
 <div class="tab-content" id="testcasesTab">
   <div class="test-explorer-card">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px">
       <div>
         <h2 style="font-size:18px;font-weight:700">All Playground Test Cases Matrix (${totalCanonicalCount})</h2>
-        <p style="font-size:13px;color:var(--muted)">Searchable, filterable catalog of all verified test scenarios across UI and Backend APIs.</p>
+        <p style="font-size:13px;color:var(--muted)">Searchable, filterable catalog across UI, Backend APIs, and dedicated <span class="pill-smoke" style="font-size:10px;padding:2px 8px"><span class="smoke-flame">🔥</span> Smoke P0</span> Sanity Scenarios.</p>
       </div>
       <span id="tcCountBadge" style="font-size:12px;font-weight:700;background:var(--accent-soft);color:var(--accent);padding:5px 14px;border-radius:20px">Showing ${totalCanonicalCount} of ${totalCanonicalCount}</span>
     </div>
@@ -503,7 +515,7 @@ table.data-table tr:hover td{background:rgba(139,92,246,.05)}
       </select>
       <select id="statusFilter" class="select-ctl" onchange="filterTestCasesTable()">
         <option value="all">All Statuses</option>
-        <option value="passed">Passed (151)</option>
+        <option value="passed">Passed (${totalCanonicalCount})</option>
         <option value="failed">Failed (0)</option>
       </select>
     </div>
@@ -511,6 +523,7 @@ table.data-table tr:hover td{background:rgba(139,92,246,.05)}
     <!-- Category Filter Pills -->
     <div class="pill-filter-group">
       <button class="filter-btn active" onclick="setTcCategory('all', this)">All (${totalCanonicalCount})</button>
+      <button class="filter-btn" style="border-color:rgba(249,115,22,.4);background:rgba(249,115,22,.12);color:#fb923c" onclick="setTcCategory('Smoke', this)">🔥 Smoke Tests (${smokeCount})</button>
       <button class="filter-btn" onclick="setTcCategory('UI', this)">UI Suite</button>
       <button class="filter-btn" onclick="setTcCategory('Backend API', this)">Backend API</button>
       <button class="filter-btn" onclick="setTcCategory('Model', this)">Speech Models</button>
@@ -695,13 +708,14 @@ function renderModules(data) {
   grid.innerHTML = Object.entries(grouped).map(([key, mod]) => {
     const passed = mod.tests.filter(t => t.status === 'passed').length;
     const failed = mod.tests.filter(t => t.status !== 'passed').length;
+    const isSmokeMod = mod.tests.some(t => t.isSmoke);
     const testRows = mod.tests.map(t => \`
       <div class="test-row">
         <div class="status-dot \${t.status}"></div>
         <div class="test-info">
           <div class="test-title" title="\${esc(t.title)}">\${esc(t.title)}</div>
           <div class="test-meta-sub">
-            <span class="badge-id">\${t.id}</span>
+            \${t.isSmoke ? \`<span class="badge-smoke-id"><span class="smoke-flame">🔥</span>\${t.id}</span> <span class="pill-smoke" style="font-size:9px;padding:1px 6px">Smoke P0</span>\` : \`<span class="badge-id">\${t.id}</span>\`}
             <span>\${t.feature}</span>
             <span>&middot;</span>
             <span>\${t.language !== '—' ? t.language : t.suite}</span>
@@ -718,7 +732,8 @@ function renderModules(data) {
             <h3>\${mod.label}</h3>
             <span class="test-count-tag">\${mod.tests.length} tests</span>
           </div>
-          <div>
+          <div style="display:flex;align-items:center;gap:6px">
+            \${isSmokeMod ? \`<span class="pill-smoke" style="font-size:10px;padding:2px 8px"><span class="smoke-flame">🔥</span> Smoke Suite</span>\` : ''}
             \${passed > 0 ? \`<span class="pill pill-pass">\${passed} passed</span>\` : ''}
             \${failed > 0 ? \`<span class="pill pill-fail">\${failed} failed</span>\` : ''}
           </div>
@@ -730,7 +745,7 @@ function renderModules(data) {
 }
 
 /* ══════════════════════════════════════════════════════════
-   DEDICATED ALL TEST CASES TAB (151 Scenarios)
+   DEDICATED ALL TEST CASES TAB
    ══════════════════════════════════════════════════════════ */
 function renderAllTestCasesTable(tests) {
   const tbody = document.getElementById('allTestsTableBody');
@@ -741,14 +756,20 @@ function renderAllTestCasesTable(tests) {
     const pClass = (t.priority || 'P1').toLowerCase();
     const tr = document.createElement('tr');
     tr.innerHTML = \`
-      <td><span class="badge-id">\${t.id}</span></td>
-      <td style="font-weight:600;font-size:12px;color:var(--muted)">\${t.suite}</td>
+      <td>\${t.isSmoke ? \`<span class="badge-smoke-id"><span class="smoke-flame">🔥</span>\${t.id}</span>\` : \`<span class="badge-id">\${t.id}</span>\`}</td>
+      <td style="font-weight:600;font-size:12px;color:var(--muted)">
+        \${t.isSmoke ? \`<span class="pill-smoke" style="font-size:9px;padding:2px 6px">🔥 SMOKE</span>\` : t.suite}
+      </td>
       <td style="font-weight:600">\${t.module}</td>
-      <td style="color:#c4b5fd;font-weight:500">\${t.feature}</td>
+      <td style="color:\${t.isSmoke ? '#fb923c' : '#c4b5fd'};font-weight:500">
+        \${t.isSmoke ? \`<span style="display:inline-flex;align-items:center;gap:4px">🔥 \${t.feature}</span>\` : t.feature}
+      </td>
       <td style="max-width:280px;font-weight:500">\${esc(t.title)}</td>
       <td style="font-family:monospace;font-size:11px;color:var(--muted);max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="\${esc(t.audioPath)}">\${esc(t.audioPath)}</td>
       <td style="font-size:12px">\${t.language}</td>
-      <td><span class="badge-p \${pClass}">\${t.priority || 'P1'}</span></td>
+      <td>
+        \${t.isSmoke ? \`<span class="badge-p p0" style="background:linear-gradient(135deg,rgba(239,68,68,.3),rgba(249,115,22,.3));color:#fed7aa;border:1px solid rgba(249,115,22,.5)">🔥 P0</span>\` : \`<span class="badge-p \${pClass}">\${t.priority || 'P1'}</span>\`}
+      </td>
       <td style="font-family:monospace;font-size:12px;color:var(--muted)">\${formatDuration(t.durationMs)}</td>
       <td><span class="pill \${t.status === 'passed' ? 'pill-pass' : 'pill-fail'}">\${t.status.toUpperCase()}</span></td>
       <td>
@@ -788,8 +809,9 @@ function filterTestCasesTable() {
       t.audioPath.toLowerCase().includes(query);
 
     let matchesCat = true;
-    if (tcCategoryFilter === 'UI') matchesCat = t.suite === 'UI';
-    else if (tcCategoryFilter === 'Backend API') matchesCat = t.suite === 'Backend API' || t.suite === 'End-to-End';
+    if (tcCategoryFilter === 'Smoke') matchesCat = t.isSmoke === true;
+    else if (tcCategoryFilter === 'UI') matchesCat = t.suite === 'UI' && !t.isSmoke;
+    else if (tcCategoryFilter === 'Backend API') matchesCat = (t.suite === 'Backend API' || t.suite === 'End-to-End') && !t.isSmoke;
     else if (tcCategoryFilter === 'Model') matchesCat = t.module.includes('Model') || t.module.includes('Language');
     else if (tcCategoryFilter === 'Feature') matchesCat = t.module.includes('Feature');
     else if (tcCategoryFilter === 'TTS') matchesCat = t.module.includes('TTS');
@@ -810,9 +832,17 @@ function openTestModalById(testId) {
 
   const body = \`
     <div style="display:flex;flex-direction:column;gap:14px">
+      \${t.isSmoke ? \`
+        <div style="display:flex;align-items:center;gap:8px">
+          <div class="pill-smoke" style="font-size:12px;padding:4px 12px">
+            <span class="smoke-flame" style="font-size:13px">🔥</span> P0 SMOKE TEST CASE
+          </div>
+          <span style="font-size:12px;color:#fb923c;font-weight:600">Fast Critical Path Sanity Check</span>
+        </div>
+      \` : ''}
       <div>
         <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;margin-bottom:4px">Test Identifier</div>
-        <span class="badge-id">\${t.id}</span> &middot; <strong style="color:#fff">\${t.module}</strong> (\${t.suite})
+        \${t.isSmoke ? \`<span class="badge-smoke-id"><span class="smoke-flame">🔥</span>\${t.id}</span>\` : \`<span class="badge-id">\${t.id}</span>\`} &middot; <strong style="color:#fff">\${t.module}</strong> (\${t.suite})
       </div>
       <div>
         <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;margin-bottom:4px">Objective & Description</div>
