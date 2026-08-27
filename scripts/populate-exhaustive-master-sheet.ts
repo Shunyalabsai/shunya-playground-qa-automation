@@ -1265,63 +1265,104 @@ export function generateTestCases(): DeepTestCase[] {
     });
   }
 
-  // ── 7. Text to Speech (TTS) Synthesis Matrix (10 cases) ───────────────────
+  // ── 7. Text to Speech (TTS) Synthesis Comprehensive Matrix (30 cases) ───
   seq = 1;
-  const TTS_SCENARIOS = [
-    { lang: 'en', voice: 'shunya-female-1', speed: '1.0', format: 'mp3', text: 'Welcome to Shunya Labs speech synthesis platform.' },
-    { lang: 'en', voice: 'shunya-male-1', speed: '1.0', format: 'mp3', text: 'Experience natural sounding AI voices for your applications.' },
-    { lang: 'hi', voice: 'shunya-female-1', speed: '1.0', format: 'mp3', text: 'नमस्ते, शून्या लैब्स में आपका स्वागत है।' },
-    { lang: 'hi', voice: 'shunya-male-1', speed: '1.25', format: 'mp3', text: 'यह भारतीय भाषाओं के लिए विशेष रूप से निर्मित आवाज है।' },
-    { lang: 'bn', voice: 'shunya-female-1', speed: '1.0', format: 'mp3', text: 'শূন্যা ল্যাবসে আপনাকে স্বাগতম।' },
-    { lang: 'ta', voice: 'shunya-female-1', speed: '1.0', format: 'mp3', text: 'ஷூன்யா லேப்ஸுக்கு வரவேற்கிறோம்.' },
-    { lang: 'te', voice: 'shunya-female-1', speed: '1.0', format: 'mp3', text: 'శూన్య ల్యాబ్స్‌కు స్వాగతం.' },
-    { lang: 'en', voice: 'shunya-female-1', speed: '0.5', format: 'wav', text: 'Slow playback speech test for accessibility.' },
-    { lang: 'en', voice: 'shunya-female-1', speed: '1.5', format: 'wav', text: 'Fast playback speech test for quick audio previews.' },
-    { lang: 'en', voice: 'shunya-female-1', speed: '2.0', format: 'mp3', text: 'Double speed audio generation test.' },
+  const TTS_UI_SCENARIOS = [
+    { lang: 'en', voice: 'shunya-female-1', speed: '1.0', format: 'mp3', text: 'Welcome to Shunya Labs speech synthesis platform.', title: 'Standard English Synthesis with Natural Female Voice (shunya-female-1)' },
+    { lang: 'en', voice: 'shunya-male-1', speed: '1.0', format: 'mp3', text: 'Experience natural sounding AI voices for your enterprise applications.', title: 'Standard English Synthesis with Deep Male Voice (shunya-male-1)' },
+    { lang: 'hi', voice: 'shunya-female-1', speed: '1.0', format: 'mp3', text: 'नमस्ते, शून्या लैब्स एआई वॉइस प्लेटफ़ॉर्म में आपका स्वागत है।', title: 'Hindi Speech Synthesis with Natural Female Voice (shunya-female-1)' },
+    { lang: 'hi', voice: 'shunya-male-1', speed: '1.25', format: 'mp3', text: 'यह भारतीय भाषाओं के लिए विशेष रूप से निर्मित आवाज है।', title: 'Hindi Speech Synthesis with 1.25x Speed Male Voice (shunya-male-1)' },
+    { lang: 'bn', voice: 'shunya-female-1', speed: '1.0', format: 'mp3', text: 'শূন্যা ল্যাবসে আপনাকে স্বাগতম। এটি একটি বাংলা স্পিচ টেস্ট।', title: 'Bengali (বাংলা) Speech Synthesis with Female Voice' },
+    { lang: 'ta', voice: 'shunya-female-1', speed: '1.0', format: 'mp3', text: 'ஷூன்யா லேப்ஸுக்கு வரவேற்கிறோம். இது தமிழ் பேச்சு சோதனை.', title: 'Tamil (தமிழ்) Speech Synthesis with Female Voice' },
+    { lang: 'te', voice: 'shunya-female-1', speed: '1.0', format: 'mp3', text: 'శూన్య ల్యాబ్స్‌కు స్వాగతం. ఇది తెలుగు స్పీచ్ పరీక్ష.', title: 'Telugu (తెలుగు) Speech Synthesis with Female Voice' },
+    { lang: 'mr', voice: 'shunya-female-1', speed: '1.0', format: 'mp3', text: 'शून्या लॅब्समध्ये आपले स्वागत आहे. मराठी आवाज चाचणी.', title: 'Marathi (मराठी) Speech Synthesis with Female Voice' },
+    { lang: 'gu', voice: 'shunya-female-1', speed: '1.0', format: 'mp3', text: 'શૂન્યા લેબ્સમાં આપનું સ્વાગત છે. ગુજરાતી ભાષણ પરીક્ષણ.', title: 'Gujarati (ગુજરાતી) Speech Synthesis with Female Voice' },
+    { lang: 'kn', voice: 'shunya-female-1', speed: '1.0', format: 'mp3', text: 'ಶೂನ್ಯ ಲ್ಯಾಬ್ಸ್‌ಗೆ ಸುಸ್ವಾಗತ. ಕನ್ನಡ ಭಾಷಣ ಸಂಶ್ಲೇಷಣೆ ಪರೀಕ್ಷೆ.', title: 'Kannada (ಕನ್ನಡ) Speech Synthesis with Female Voice' },
+    { lang: 'pa', voice: 'shunya-female-1', speed: '1.0', format: 'mp3', text: 'ਸ਼ੂਨਿਆ ਲੈਬਜ਼ ਵਿੱਚ ਤੁਹਾਡਾ ਸੁਆਗਤ ਹੈ। ਪੰਜਾਬੀ ਆਵਾਜ਼ ਟੈਸਟ।', title: 'Punjabi (ਪੰਜਾਬੀ) Speech Synthesis with Female Voice' },
+    { lang: 'en', voice: 'shunya-female-1', speed: '0.5', format: 'wav', text: 'Slow playback speech test for accessibility and assistive technology.', title: 'Slow Playback (0.5x) Accessibility Test with WAV Format' },
+    { lang: 'en', voice: 'shunya-female-1', speed: '1.5', format: 'wav', text: 'Fast playback speech test for quick audio previews and content skimming.', title: 'Fast Playback (1.5x) Speed Test with WAV Format' },
+    { lang: 'en', voice: 'shunya-female-1', speed: '2.0', format: 'mp3', text: 'Double speed audio generation test across long paragraph texts.', title: 'Double Speed (2.0x) Audio Generation Test with MP3 Format' },
+    { lang: 'hi-en', voice: 'shunya-female-1', speed: '1.0', format: 'mp3', text: 'डॉक्टर साहब, मेरा appointment confirm हो गया है for tomorrow morning at 10 AM.', title: 'Code-Mixed Hinglish Synthesis (Devanagari + English Script)' },
   ];
 
-  for (const t of TTS_SCENARIOS) {
+  for (const t of TTS_UI_SCENARIOS) {
+    const langMap: Record<string, string> = {
+      hi: 'Hindi', bn: 'Bengali', ta: 'Tamil', te: 'Telugu',
+      mr: 'Marathi', gu: 'Gujarati', kn: 'Kannada', pa: 'Punjabi',
+      'hi-en': 'Hinglish', en: 'English'
+    };
+    const langName = langMap[t.lang] || 'English';
+
     list.push({
       id: nextId('TC-TTS-SYN'),
       module: 'UI - Text to Speech',
       suite: 'UI',
       scenarioType: 'Positive',
-      title: `TTS UI Synthesis: ${t.lang.toUpperCase()} voice=${t.voice} speed=${t.speed}x`,
-      description: `Verify typing "${t.text.slice(0, 30)}...", selecting voice ${t.voice}, speed ${t.speed}x, generating audio`,
+      title: `TTS UI Synthesis: ${t.title}`,
+      description: `Verify typing "${t.text.slice(0, 32)}...", selecting voice ${t.voice}, speed ${t.speed}x, format ${t.format}, generating audio and testing playback`,
       model: 'N/A',
       languageCode: t.lang,
-      languageName: t.lang === 'hi' ? 'Hindi' : t.lang === 'bn' ? 'Bengali' : t.lang === 'ta' ? 'Tamil' : t.lang === 'te' ? 'Telugu' : 'English',
+      languageName: langName,
       featuresEnabled: 'TTS Speech Synthesis',
       featureConfig: JSON.stringify({ voice: t.voice, speed: t.speed, format: t.format }),
       audioPath: 'N/A',
       ttsInputText: t.text,
       ttsVoiceAndSpeed: `Voice: ${t.voice} | Speed: ${t.speed}x | Format: ${t.format}`,
-      preconditions: 'TTS tab active',
-      testSteps: `1. Switch to Text to Speech tab\n2. Enter text "${t.text}"\n3. Select voice "${t.voice}"\n4. Set speed slider to ${t.speed}x\n5. Click Generate Speech`,
-      expectedResult: `Audio synthesized; audio player populates with waveform; play button plays synthesized voice`,
+      preconditions: 'TTS tab active; valid authentication',
+      testSteps: `1. Switch to Text to Speech tab\n2. Enter text "${t.text}"\n3. Select voice "${t.voice}"\n4. Set speed slider to ${t.speed}x\n5. Select format ${t.format}\n6. Click Generate Speech\n7. Assert waveform and playback controls`,
+      expectedResult: `Audio synthesized successfully; player renders waveform with total duration; audio plays clearly without stutter`,
       expectedStatus: 'HTTP 200 / Audio Generated',
-      priority: 'P0',
+      priority: t.lang === 'en' || t.lang === 'hi' ? 'P0' : 'P1',
       automated: 'Automated',
     });
+  }
+
+  // ── 7B. Text to Speech (TTS) Backend API Comprehensive Matrix (15 cases) ──
+  seq = 1;
+  const TTS_API_SCENARIOS = [
+    { lang: 'en', voice: 'shunya-female-1', speed: 1.0, format: 'mp3', text: 'Welcome to Shunya Labs speech synthesis platform.', title: 'POST /v1/audio/speech — Standard English Female (shunya-female-1)' },
+    { lang: 'en', voice: 'shunya-male-1', speed: 1.0, format: 'mp3', text: 'Experience natural sounding AI voices for your applications.', title: 'POST /v1/audio/speech — Standard English Male (shunya-male-1)' },
+    { lang: 'hi', voice: 'shunya-female-1', speed: 1.0, format: 'mp3', text: 'नमस्ते, शून्या लैब्स में आपका स्वागत है।', title: 'POST /v1/audio/speech — Hindi Devanagari Script (shunya-female-1)' },
+    { lang: 'hi', voice: 'shunya-male-1', speed: 1.25, format: 'mp3', text: 'यह भारतीय भाषाओं के लिए विशेष रूप से निर्मित आवाज है।', title: 'POST /v1/audio/speech — Hindi 1.25x Speed (shunya-male-1)' },
+    { lang: 'bn', voice: 'shunya-female-1', speed: 1.0, format: 'mp3', text: 'শূন্যা ল্যাবসে আপনাকে স্বাগতম।', title: 'POST /v1/audio/speech — Bengali Script Synthesis' },
+    { lang: 'ta', voice: 'shunya-female-1', speed: 1.0, format: 'mp3', text: 'ஷூன்யா லேப்ஸுக்கு வரவேற்கிறோம்.', title: 'POST /v1/audio/speech — Tamil Script Synthesis' },
+    { lang: 'te', voice: 'shunya-female-1', speed: 1.0, format: 'mp3', text: 'శూన్య ల్యాబ్స్‌కు స్వాగతం.', title: 'POST /v1/audio/speech — Telugu Script Synthesis' },
+    { lang: 'mr', voice: 'shunya-female-1', speed: 1.0, format: 'mp3', text: 'शून्या लॅब्समध्ये आपले स्वागत आहे.', title: 'POST /v1/audio/speech — Marathi Script Synthesis' },
+    { lang: 'en', voice: 'shunya-female-1', speed: 0.5, format: 'wav', text: 'Slow playback speech test for accessibility.', title: 'POST /v1/audio/speech — 0.5x Speed WAV Format' },
+    { lang: 'en', voice: 'shunya-female-1', speed: 1.5, format: 'wav', text: 'Fast playback speech test for quick audio previews.', title: 'POST /v1/audio/speech — 1.5x Speed WAV Format' },
+    { lang: 'en', voice: 'shunya-female-1', speed: 2.0, format: 'mp3', text: 'Double speed audio generation test.', title: 'POST /v1/audio/speech — 2.0x Double Speed MP3 Format' },
+    { lang: 'hi-en', voice: 'shunya-female-1', speed: 1.0, format: 'mp3', text: 'Your payment of ₹25,450.75 is confirmed on 25/08/2026 with 18% GST.', title: 'POST /v1/audio/speech — Numbers, Currency (₹) & Dates Pronunciation' },
+    { lang: 'en', voice: 'shunya-female-1', speed: 1.0, format: 'mp3', text: 'Patient diagnosed with acute bacterial pharyngitis; prescribed Amoxicillin 500mg.', title: 'POST /v1/audio/speech — Clinical Medical Diagnosis & Drug Terminology' },
+    { lang: 'en', voice: 'shunya-female-1', speed: 1.0, format: 'mp3', text: 'Shunya Labs AI speech synthesis platform provides low-latency, natural voices. '.repeat(10), title: 'POST /v1/audio/speech — Long-Form Text Paragraph (>800 Characters)' },
+    { lang: 'en', voice: 'shunya-female-1', speed: 1.0, format: 'mp3', text: 'Concurrent batch synthesis request.', title: 'POST /v1/audio/speech — Concurrency & High Throughput Batch Request' },
+  ];
+
+  for (const t of TTS_API_SCENARIOS) {
+    const langMap: Record<string, string> = {
+      hi: 'Hindi', bn: 'Bengali', ta: 'Tamil', te: 'Telugu',
+      mr: 'Marathi', gu: 'Gujarati', kn: 'Kannada', pa: 'Punjabi',
+      'hi-en': 'Hinglish', en: 'English'
+    };
+    const langName = langMap[t.lang] || 'English';
 
     list.push({
       id: nextId('TC-TTS-API'),
       module: 'Backend API - TTS Speech Synthesis',
       suite: 'Backend API',
       scenarioType: 'Positive',
-      title: `Backend POST /v1/audio/speech: ${t.lang.toUpperCase()} voice=${t.voice}`,
-      description: `Verify direct POST https://ttsv2.shunyalabs.ai/v1/audio/speech returns binary audio stream`,
+      title: t.title,
+      description: `Verify direct POST https://ttsv2.shunyalabs.ai/v1/audio/speech with input "${t.text.slice(0, 30)}...", voice ${t.voice}, speed ${t.speed}x, format ${t.format}`,
       model: 'N/A',
       languageCode: t.lang,
-      languageName: t.lang,
+      languageName: langName,
       featuresEnabled: 'TTS Synthesis',
-      featureConfig: JSON.stringify({ input: t.text, voice: t.voice, speed: parseFloat(t.speed), response_format: t.format }),
+      featureConfig: JSON.stringify({ input: t.text, voice: t.voice, speed: t.speed, response_format: t.format }),
       audioPath: 'N/A',
       ttsInputText: t.text,
-      ttsVoiceAndSpeed: `Voice: ${t.voice} | Speed: ${t.speed}x`,
-      preconditions: 'Valid API Key; TTS service live',
-      testSteps: `1. POST /v1/audio/speech with input, voice, speed, response_format\n2. Assert status 200\n3. Verify binary Content-Type audio/mpeg or audio/wav`,
-      expectedResult: 'HTTP 200 OK; Content-Type: audio/mpeg; non-zero binary payload',
+      ttsVoiceAndSpeed: `Voice: ${t.voice} | Speed: ${t.speed}x | Format: ${t.format}`,
+      preconditions: 'Valid API Key; TTS microservice live',
+      testSteps: `1. POST /v1/audio/speech with JSON payload { input, voice, speed, response_format }\n2. Assert HTTP 200/201 OK\n3. Verify binary Content-Type (audio/mpeg or audio/wav)\n4. Assert payload byte length > 0`,
+      expectedResult: 'HTTP 200 OK; Content-Type: audio/mpeg or audio/wav; non-zero binary payload',
       expectedStatus: 'HTTP 200 OK',
       priority: 'P0',
       automated: 'Automated',
