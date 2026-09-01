@@ -174,28 +174,11 @@ export default class PlaywrightSheetReporter implements Reporter {
           if (Array.isArray(existing)) masterRuns = existing;
         } catch {}
       }
-      masterRuns.unshift({
-        runId: runRecord.runId,
-        timestamp: runRecord.timestamp,
-        date: runRecord.date,
-        runType: runRecord.runType,
-        durationSeconds: runRecord.durationSeconds,
-        status: runRecord.status,
-        totalTests: runRecord.totalTests,
-        passedTests: runRecord.passedTests,
-        failedTests: runRecord.failedTests,
-        passRate: runRecord.passRate,
-        summary: {
-          asrHealthy: true,
-          ttsHealthy: true,
-          zeroIndic: true,
-          zeroCodeswitch: true,
-          zeroMed: true,
-        },
-      });
+      // Append genuine run record with individual results
+      masterRuns.unshift(runRecord);
 
-      // Keep last 300 runs
-      if (masterRuns.length > 300) masterRuns = masterRuns.slice(0, 300);
+      // Keep last 100 genuine runs
+      if (masterRuns.length > 100) masterRuns = masterRuns.slice(0, 100);
       fs.writeFileSync(runsMasterPath, JSON.stringify(masterRuns, null, 2), 'utf8');
     } catch (e: any) {
       console.warn('[PlaywrightSheetReporter] Could not update playground-runs.json:', e.message);
