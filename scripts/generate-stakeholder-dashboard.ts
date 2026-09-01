@@ -19,7 +19,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { generateTestCases, DeepTestCase } from './populate-exhaustive-master-sheet';
 import { generateSmokeTestCases } from './populate-smoke-test-sheet';
-import { getLocalDateDMY, getLocalTimestamp } from '../src/utils/playgroundSheetWriter';
+import { getLocalDateDMY, getLocalTimestamp, getLocalTimeString } from '../src/utils/playgroundSheetWriter';
 
 export async function generateStakeholderDashboard(): Promise<string> {
   const reportsDir = path.resolve(__dirname, '../reports');
@@ -63,8 +63,9 @@ export async function generateStakeholderDashboard(): Promise<string> {
     });
   }
 
-  const todayDMY = getLocalDateDMY();
-  const nowTimestamp = getLocalTimestamp();
+  const latestRunDate = (latestRealRun?.startedAt || latestRealRun?.timestamp) ? new Date(latestRealRun.startedAt || latestRealRun.timestamp) : new Date();
+  const latestRunDMY = getLocalDateDMY(latestRunDate);
+  const latestRunTimeStr = getLocalTimeString(latestRunDate);
   const nowIso = new Date().toISOString();
 
   // 4. Construct Test List mapped strictly to genuine test execution results
@@ -510,7 +511,7 @@ table.data-table tr:hover td{background:rgba(139,92,246,.05)}
   <div class="header-actions">
     <span id="browsersHeaderLabel" style="font-size:12px;font-weight:600;padding:4px 10px;border-radius:6px;display:inline-block;background:rgba(139,92,246,.2);color:#c4b5fd">Browsers: Chromium + Safari</span>
     <span id="runCountLabel" style="font-size:12px;color:var(--accent);font-weight:600;background:var(--accent-soft);padding:4px 10px;border-radius:6px">Total Runs: ${normalizedHistory.length}</span>
-    <span id="lastRunLabel">${todayDMY} • ${nowTimestamp}</span>
+    <span id="lastRunLabel">${latestRunDMY} • ${latestRunTimeStr}</span>
     <div class="dropdown" id="exportDropdown">
       <button class="btn" onclick="toggleDropdown()">Export &#9662;</button>
       <div class="dropdown-menu">
@@ -723,6 +724,15 @@ calYear = now.getFullYear();
    RENDER INITIALIZATION
    ══════════════════════════════════════════════════════════ */
 function initDashboard() {
+  if (latestData && latestData.startedAt) {
+    const d = new Date(latestData.startedAt);
+    const dd = String(d.getDate()).padStart(2, '0');
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const yyyy = d.getFullYear();
+    const time = d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
+    const labelEl = document.getElementById('lastRunLabel');
+    if (labelEl) labelEl.textContent = dd + '-' + mm + '-' + yyyy + ' • ' + time;
+  }
   renderCharts(latestData);
   renderModules(latestData);
   renderAllTestCasesTable(latestData.tests);
@@ -1355,9 +1365,30 @@ function esc(str) {
   const rootDir = path.resolve(__dirname, '..');
   const rootIndexPath = path.join(rootDir, 'index.html');
   const nojekyllPath = path.join(rootDir, '.nojekyll');
+  const docsDir = path.join(rootDir, 'docs');
+  const docsIndexPath = path.join(docsDir, 'index.html');
 
   fs.writeFileSync(rootIndexPath, html, 'utf8');
   if (!fs.existsSync(nojekyllPath)) fs.writeFileSync(nojekyllPath, '', 'utf8');
+  if (fs.existsSync(docsDir)) fs.writeFileSync(docsIndexPath, html, 'utf8');
+
+  // Also sync to parent workspace root if operating in a subfolder
+  const parentRootDir = path.resolve(rootDir, '..');
+  const parentIndexPath = path.join(parentRootDir, 'index.html');
+  const parentReportsDir = path.join(parentRootDir, 'reports');
+  const parentDocsDir = path.join(parentRootDir, 'docs');
+
+  try {
+    if (fs.existsSync(parentRootDir) && parentRootDir !== rootDir) {
+      fs.writeFileSync(parentIndexPath, html, 'utf8');
+      if (fs.existsSync(parentReportsDir)) {
+        fs.writeFileSync(path.join(parentReportsDir, 'Stakeholder-Dashboard.html'), html, 'utf8');
+      }
+      if (fs.existsSync(parentDocsDir)) {
+        fs.writeFileSync(path.join(parentDocsDir, 'index.html'), html, 'utf8');
+      }
+    }
+  } catch {}
 
   console.log(`[DashboardGenerator] Wrote executive dashboard to: ${dashboardPath}`);
   console.log(`[DashboardGenerator] Wrote root index.html to: ${rootIndexPath}`);

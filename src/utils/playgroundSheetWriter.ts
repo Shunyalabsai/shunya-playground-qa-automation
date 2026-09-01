@@ -39,11 +39,25 @@ export function getLocalDateDMY(d: Date = new Date()): string {
   return `${pad(d.getDate())}-${pad(d.getMonth() + 1)}-${d.getFullYear()}`;
 }
 
+export function getLocalTimeString(d: Date = new Date()): string {
+  const pad = (n: number) => (n < 10 ? '0' + n : String(n));
+  let hours = d.getHours();
+  const minutes = pad(d.getMinutes());
+  const seconds = pad(d.getSeconds());
+  const ampm = hours >= 12 ? 'PM' : 'AM';
+  const hours12 = pad(hours % 12 || 12);
+  return `${hours12}:${minutes}:${seconds} ${ampm}`;
+}
+
 export function getLocalTimestamp(d: Date = new Date()): string {
   const pad = (n: number) => (n < 10 ? '0' + n : String(n));
   const dateStr = `${pad(d.getDate())}-${pad(d.getMonth() + 1)}-${d.getFullYear()}`;
-  const timeStr = `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
-  return `${dateStr} ${timeStr}`;
+  let hours = d.getHours();
+  const minutes = pad(d.getMinutes());
+  const seconds = pad(d.getSeconds());
+  const ampm = hours >= 12 ? 'PM' : 'AM';
+  const hours12 = pad(hours % 12 || 12);
+  return `${dateStr} ${hours12}:${minutes}:${seconds} ${ampm}`;
 }
 
 export function parseTestDetails(testTitle: string, defaultModule: string = 'Backend API'): {
