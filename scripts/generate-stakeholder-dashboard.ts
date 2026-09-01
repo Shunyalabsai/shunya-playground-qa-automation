@@ -515,8 +515,9 @@ table.data-table tr:hover td{background:rgba(139,92,246,.05)}
       </select>
       <select id="statusFilter" class="select-ctl" onchange="filterTestCasesTable()">
         <option value="all">All Statuses</option>
-        <option value="passed">Passed (${totalCanonicalCount})</option>
-        <option value="failed">Failed (0)</option>
+        <option value="passed">Passed</option>
+        <option value="failed">Failed</option>
+        <option value="skipped">Skipped</option>
       </select>
     </div>
 
@@ -771,7 +772,7 @@ function renderAllTestCasesTable(tests) {
         \${t.isSmoke ? \`<span class="badge-p p0" style="background:linear-gradient(135deg,rgba(239,68,68,.3),rgba(249,115,22,.3));color:#fed7aa;border:1px solid rgba(249,115,22,.5)">🔥 P0</span>\` : \`<span class="badge-p \${pClass}">\${t.priority || 'P1'}</span>\`}
       </td>
       <td style="font-family:monospace;font-size:12px;color:var(--muted)">\${formatDuration(t.durationMs)}</td>
-      <td><span class="pill \${t.status === 'passed' ? 'pill-pass' : 'pill-fail'}">\${t.status.toUpperCase()}</span></td>
+      <td><span class="pill \${t.status === 'passed' ? 'pill-pass' : (t.status === 'skipped' ? 'pill-skip' : 'pill-fail')}">\${t.status.toUpperCase()}</span></td>
       <td>
         <button class="btn" onclick="openTestModalById('\${t.id}')" style="padding:4px 10px;font-size:11px;font-weight:600">
           Inspect

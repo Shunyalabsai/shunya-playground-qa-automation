@@ -45,8 +45,10 @@ export default class PlaywrightSheetReporter implements Reporter {
     const timestamp = getLocalTimestamp();
 
     const isPass = result.status === 'passed';
+    const isSkipped = result.status === 'skipped';
+    const isFailed = result.status === 'failed' || result.status === 'timedOut';
     const durationMs = result.duration || 0;
-    const errorMsg = result.error?.message ? result.error.message.split('\n')[0].replace(/\x1B\[[0-9;]*[a-zA-Z]/g, '') : '';
+    const errorMsg = result.error?.message ? result.error.message.split('\n')[0].replace(/\x1B\[[0-9;]*[a-zA-Z]/g, '') : (isSkipped ? 'Skipped in test execution' : '');
 
     const titlePath = test.titlePath();
     const testTitle = test.title;
@@ -90,6 +92,8 @@ export default class PlaywrightSheetReporter implements Reporter {
       }
     }
 
+    const testStatus = isPass ? 'PASS' : (isSkipped ? 'SKIPPED' : 'FAIL');
+
     this.collectedResults.push({
       test_id: parsed.testId || '—',
       date: today,
@@ -99,10 +103,10 @@ export default class PlaywrightSheetReporter implements Reporter {
       audio_file: audioDisplay,
       language: langDisplay,
       lang_code: langCodeDisplay,
-      status: isPass ? 'PASS' : 'FAIL',
+      status: testStatus as any,
       failure_reason: isPass ? '' : errorMsg,
       latency_ms: durationMs,
-      api_response_preview: isPass ? 'HTTP 200 OK — Assertion Verified' : `Failed: ${errorMsg.slice(0, 150)}`,
+      api_response_preview: isPass ? 'HTTP 200 OK — Assertion Verified' : (isSkipped ? 'Test Skipped' : `Failed: ${errorMsg.slice(0, 150)}`),
       timestamp,
     });
   }
@@ -112,11 +116,12 @@ export default class PlaywrightSheetReporter implements Reporter {
     const totalTests = this.collectedResults.length;
     const passedTests = this.collectedResults.filter((r) => r.status === 'PASS').length;
     const failedTests = this.collectedResults.filter((r) => r.status === 'FAIL').length;
-    const passRate = totalTests > 0 ? ((passedTests / totalTests) * 100).toFixed(1) : '0';
+    const skippedTests = this.collectedResults.filter((r) => r.status === 'SKIPPED').length;
+    const passRate = totalTests > 0 ? ((passedTests / (totalTests - skippedTests || totalTests)) * 100).toFixed(1) : '0';
 
     console.log(`\n================================================================`);
     console.log(`📊 [PlaywrightSheetReporter] Execution Finished in ${totalDuration}s`);
-    console.log(`   Total: ${totalTests} | Passed: ${passedTests} (${passRate}%) | Failed: ${failedTests}`);
+    console.log(`   Total: ${totalTests} | Passed: ${passedTests} | Skipped: ${skippedTests} | Failed: ${failedTests}`);
     console.log(`================================================================\n`);
 
     if (totalTests === 0) {
@@ -146,6 +151,7 @@ export default class PlaywrightSheetReporter implements Reporter {
       totalTests,
       passedTests,
       failedTests,
+      skippedTests,
       passRate: parseFloat(passRate),
       results: this.collectedResults,
     };
