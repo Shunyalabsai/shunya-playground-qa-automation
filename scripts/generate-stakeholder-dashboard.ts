@@ -41,8 +41,8 @@ export async function generateStakeholderDashboard(): Promise<string> {
     try {
       const parsed = JSON.parse(fs.readFileSync(masterRunsPath, 'utf8'));
       if (Array.isArray(parsed)) {
-        // Filter strictly to genuine recorded runs that contain actual execution results and real timestamps
-        historicalRuns = parsed.filter(r => r && (r.runId || r.id) && (r.timestamp || r.startedAt) && !String(r.id || r.runId).startsWith('run-178'));
+        // Load all authentic runs sorted newest first
+        historicalRuns = parsed.filter(r => r && (r.runId || r.id) && (r.timestamp || r.startedAt || r.runDate));
       }
     } catch {}
   }
