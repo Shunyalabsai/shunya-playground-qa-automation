@@ -1217,24 +1217,6 @@ function esc(str) {
   fs.writeFileSync(docsIndexPath, html, 'utf8');
   if (!fs.existsSync(nojekyllPath)) fs.writeFileSync(nojekyllPath, '', 'utf8');
 
-  // Also sync to top-level repository root if playground-testing is a subfolder
-  const parentRepoDir = path.resolve(rootDir, '..');
-  try {
-    const parentIndexPath = path.join(parentRepoDir, 'index.html');
-    const parentDocsDir = path.join(parentRepoDir, 'docs');
-    const parentReportsDir = path.join(parentRepoDir, 'reports');
-    if (!fs.existsSync(parentDocsDir)) fs.mkdirSync(parentDocsDir, { recursive: true });
-    if (!fs.existsSync(parentReportsDir)) fs.mkdirSync(parentReportsDir, { recursive: true });
-
-    fs.writeFileSync(parentIndexPath, html, 'utf8');
-    fs.writeFileSync(path.join(parentDocsDir, 'index.html'), html, 'utf8');
-    fs.writeFileSync(path.join(parentReportsDir, 'Stakeholder-Dashboard.html'), html, 'utf8');
-    fs.writeFileSync(path.join(parentRepoDir, '.nojekyll'), '', 'utf8');
-    console.log(`[DashboardGenerator] Synced to parent repo index.html, docs/index.html, reports/Stakeholder-Dashboard.html`);
-  } catch (e) {
-    // Ignore if not permitted
-  }
-
   console.log(`[DashboardGenerator] Wrote executive dashboard to: ${dashboardPath}`);
   console.log(`[DashboardGenerator] Wrote root index.html to: ${rootIndexPath}`);
   console.log(`[DashboardGenerator] Wrote docs/index.html to: ${docsIndexPath}`);
