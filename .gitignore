@@ -21,7 +21,5 @@ auth/playground-auth.json
 test-results-summary.json
 
 # Exclude sensitive documentation and API guides from git tracking
-docs/*.md
-docs/*.pdf
-docs/*.docx
-!docs/index.html
+docs/
+
