@@ -92,8 +92,29 @@ export async function generateStakeholderDashboard(): Promise<string> {
 
     // Strict genuine result mapping
     const executed = realResultsMap.get(tc.id);
-    let testStatus: 'passed' | 'failed' | 'skipped' = executed ? (executed.status === 'PASS' || executed.status === 'passed' ? 'passed' : (executed.status === 'SKIPPED' || executed.status === 'skipped' ? 'skipped' : 'failed')) : 'passed';
-    let errorMsg: string | null = executed?.failure_reason || null;
+    let testStatus: 'passed' | 'failed' | 'skipped' = 'passed';
+    let errorMsg: string | null = null;
+
+    if (executed) {
+      if (executed.status === 'PASS' || executed.status === 'passed') {
+        testStatus = 'passed';
+        errorMsg = null;
+      } else if (executed.status === 'SKIPPED' || executed.status === 'skipped') {
+        testStatus = 'skipped';
+        errorMsg = executed.failure_reason || 'Skipped in test execution';
+      } else {
+        testStatus = 'failed';
+        errorMsg = executed.failure_reason || 'Test assertion failed';
+      }
+    } else {
+      if (isSmokeExecution) {
+        testStatus = 'skipped';
+        errorMsg = 'Skipped: Not in targeted smoke execution scope';
+      } else {
+        testStatus = 'passed';
+        errorMsg = null;
+      }
+    }
     let actualDuration = executed?.latency_ms || 120;
 
     return {
@@ -146,7 +167,29 @@ export async function generateStakeholderDashboard(): Promise<string> {
     let langCodeDisplay = tc.languageCode && tc.languageCode !== 'N/A' ? tc.languageCode : '—';
 
     const executed = realResultsMap.get(tc.id);
-    let testStatus: 'passed' | 'failed' | 'skipped' = executed ? (executed.status === 'PASS' || executed.status === 'passed' ? 'passed' : (executed.status === 'SKIPPED' || executed.status === 'skipped' ? 'skipped' : 'failed')) : (isSmokeExecution ? 'skipped' : 'passed');
+    let testStatus: 'passed' | 'failed' | 'skipped' = 'passed';
+    let errorMsg: string | null = null;
+
+    if (executed) {
+      if (executed.status === 'PASS' || executed.status === 'passed') {
+        testStatus = 'passed';
+        errorMsg = null;
+      } else if (executed.status === 'SKIPPED' || executed.status === 'skipped') {
+        testStatus = 'skipped';
+        errorMsg = executed.failure_reason || 'Skipped in test execution';
+      } else {
+        testStatus = 'failed';
+        errorMsg = executed.failure_reason || 'Test assertion failed';
+      }
+    } else {
+      if (isSmokeExecution) {
+        testStatus = 'skipped';
+        errorMsg = 'Skipped: Not in targeted smoke execution scope';
+      } else {
+        testStatus = 'passed';
+        errorMsg = null;
+      }
+    }
 
     return {
       id: tc.id,
@@ -163,7 +206,7 @@ export async function generateStakeholderDashboard(): Promise<string> {
       languageCode: langCodeDisplay,
       isSmoke,
       status: testStatus,
-      error: executed?.failure_reason || null,
+      error: errorMsg,
       durationMs: executed?.latency_ms || 120,
       priority: tc.priority || (isSmoke ? 'P0' : 'P1'),
       preconditions: tc.preconditions,
@@ -790,7 +833,8 @@ function renderModules(data) {
 
   grid.innerHTML = Object.entries(grouped).map(([key, mod]) => {
     const passed = mod.tests.filter(t => t.status === 'passed').length;
-    const failed = mod.tests.filter(t => t.status !== 'passed').length;
+    const failed = mod.tests.filter(t => t.status === 'failed').length;
+    const skipped = mod.tests.filter(t => t.status === 'skipped').length;
     const isSmokeMod = mod.tests.some(t => t.isSmoke);
     const testRows = mod.tests.map(t => \`
       <div class="test-row">
@@ -802,6 +846,8 @@ function renderModules(data) {
             <span>\${t.feature}</span>
             <span>&middot;</span>
             <span>\${t.language !== '—' ? t.language : t.suite}</span>
+            \${t.status === 'skipped' ? \`<span style="color:#fbbf24;font-size:10px;margin-left:4px">⚠️ \${esc(t.error || 'Skipped in execution')}</span>\` : ''}
+            \${t.status === 'failed' ? \`<span style="color:#f87171;font-size:10px;margin-left:4px">❌ \${esc(t.error || 'Test failed')}</span>\` : ''}
           </div>
         </div>
         <div class="test-duration">\${formatDuration(t.durationMs)}</div>
@@ -819,6 +865,7 @@ function renderModules(data) {
             \${isSmokeMod ? \`<span class="pill-smoke" style="font-size:10px;padding:2px 8px"><span class="smoke-flame">🔥</span> Smoke Suite</span>\` : ''}
             \${passed > 0 ? \`<span class="pill pill-pass">\${passed} passed</span>\` : ''}
             \${failed > 0 ? \`<span class="pill pill-fail">\${failed} failed</span>\` : ''}
+            \${skipped > 0 ? \`<span class="pill pill-skip">\${skipped} skipped</span>\` : ''}
           </div>
         </div>
         <div class="module-tests">\${testRows}</div>
@@ -927,6 +974,23 @@ function openTestModalById(testId) {
         <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;margin-bottom:4px">Test Identifier</div>
         \${t.isSmoke ? \`<span class="badge-smoke-id"><span class="smoke-flame">🔥</span>\${t.id}</span>\` : \`<span class="badge-id">\${t.id}</span>\`} &middot; <strong style="color:#fff">\${t.module}</strong> (\${t.suite})
       </div>
+      <div>
+        <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;margin-bottom:4px">Test Execution Status</div>
+        <div style="background:var(--panel-soft);padding:12px 14px;border-radius:8px;border:1px solid var(--panel-border);font-size:13px;display:flex;align-items:center;gap:10px">
+          <span class="pill \${t.status === 'passed' ? 'pill-pass' : (t.status === 'skipped' ? 'pill-skip' : 'pill-fail')}">\${t.status.toUpperCase()}</span>
+          <span style="color:var(--muted)">Latency: <strong>\${formatDuration(t.durationMs)}</strong></span>
+        </div>
+      </div>
+      \${t.error ? \`
+        <div>
+          <div style="font-size:11px;font-weight:700;color:\${t.status === 'skipped' ? '#fbbf24' : '#f87171'};text-transform:uppercase;margin-bottom:4px">
+            \${t.status === 'skipped' ? '⚠️ Skip Reason / Execution Condition' : '❌ Failure Reason / Error Message'}
+          </div>
+          <div style="background:\${t.status === 'skipped' ? 'rgba(245,158,11,0.12)' : 'rgba(239,68,68,0.12)'};padding:12px 14px;border-radius:8px;border:1px solid \${t.status === 'skipped' ? 'rgba(245,158,11,0.3)' : 'rgba(239,68,68,0.3)'};font-size:13px;color:\${t.status === 'skipped' ? '#fbbf24' : '#f87171'};font-weight:500">
+            \${esc(t.error)}
+          </div>
+        </div>
+      \` : ''}
       <div>
         <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;margin-bottom:4px">Objective & Description</div>
         <div style="background:var(--panel-soft);padding:12px 14px;border-radius:8px;border:1px solid var(--panel-border);font-size:13px">\${esc(t.description || t.title)}</div>

@@ -25,7 +25,7 @@ export interface PlaygroundSuiteResult {
   audio_file: string;
   language: string;
   lang_code: string;
-  status: 'PASS' | 'FAIL';
+  status: 'PASS' | 'FAIL' | 'SKIPPED';
   failure_reason: string;
   latency_ms: number;
   api_response_preview: string;
@@ -696,9 +696,16 @@ export async function writePlaygroundResults(
         },
       });
 
-      // 8. Status Cell (Soft Pastel Badge: PASS in #DCFCE7, FAIL in #FEE2E2)
-      const statusBg = r.status === 'PASS' ? hexToColor('#DCFCE7') : hexToColor('#FEE2E2');
-      const statusFg = r.status === 'PASS' ? hexToColor('#166534') : hexToColor('#991B1B');
+      // 8. Status Cell (Soft Pastel Badge: PASS in #DCFCE7, FAIL in #FEE2E2, SKIPPED in #FEF3C7)
+      let statusBg = hexToColor('#DCFCE7');
+      let statusFg = hexToColor('#166534');
+      if (r.status === 'FAIL') {
+        statusBg = hexToColor('#FEE2E2');
+        statusFg = hexToColor('#991B1B');
+      } else if (r.status === 'SKIPPED') {
+        statusBg = hexToColor('#FEF3C7');
+        statusFg = hexToColor('#92400E');
+      }
 
       formatRequests.push({
         repeatCell: {
@@ -724,8 +731,12 @@ export async function writePlaygroundResults(
         },
       });
 
-      // 9. Failure reason styling (Soft light red #FEF2F2 ONLY if error present)
+      // 9. Failure / Skip reason styling (Soft light red #FEF2F2 if error, Soft light amber #FFFBEB if skipped)
       if (r.failure_reason) {
+        const isSkipReason = r.status === 'SKIPPED';
+        const reasonBg = isSkipReason ? hexToColor('#FFFBEB') : hexToColor('#FEF2F2');
+        const reasonFg = isSkipReason ? hexToColor('#B45309') : hexToColor('#991B1B');
+
         formatRequests.push({
           repeatCell: {
             range: {
@@ -737,9 +748,9 @@ export async function writePlaygroundResults(
             },
             cell: {
               userEnteredFormat: {
-                backgroundColor: hexToColor('#FEF2F2'),
+                backgroundColor: reasonBg,
                 textFormat: {
-                  foregroundColor: hexToColor('#991B1B'),
+                  foregroundColor: reasonFg,
                   bold: true,
                   fontSize: 10,
                 },

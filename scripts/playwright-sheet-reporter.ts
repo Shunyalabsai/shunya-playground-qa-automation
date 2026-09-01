@@ -48,7 +48,27 @@ export default class PlaywrightSheetReporter implements Reporter {
     const isSkipped = result.status === 'skipped';
     const isFailed = result.status === 'failed' || result.status === 'timedOut';
     const durationMs = result.duration || 0;
-    const errorMsg = result.error?.message ? result.error.message.split('\n')[0].replace(/\x1B\[[0-9;]*[a-zA-Z]/g, '') : (isSkipped ? 'Skipped in test execution' : '');
+
+    // Extract genuine error message or explicit skip reason
+    let errorOrSkipMsg = '';
+    if (isPass) {
+      errorOrSkipMsg = '';
+    } else if (isSkipped) {
+      // Check if Playwright recorded test.skip(condition, reason)
+      const testAnnotations = (test as any).annotations || [];
+      const skipAnnotation = testAnnotations.find((a: any) => a.type === 'skip' || a.type === 'fixme');
+      if (skipAnnotation && skipAnnotation.description) {
+        errorOrSkipMsg = `Skipped: ${skipAnnotation.description}`;
+      } else if (result.error?.message) {
+        errorOrSkipMsg = `Skipped: ${result.error.message.split('\n')[0].replace(/\x1B\[[0-9;]*[a-zA-Z]/g, '')}`;
+      } else {
+        errorOrSkipMsg = 'Skipped: Not in current project execution scope';
+      }
+    } else {
+      errorOrSkipMsg = result.error?.message
+        ? result.error.message.split('\n')[0].replace(/\x1B\[[0-9;]*[a-zA-Z]/g, '')
+        : 'Test assertion failed';
+    }
 
     const titlePath = test.titlePath();
     const testTitle = test.title;
@@ -104,9 +124,9 @@ export default class PlaywrightSheetReporter implements Reporter {
       language: langDisplay,
       lang_code: langCodeDisplay,
       status: testStatus as any,
-      failure_reason: isPass ? '' : errorMsg,
+      failure_reason: errorOrSkipMsg,
       latency_ms: durationMs,
-      api_response_preview: isPass ? 'HTTP 200 OK — Assertion Verified' : (isSkipped ? 'Test Skipped' : `Failed: ${errorMsg.slice(0, 150)}`),
+      api_response_preview: isPass ? 'HTTP 200 OK — Assertion Verified' : (isSkipped ? errorOrSkipMsg : `Failed: ${errorOrSkipMsg.slice(0, 150)}`),
       timestamp,
     });
   }
