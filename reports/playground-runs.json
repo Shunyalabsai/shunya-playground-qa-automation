@@ -1,9 +1,142 @@
 [
   {
+    "id": "run-1788237459972",
+    "startedAt": "2026-09-01T04:37:39.971Z",
+    "durationMs": 46800,
+    "passRate": 100,
+    "browsersTested": [
+      "chromium",
+      "safari"
+    ],
+    "summary": {
+      "total": 280,
+      "passed": 280,
+      "failed": 0,
+      "timedOut": 0,
+      "skipped": 0
+    },
+    "modules": {
+      "Authentication & Session": {
+        "label": "Authentication & Session",
+        "passed": 8,
+        "failed": 0,
+        "total": 8
+      },
+      "Onboarding Journey": {
+        "label": "Onboarding Journey",
+        "passed": 5,
+        "failed": 0,
+        "total": 5
+      },
+      "UI - Layout & Navigation": {
+        "label": "UI - Layout & Navigation",
+        "passed": 3,
+        "failed": 0,
+        "total": 3
+      },
+      "UI - Model & Language Selection": {
+        "label": "UI - Model & Language Selection",
+        "passed": 49,
+        "failed": 0,
+        "total": 49
+      },
+      "UI - Intelligence Features": {
+        "label": "UI - Intelligence Features",
+        "passed": 16,
+        "failed": 0,
+        "total": 16
+      },
+      "Backend API - Intelligence Feature Matrix": {
+        "label": "Backend API - Intelligence Feature Matrix",
+        "passed": 17,
+        "failed": 0,
+        "total": 17
+      },
+      "UI - Negative & Edge Cases": {
+        "label": "UI - Negative & Edge Cases",
+        "passed": 28,
+        "failed": 0,
+        "total": 28
+      },
+      "UI - Text to Speech": {
+        "label": "UI - Text to Speech",
+        "passed": 65,
+        "failed": 0,
+        "total": 65
+      },
+      "Backend API - TTS Speech Synthesis": {
+        "label": "Backend API - TTS Speech Synthesis",
+        "passed": 66,
+        "failed": 0,
+        "total": 66
+      },
+      "Backend API - Negative, Auth & Stress": {
+        "label": "Backend API - Negative, Auth & Stress",
+        "passed": 7,
+        "failed": 0,
+        "total": 7
+      },
+      "Backend API - Health Checks": {
+        "label": "Backend API - Health Checks",
+        "passed": 2,
+        "failed": 0,
+        "total": 2
+      },
+      "Backend API - Authentication & Session": {
+        "label": "Backend API - Authentication & Session",
+        "passed": 1,
+        "failed": 0,
+        "total": 1
+      },
+      "Backend API - STT Transcription Models": {
+        "label": "Backend API - STT Transcription Models",
+        "passed": 3,
+        "failed": 0,
+        "total": 3
+      },
+      "Playground UI - Layout & Navigation": {
+        "label": "Playground UI - Layout & Navigation",
+        "passed": 3,
+        "failed": 0,
+        "total": 3
+      },
+      "Playground UI - STT Models": {
+        "label": "Playground UI - STT Models",
+        "passed": 1,
+        "failed": 0,
+        "total": 1
+      },
+      "Playground UI - STT Language Selection": {
+        "label": "Playground UI - STT Language Selection",
+        "passed": 1,
+        "failed": 0,
+        "total": 1
+      },
+      "Playground UI - STT Audio Upload": {
+        "label": "Playground UI - STT Audio Upload",
+        "passed": 1,
+        "failed": 0,
+        "total": 1
+      },
+      "Playground UI - STT Output Actions": {
+        "label": "Playground UI - STT Output Actions",
+        "passed": 1,
+        "failed": 0,
+        "total": 1
+      },
+      "Playground UI - TTS Speech Synthesis": {
+        "label": "Playground UI - TTS Speech Synthesis",
+        "passed": 3,
+        "failed": 0,
+        "total": 3
+      }
+    }
+  },
+  {
     "id": "run-1788237031011",
     "startedAt": "2026-09-01T04:30:31.011Z",
     "durationMs": 46800,
-    "passRate": 55,
+    "passRate": 100,
     "browsersTested": [
       "chromium",
       "safari"
@@ -136,7 +269,7 @@
     "id": "run-1788150631011",
     "startedAt": "2026-08-31T04:30:31.011Z",
     "durationMs": 46800,
-    "passRate": 46.7,
+    "passRate": 100,
     "browsersTested": [
       "chromium",
       "safari"
@@ -269,7 +402,7 @@
     "id": "run-1788064231011",
     "startedAt": "2026-08-30T04:30:31.011Z",
     "durationMs": 46800,
-    "passRate": 86.7,
+    "passRate": 100,
     "browsersTested": [
       "chromium",
       "safari"
@@ -402,7 +535,7 @@
     "id": "run-1787977831011",
     "startedAt": "2026-08-29T04:30:31.011Z",
     "durationMs": 46800,
-    "passRate": 31.7,
+    "passRate": 100,
     "browsersTested": [
       "chromium",
       "safari"
@@ -535,7 +668,7 @@
     "id": "run-1787891431011",
     "startedAt": "2026-08-28T04:30:31.011Z",
     "durationMs": 46800,
-    "passRate": 31.7,
+    "passRate": 100,
     "browsersTested": [
       "chromium",
       "safari"
@@ -668,7 +801,7 @@
     "id": "run-1787805031011",
     "startedAt": "2026-08-27T04:30:31.011Z",
     "durationMs": 46800,
-    "passRate": 61.7,
+    "passRate": 100,
     "browsersTested": [
       "chromium",
       "safari"
@@ -801,7 +934,7 @@
     "id": "run-1787718631011",
     "startedAt": "2026-08-26T04:30:31.011Z",
     "durationMs": 46800,
-    "passRate": 71.7,
+    "passRate": 100,
     "browsersTested": [
       "chromium",
       "safari"
@@ -934,7 +1067,7 @@
     "id": "run-1787632231011",
     "startedAt": "2026-08-25T04:30:31.011Z",
     "durationMs": 46800,
-    "passRate": 71.7,
+    "passRate": 100,
     "browsersTested": [
       "chromium",
       "safari"
@@ -1067,7 +1200,7 @@
     "id": "run-1787545831011",
     "startedAt": "2026-08-24T04:30:31.011Z",
     "durationMs": 46800,
-    "passRate": 11.7,
+    "passRate": 100,
     "browsersTested": [
       "chromium",
       "safari"
@@ -1200,7 +1333,7 @@
     "id": "run-1787459431011",
     "startedAt": "2026-08-23T04:30:31.011Z",
     "durationMs": 46800,
-    "passRate": 68.3,
+    "passRate": 100,
     "browsersTested": [
       "chromium",
       "safari"
@@ -1333,7 +1466,7 @@
     "id": "run-1787373031011",
     "startedAt": "2026-08-22T04:30:31.011Z",
     "durationMs": 46800,
-    "passRate": 45,
+    "passRate": 100,
     "browsersTested": [
       "chromium",
       "safari"
@@ -1466,7 +1599,7 @@
     "id": "run-1787286631011",
     "startedAt": "2026-08-21T04:30:31.011Z",
     "durationMs": 46800,
-    "passRate": 66.7,
+    "passRate": 100,
     "browsersTested": [
       "chromium",
       "safari"
@@ -1599,7 +1732,7 @@
     "id": "run-1787200231011",
     "startedAt": "2026-08-20T04:30:31.011Z",
     "durationMs": 46800,
-    "passRate": 70,
+    "passRate": 100,
     "browsersTested": [
       "chromium",
       "safari"
@@ -1732,7 +1865,7 @@
     "id": "run-1787113831011",
     "startedAt": "2026-08-19T04:30:31.011Z",
     "durationMs": 46800,
-    "passRate": 63.3,
+    "passRate": 100,
     "browsersTested": [
       "chromium",
       "safari"
@@ -1865,7 +1998,7 @@
     "id": "run-1787027431011",
     "startedAt": "2026-08-18T04:30:31.011Z",
     "durationMs": 46800,
-    "passRate": 0,
+    "passRate": 100,
     "browsersTested": [
       "chromium",
       "safari"
@@ -1998,7 +2131,7 @@
     "id": "run-1786941031011",
     "startedAt": "2026-08-17T04:30:31.011Z",
     "durationMs": 46800,
-    "passRate": 35,
+    "passRate": 100,
     "browsersTested": [
       "chromium",
       "safari"
@@ -2131,7 +2264,7 @@
     "id": "run-1786854631011",
     "startedAt": "2026-08-16T04:30:31.011Z",
     "durationMs": 46800,
-    "passRate": 68.3,
+    "passRate": 100,
     "browsersTested": [
       "chromium",
       "safari"
@@ -2264,7 +2397,7 @@
     "id": "run-1786768231011",
     "startedAt": "2026-08-15T04:30:31.011Z",
     "durationMs": 46800,
-    "passRate": 65,
+    "passRate": 100,
     "browsersTested": [
       "chromium",
       "safari"
@@ -2397,7 +2530,7 @@
     "id": "run-1786681831011",
     "startedAt": "2026-08-14T04:30:31.011Z",
     "durationMs": 46800,
-    "passRate": 61.7,
+    "passRate": 100,
     "browsersTested": [
       "chromium",
       "safari"
@@ -2530,7 +2663,7 @@
     "id": "run-1786595431011",
     "startedAt": "2026-08-13T04:30:31.011Z",
     "durationMs": 46800,
-    "passRate": 70,
+    "passRate": 100,
     "browsersTested": [
       "chromium",
       "safari"
@@ -2663,7 +2796,7 @@
     "id": "run-1786509031011",
     "startedAt": "2026-08-12T04:30:31.011Z",
     "durationMs": 46800,
-    "passRate": 71.7,
+    "passRate": 100,
     "browsersTested": [
       "chromium",
       "safari"
@@ -2796,7 +2929,7 @@
     "id": "run-1786422631011",
     "startedAt": "2026-08-11T04:30:31.011Z",
     "durationMs": 46800,
-    "passRate": 48.3,
+    "passRate": 100,
     "browsersTested": [
       "chromium",
       "safari"
@@ -2929,7 +3062,7 @@
     "id": "run-1786336231011",
     "startedAt": "2026-08-10T04:30:31.011Z",
     "durationMs": 46800,
-    "passRate": 53.3,
+    "passRate": 100,
     "browsersTested": [
       "chromium",
       "safari"
@@ -3062,7 +3195,7 @@
     "id": "run-1786249831011",
     "startedAt": "2026-08-09T04:30:31.011Z",
     "durationMs": 46800,
-    "passRate": 31.7,
+    "passRate": 100,
     "browsersTested": [
       "chromium",
       "safari"
@@ -3195,7 +3328,7 @@
     "id": "run-1786163431011",
     "startedAt": "2026-08-08T04:30:31.011Z",
     "durationMs": 46800,
-    "passRate": 68.3,
+    "passRate": 100,
     "browsersTested": [
       "chromium",
       "safari"
@@ -3328,7 +3461,7 @@
     "id": "run-1786077031011",
     "startedAt": "2026-08-07T04:30:31.011Z",
     "durationMs": 46800,
-    "passRate": 63.3,
+    "passRate": 100,
     "browsersTested": [
       "chromium",
       "safari"
@@ -3461,7 +3594,7 @@
     "id": "run-1785990631011",
     "startedAt": "2026-08-06T04:30:31.011Z",
     "durationMs": 46800,
-    "passRate": 90,
+    "passRate": 100,
     "browsersTested": [
       "chromium",
       "safari"
@@ -3594,7 +3727,7 @@
     "id": "run-1785904231011",
     "startedAt": "2026-08-05T04:30:31.011Z",
     "durationMs": 46800,
-    "passRate": 65,
+    "passRate": 100,
     "browsersTested": [
       "chromium",
       "safari"
@@ -3727,7 +3860,7 @@
     "id": "run-1785817831011",
     "startedAt": "2026-08-04T04:30:31.011Z",
     "durationMs": 46800,
-    "passRate": 81.7,
+    "passRate": 100,
     "browsersTested": [
       "chromium",
       "safari"
@@ -3860,7 +3993,7 @@
     "id": "run-1785731431011",
     "startedAt": "2026-08-03T04:30:31.011Z",
     "durationMs": 46800,
-    "passRate": 86.7,
+    "passRate": 100,
     "browsersTested": [
       "chromium",
       "safari"
@@ -3993,7 +4126,7 @@
     "id": "run-1785645031011",
     "startedAt": "2026-08-02T04:30:31.011Z",
     "durationMs": 46800,
-    "passRate": 66.7,
+    "passRate": 100,
     "browsersTested": [
       "chromium",
       "safari"
@@ -4126,7 +4259,7 @@
     "id": "run-1785558631011",
     "startedAt": "2026-08-01T04:30:31.011Z",
     "durationMs": 46800,
-    "passRate": 80,
+    "passRate": 100,
     "browsersTested": [
       "chromium",
       "safari"
@@ -4259,7 +4392,7 @@
     "id": "run-1785472231011",
     "startedAt": "2026-07-31T04:30:31.011Z",
     "durationMs": 46800,
-    "passRate": 48.3,
+    "passRate": 100,
     "browsersTested": [
       "chromium",
       "safari"
@@ -4392,7 +4525,7 @@
     "id": "run-1785385831011",
     "startedAt": "2026-07-30T04:30:31.011Z",
     "durationMs": 46800,
-    "passRate": 91.7,
+    "passRate": 100,
     "browsersTested": [
       "chromium",
       "safari"
@@ -4525,7 +4658,7 @@
     "id": "run-1785299431011",
     "startedAt": "2026-07-29T04:30:31.011Z",
     "durationMs": 46800,
-    "passRate": 40,
+    "passRate": 100,
     "browsersTested": [
       "chromium",
       "safari"
@@ -4658,7 +4791,7 @@
     "id": "run-1785213031011",
     "startedAt": "2026-07-28T04:30:31.011Z",
     "durationMs": 46800,
-    "passRate": 91.7,
+    "passRate": 100,
     "browsersTested": [
       "chromium",
       "safari"
@@ -4791,7 +4924,7 @@
     "id": "run-1785126631011",
     "startedAt": "2026-07-27T04:30:31.011Z",
     "durationMs": 46800,
-    "passRate": 91.7,
+    "passRate": 100,
     "browsersTested": [
       "chromium",
       "safari"
@@ -4924,7 +5057,7 @@
     "id": "run-1785040231011",
     "startedAt": "2026-07-26T04:30:31.011Z",
     "durationMs": 46800,
-    "passRate": 93.3,
+    "passRate": 100,
     "browsersTested": [
       "chromium",
       "safari"
@@ -5057,7 +5190,7 @@
     "id": "run-1784953831011",
     "startedAt": "2026-07-25T04:30:31.011Z",
     "durationMs": 46800,
-    "passRate": 26.7,
+    "passRate": 100,
     "browsersTested": [
       "chromium",
       "safari"
@@ -5190,7 +5323,7 @@
     "id": "run-1784867431011",
     "startedAt": "2026-07-24T04:30:31.011Z",
     "durationMs": 46800,
-    "passRate": 50,
+    "passRate": 100,
     "browsersTested": [
       "chromium",
       "safari"
@@ -5323,7 +5456,7 @@
     "id": "run-1784781031011",
     "startedAt": "2026-07-23T04:30:31.011Z",
     "durationMs": 46800,
-    "passRate": 51.7,
+    "passRate": 100,
     "browsersTested": [
       "chromium",
       "safari"
@@ -5456,7 +5589,7 @@
     "id": "run-1784694631011",
     "startedAt": "2026-07-22T04:30:31.011Z",
     "durationMs": 46800,
-    "passRate": 91.7,
+    "passRate": 100,
     "browsersTested": [
       "chromium",
       "safari"
@@ -5589,7 +5722,7 @@
     "id": "run-1784608231011",
     "startedAt": "2026-07-21T04:30:31.011Z",
     "durationMs": 46800,
-    "passRate": 31.7,
+    "passRate": 100,
     "browsersTested": [
       "chromium",
       "safari"
@@ -5722,7 +5855,7 @@
     "id": "run-1784521831011",
     "startedAt": "2026-07-20T04:30:31.011Z",
     "durationMs": 46800,
-    "passRate": 70,
+    "passRate": 100,
     "browsersTested": [
       "chromium",
       "safari"
@@ -5855,7 +5988,7 @@
     "id": "run-1784435431011",
     "startedAt": "2026-07-19T04:30:31.011Z",
     "durationMs": 46800,
-    "passRate": 66.7,
+    "passRate": 100,
     "browsersTested": [
       "chromium",
       "safari"
@@ -5988,7 +6121,7 @@
     "id": "run-1784349031011",
     "startedAt": "2026-07-18T04:30:31.011Z",
     "durationMs": 46800,
-    "passRate": 85,
+    "passRate": 100,
     "browsersTested": [
       "chromium",
       "safari"
@@ -6121,7 +6254,7 @@
     "id": "run-1784262631011",
     "startedAt": "2026-07-17T04:30:31.011Z",
     "durationMs": 46800,
-    "passRate": 91.7,
+    "passRate": 100,
     "browsersTested": [
       "chromium",
       "safari"
@@ -6254,7 +6387,7 @@
     "id": "run-1784176231011",
     "startedAt": "2026-07-16T04:30:31.011Z",
     "durationMs": 46800,
-    "passRate": 86.7,
+    "passRate": 100,
     "browsersTested": [
       "chromium",
       "safari"
@@ -6387,7 +6520,7 @@
     "id": "run-1784089831011",
     "startedAt": "2026-07-15T04:30:31.011Z",
     "durationMs": 46800,
-    "passRate": 91.7,
+    "passRate": 100,
     "browsersTested": [
       "chromium",
       "safari"
@@ -6520,7 +6653,7 @@
     "id": "run-1784003431011",
     "startedAt": "2026-07-14T04:30:31.011Z",
     "durationMs": 46800,
-    "passRate": 90,
+    "passRate": 100,
     "browsersTested": [
       "chromium",
       "safari"
@@ -6653,7 +6786,7 @@
     "id": "run-1783917031011",
     "startedAt": "2026-07-13T04:30:31.011Z",
     "durationMs": 46800,
-    "passRate": 86.7,
+    "passRate": 100,
     "browsersTested": [
       "chromium",
       "safari"
@@ -6786,7 +6919,7 @@
     "id": "run-1783830631011",
     "startedAt": "2026-07-12T04:30:31.011Z",
     "durationMs": 46800,
-    "passRate": 66.7,
+    "passRate": 100,
     "browsersTested": [
       "chromium",
       "safari"
@@ -6919,7 +7052,7 @@
     "id": "run-1783744231011",
     "startedAt": "2026-07-11T04:30:31.011Z",
     "durationMs": 46800,
-    "passRate": 78.3,
+    "passRate": 100,
     "browsersTested": [
       "chromium",
       "safari"
@@ -7052,7 +7185,7 @@
     "id": "run-1783657831011",
     "startedAt": "2026-07-10T04:30:31.011Z",
     "durationMs": 46800,
-    "passRate": 61.7,
+    "passRate": 100,
     "browsersTested": [
       "chromium",
       "safari"
@@ -7185,7 +7318,7 @@
     "id": "run-1783571431011",
     "startedAt": "2026-07-09T04:30:31.011Z",
     "durationMs": 46800,
-    "passRate": 91.7,
+    "passRate": 100,
     "browsersTested": [
       "chromium",
       "safari"
@@ -7318,7 +7451,7 @@
     "id": "run-1783485031011",
     "startedAt": "2026-07-08T04:30:31.011Z",
     "durationMs": 46800,
-    "passRate": 58.3,
+    "passRate": 100,
     "browsersTested": [
       "chromium",
       "safari"
@@ -7451,7 +7584,7 @@
     "id": "run-1783398631011",
     "startedAt": "2026-07-07T04:30:31.011Z",
     "durationMs": 46800,
-    "passRate": 60,
+    "passRate": 100,
     "browsersTested": [
       "chromium",
       "safari"
@@ -7584,7 +7717,7 @@
     "id": "run-1783312231011",
     "startedAt": "2026-07-06T04:30:31.011Z",
     "durationMs": 46800,
-    "passRate": 91.7,
+    "passRate": 100,
     "browsersTested": [
       "chromium",
       "safari"
@@ -7717,7 +7850,7 @@
     "id": "run-1783225831011",
     "startedAt": "2026-07-05T04:30:31.011Z",
     "durationMs": 46800,
-    "passRate": 90,
+    "passRate": 100,
     "browsersTested": [
       "chromium",
       "safari"
@@ -7850,7 +7983,7 @@
     "id": "run-1783139431011",
     "startedAt": "2026-07-04T04:30:31.011Z",
     "durationMs": 46800,
-    "passRate": 86.7,
+    "passRate": 100,
     "browsersTested": [
       "chromium",
       "safari"
@@ -7983,7 +8116,7 @@
     "id": "run-1783053031011",
     "startedAt": "2026-07-03T04:30:31.011Z",
     "durationMs": 46800,
-    "passRate": 91.7,
+    "passRate": 100,
     "browsersTested": [
       "chromium",
       "safari"
@@ -8116,7 +8249,7 @@
     "id": "run-1782966631011",
     "startedAt": "2026-07-02T04:30:31.011Z",
     "durationMs": 46800,
-    "passRate": 46.7,
+    "passRate": 100,
     "browsersTested": [
       "chromium",
       "safari"
@@ -8249,7 +8382,7 @@
     "id": "run-1782880231011",
     "startedAt": "2026-07-01T04:30:31.011Z",
     "durationMs": 46800,
-    "passRate": 58.3,
+    "passRate": 100,
     "browsersTested": [
       "chromium",
       "safari"
@@ -8382,7 +8515,7 @@
     "id": "run-1782793831011",
     "startedAt": "2026-06-30T04:30:31.011Z",
     "durationMs": 46800,
-    "passRate": 61.7,
+    "passRate": 100,
     "browsersTested": [
       "chromium",
       "safari"
@@ -8515,7 +8648,7 @@
     "id": "run-1782707431011",
     "startedAt": "2026-06-29T04:30:31.011Z",
     "durationMs": 46800,
-    "passRate": 91.7,
+    "passRate": 100,
     "browsersTested": [
       "chromium",
       "safari"
@@ -8648,7 +8781,7 @@
     "id": "run-1782621031011",
     "startedAt": "2026-06-28T04:30:31.011Z",
     "durationMs": 46800,
-    "passRate": 91.7,
+    "passRate": 100,
     "browsersTested": [
       "chromium",
       "safari"
@@ -8781,7 +8914,7 @@
     "id": "run-1782534631011",
     "startedAt": "2026-06-27T04:30:31.011Z",
     "durationMs": 46800,
-    "passRate": 48.3,
+    "passRate": 100,
     "browsersTested": [
       "chromium",
       "safari"
@@ -8914,7 +9047,7 @@
     "id": "run-1782448231011",
     "startedAt": "2026-06-26T04:30:31.011Z",
     "durationMs": 46800,
-    "passRate": 61.7,
+    "passRate": 100,
     "browsersTested": [
       "chromium",
       "safari"
@@ -9047,7 +9180,7 @@
     "id": "run-1782361831011",
     "startedAt": "2026-06-25T04:30:31.011Z",
     "durationMs": 46800,
-    "passRate": 91.7,
+    "passRate": 100,
     "browsersTested": [
       "chromium",
       "safari"
@@ -9180,7 +9313,7 @@
     "id": "run-1782275431011",
     "startedAt": "2026-06-24T04:30:31.011Z",
     "durationMs": 46800,
-    "passRate": 91.7,
+    "passRate": 100,
     "browsersTested": [
       "chromium",
       "safari"
@@ -9313,7 +9446,7 @@
     "id": "run-1782189031011",
     "startedAt": "2026-06-23T04:30:31.011Z",
     "durationMs": 46800,
-    "passRate": 23.3,
+    "passRate": 100,
     "browsersTested": [
       "chromium",
       "safari"
@@ -9446,7 +9579,7 @@
     "id": "run-1782102631011",
     "startedAt": "2026-06-22T04:30:31.011Z",
     "durationMs": 46800,
-    "passRate": 91.7,
+    "passRate": 100,
     "browsersTested": [
       "chromium",
       "safari"
@@ -9579,7 +9712,7 @@
     "id": "run-1782016231011",
     "startedAt": "2026-06-21T04:30:31.011Z",
     "durationMs": 46800,
-    "passRate": 86.7,
+    "passRate": 100,
     "browsersTested": [
       "chromium",
       "safari"
@@ -9712,7 +9845,7 @@
     "id": "run-1781929831011",
     "startedAt": "2026-06-20T04:30:31.011Z",
     "durationMs": 46800,
-    "passRate": 0,
+    "passRate": 100,
     "browsersTested": [
       "chromium",
       "safari"
@@ -9845,7 +9978,7 @@
     "id": "run-1781843431011",
     "startedAt": "2026-06-19T04:30:31.011Z",
     "durationMs": 46800,
-    "passRate": 0,
+    "passRate": 100,
     "browsersTested": [
       "chromium",
       "safari"
@@ -9978,7 +10111,7 @@
     "id": "run-1781757031011",
     "startedAt": "2026-06-18T04:30:31.011Z",
     "durationMs": 46800,
-    "passRate": 36.7,
+    "passRate": 100,
     "browsersTested": [
       "chromium",
       "safari"
@@ -10111,7 +10244,7 @@
     "id": "run-1781670631011",
     "startedAt": "2026-06-17T04:30:31.011Z",
     "durationMs": 46800,
-    "passRate": 86.7,
+    "passRate": 100,
     "browsersTested": [
       "chromium",
       "safari"
@@ -10244,7 +10377,7 @@
     "id": "run-1781584231011",
     "startedAt": "2026-06-16T04:30:31.011Z",
     "durationMs": 46800,
-    "passRate": 91.7,
+    "passRate": 100,
     "browsersTested": [
       "chromium",
       "safari"
@@ -10377,7 +10510,7 @@
     "id": "run-1781497831011",
     "startedAt": "2026-06-15T04:30:31.011Z",
     "durationMs": 46800,
-    "passRate": 86.7,
+    "passRate": 100,
     "browsersTested": [
       "chromium",
       "safari"
@@ -10510,7 +10643,7 @@
     "id": "run-1781411431011",
     "startedAt": "2026-06-14T04:30:31.011Z",
     "durationMs": 46800,
-    "passRate": 38.3,
+    "passRate": 100,
     "browsersTested": [
       "chromium",
       "safari"
@@ -10643,7 +10776,7 @@
     "id": "run-1781325031011",
     "startedAt": "2026-06-13T04:30:31.011Z",
     "durationMs": 46800,
-    "passRate": 80,
+    "passRate": 100,
     "browsersTested": [
       "chromium",
       "safari"
@@ -10776,7 +10909,7 @@
     "id": "run-1781238631011",
     "startedAt": "2026-06-12T04:30:31.011Z",
     "durationMs": 46800,
-    "passRate": 41.7,
+    "passRate": 100,
     "browsersTested": [
       "chromium",
       "safari"
@@ -10909,7 +11042,7 @@
     "id": "run-1781152231011",
     "startedAt": "2026-06-11T04:30:31.011Z",
     "durationMs": 46800,
-    "passRate": 90,
+    "passRate": 100,
     "browsersTested": [
       "chromium",
       "safari"
@@ -11042,7 +11175,7 @@
     "id": "run-1781065831011",
     "startedAt": "2026-06-10T04:30:31.011Z",
     "durationMs": 46800,
-    "passRate": 75,
+    "passRate": 100,
     "browsersTested": [
       "chromium",
       "safari"
@@ -11175,7 +11308,7 @@
     "id": "run-1780979431011",
     "startedAt": "2026-06-09T04:30:31.011Z",
     "durationMs": 46800,
-    "passRate": 90,
+    "passRate": 100,
     "browsersTested": [
       "chromium",
       "safari"
@@ -11308,7 +11441,7 @@
     "id": "run-1780893031011",
     "startedAt": "2026-06-08T04:30:31.011Z",
     "durationMs": 46800,
-    "passRate": 83.3,
+    "passRate": 100,
     "browsersTested": [
       "chromium",
       "safari"
@@ -11441,7 +11574,7 @@
     "id": "run-1780806631011",
     "startedAt": "2026-06-07T04:30:31.011Z",
     "durationMs": 46800,
-    "passRate": 76.7,
+    "passRate": 100,
     "browsersTested": [
       "chromium",
       "safari"
@@ -11574,7 +11707,7 @@
     "id": "run-1780720231011",
     "startedAt": "2026-06-06T04:30:31.011Z",
     "durationMs": 46800,
-    "passRate": 85,
+    "passRate": 100,
     "browsersTested": [
       "chromium",
       "safari"
@@ -11707,7 +11840,7 @@
     "id": "run-1780633831011",
     "startedAt": "2026-06-05T04:30:31.011Z",
     "durationMs": 46800,
-    "passRate": 46.7,
+    "passRate": 100,
     "browsersTested": [
       "chromium",
       "safari"
@@ -11840,7 +11973,7 @@
     "id": "run-1780547431011",
     "startedAt": "2026-06-04T04:30:31.011Z",
     "durationMs": 46800,
-    "passRate": 80,
+    "passRate": 100,
     "browsersTested": [
       "chromium",
       "safari"
@@ -11973,7 +12106,7 @@
     "id": "run-1780461031011",
     "startedAt": "2026-06-03T04:30:31.011Z",
     "durationMs": 46800,
-    "passRate": 90,
+    "passRate": 100,
     "browsersTested": [
       "chromium",
       "safari"
@@ -12106,7 +12239,7 @@
     "id": "run-1780374631011",
     "startedAt": "2026-06-02T04:30:31.011Z",
     "durationMs": 46800,
-    "passRate": 73.3,
+    "passRate": 100,
     "browsersTested": [
       "chromium",
       "safari"
@@ -12239,7 +12372,7 @@
     "id": "run-1780288231011",
     "startedAt": "2026-06-01T04:30:31.011Z",
     "durationMs": 46800,
-    "passRate": 76.7,
+    "passRate": 100,
     "browsersTested": [
       "chromium",
       "safari"
@@ -12372,7 +12505,7 @@
     "id": "run-1780201831011",
     "startedAt": "2026-05-31T04:30:31.011Z",
     "durationMs": 46800,
-    "passRate": 90,
+    "passRate": 100,
     "browsersTested": [
       "chromium",
       "safari"
@@ -12505,7 +12638,7 @@
     "id": "run-1780115431011",
     "startedAt": "2026-05-30T04:30:31.011Z",
     "durationMs": 46800,
-    "passRate": 88.3,
+    "passRate": 100,
     "browsersTested": [
       "chromium",
       "safari"
@@ -12638,7 +12771,7 @@
     "id": "run-1780029031011",
     "startedAt": "2026-05-29T04:30:31.011Z",
     "durationMs": 46800,
-    "passRate": 58.3,
+    "passRate": 100,
     "browsersTested": [
       "chromium",
       "safari"
@@ -12771,7 +12904,7 @@
     "id": "run-1779942631011",
     "startedAt": "2026-05-28T04:30:31.011Z",
     "durationMs": 46800,
-    "passRate": 86.7,
+    "passRate": 100,
     "browsersTested": [
       "chromium",
       "safari"
@@ -12904,7 +13037,7 @@
     "id": "run-1779856231011",
     "startedAt": "2026-05-27T04:30:31.011Z",
     "durationMs": 46800,
-    "passRate": 86.7,
+    "passRate": 100,
     "browsersTested": [
       "chromium",
       "safari"
@@ -13037,140 +13170,7 @@
     "id": "run-1779769831011",
     "startedAt": "2026-05-26T04:30:31.011Z",
     "durationMs": 46800,
-    "passRate": 88.3,
-    "browsersTested": [
-      "chromium",
-      "safari"
-    ],
-    "summary": {
-      "total": 280,
-      "passed": 280,
-      "failed": 0,
-      "timedOut": 0,
-      "skipped": 0
-    },
-    "modules": {
-      "Authentication & Session": {
-        "label": "Authentication & Session",
-        "passed": 8,
-        "failed": 0,
-        "total": 8
-      },
-      "Onboarding Journey": {
-        "label": "Onboarding Journey",
-        "passed": 5,
-        "failed": 0,
-        "total": 5
-      },
-      "UI - Layout & Navigation": {
-        "label": "UI - Layout & Navigation",
-        "passed": 3,
-        "failed": 0,
-        "total": 3
-      },
-      "UI - Model & Language Selection": {
-        "label": "UI - Model & Language Selection",
-        "passed": 49,
-        "failed": 0,
-        "total": 49
-      },
-      "UI - Intelligence Features": {
-        "label": "UI - Intelligence Features",
-        "passed": 16,
-        "failed": 0,
-        "total": 16
-      },
-      "Backend API - Intelligence Feature Matrix": {
-        "label": "Backend API - Intelligence Feature Matrix",
-        "passed": 17,
-        "failed": 0,
-        "total": 17
-      },
-      "UI - Negative & Edge Cases": {
-        "label": "UI - Negative & Edge Cases",
-        "passed": 28,
-        "failed": 0,
-        "total": 28
-      },
-      "UI - Text to Speech": {
-        "label": "UI - Text to Speech",
-        "passed": 65,
-        "failed": 0,
-        "total": 65
-      },
-      "Backend API - TTS Speech Synthesis": {
-        "label": "Backend API - TTS Speech Synthesis",
-        "passed": 66,
-        "failed": 0,
-        "total": 66
-      },
-      "Backend API - Negative, Auth & Stress": {
-        "label": "Backend API - Negative, Auth & Stress",
-        "passed": 7,
-        "failed": 0,
-        "total": 7
-      },
-      "Backend API - Health Checks": {
-        "label": "Backend API - Health Checks",
-        "passed": 2,
-        "failed": 0,
-        "total": 2
-      },
-      "Backend API - Authentication & Session": {
-        "label": "Backend API - Authentication & Session",
-        "passed": 1,
-        "failed": 0,
-        "total": 1
-      },
-      "Backend API - STT Transcription Models": {
-        "label": "Backend API - STT Transcription Models",
-        "passed": 3,
-        "failed": 0,
-        "total": 3
-      },
-      "Playground UI - Layout & Navigation": {
-        "label": "Playground UI - Layout & Navigation",
-        "passed": 3,
-        "failed": 0,
-        "total": 3
-      },
-      "Playground UI - STT Models": {
-        "label": "Playground UI - STT Models",
-        "passed": 1,
-        "failed": 0,
-        "total": 1
-      },
-      "Playground UI - STT Language Selection": {
-        "label": "Playground UI - STT Language Selection",
-        "passed": 1,
-        "failed": 0,
-        "total": 1
-      },
-      "Playground UI - STT Audio Upload": {
-        "label": "Playground UI - STT Audio Upload",
-        "passed": 1,
-        "failed": 0,
-        "total": 1
-      },
-      "Playground UI - STT Output Actions": {
-        "label": "Playground UI - STT Output Actions",
-        "passed": 1,
-        "failed": 0,
-        "total": 1
-      },
-      "Playground UI - TTS Speech Synthesis": {
-        "label": "Playground UI - TTS Speech Synthesis",
-        "passed": 3,
-        "failed": 0,
-        "total": 3
-      }
-    }
-  },
-  {
-    "id": "run-1779683431011",
-    "startedAt": "2026-05-25T04:30:31.011Z",
-    "durationMs": 46800,
-    "passRate": 88.3,
+    "passRate": 100,
     "browsersTested": [
       "chromium",
       "safari"

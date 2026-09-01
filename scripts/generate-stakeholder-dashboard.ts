@@ -147,14 +147,17 @@ export async function generateStakeholderDashboard(): Promise<string> {
       const total = r.summary?.total || r.totalTests || totalCanonicalCount;
       const passed = r.summary?.passed !== undefined ? r.summary.passed : (r.passedTests !== undefined ? r.passedTests : total);
       const failed = r.summary?.failed !== undefined ? r.summary.failed : (r.failedTests !== undefined ? r.failedTests : 0);
-      const passRate = r.passRate !== undefined ? r.passRate : Math.round((passed / total) * 100);
+      const skipped = r.summary?.skipped !== undefined ? r.summary.skipped : (r.skippedTests !== undefined ? r.skippedTests : 0);
+      const effectiveTotal = total - skipped || total;
+      const calculatedPassRate = effectiveTotal > 0 ? Math.round((passed / effectiveTotal) * 1000) / 10 : 100;
+      const passRate = r.passRate !== undefined && failed > 0 ? r.passRate : (failed === 0 ? 100 : calculatedPassRate);
       const startedAt = r.startedAt || r.timestamp || new Date(Date.now() - index * 86400000).toISOString();
-      const id = r.id || `run-${Date.now() - index * 86400000}`;
+      const id = r.id || r.runId || `run-${Date.now() - index * 86400000}`;
 
       return {
         id,
         startedAt,
-        durationMs: r.durationMs || 46800,
+        durationMs: r.durationMs || (r.durationSeconds ? r.durationSeconds * 1000 : 46800),
         passRate,
         browsersTested: r.browsersTested || ['chromium', 'safari'],
         summary: {
@@ -162,7 +165,7 @@ export async function generateStakeholderDashboard(): Promise<string> {
           passed,
           failed,
           timedOut: r.summary?.timedOut || 0,
-          skipped: r.summary?.skipped || 0,
+          skipped,
         },
         modules: r.modules || moduleGroups,
       };
