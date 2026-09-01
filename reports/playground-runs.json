@@ -1,5 +1,139 @@
 [
   {
+    "id": "run-1788243069170",
+    "startedAt": "2026-09-01T06:11:09.170Z",
+    "durationMs": 825000,
+    "passRate": 98.8,
+    "runType": "Full Regression Run",
+    "browsersTested": [
+      "chromium",
+      "safari"
+    ],
+    "summary": {
+      "total": 259,
+      "passed": 256,
+      "failed": 3,
+      "timedOut": 0,
+      "skipped": 0
+    },
+    "modules": {
+      "Authentication & Session": {
+        "label": "Authentication & Session",
+        "passed": 8,
+        "failed": 0,
+        "total": 8
+      },
+      "Onboarding Journey": {
+        "label": "Onboarding Journey",
+        "passed": 5,
+        "failed": 0,
+        "total": 5
+      },
+      "UI - Layout & Navigation": {
+        "label": "UI - Layout & Navigation",
+        "passed": 3,
+        "failed": 0,
+        "total": 3
+      },
+      "UI - Model & Language Selection": {
+        "label": "UI - Model & Language Selection",
+        "passed": 49,
+        "failed": 0,
+        "total": 49
+      },
+      "UI - Intelligence Features": {
+        "label": "UI - Intelligence Features",
+        "passed": 16,
+        "failed": 0,
+        "total": 16
+      },
+      "Backend API - Intelligence Feature Matrix": {
+        "label": "Backend API - Intelligence Feature Matrix",
+        "passed": 15,
+        "failed": 2,
+        "total": 17
+      },
+      "UI - Negative & Edge Cases": {
+        "label": "UI - Negative & Edge Cases",
+        "passed": 28,
+        "failed": 0,
+        "total": 28
+      },
+      "UI - Text to Speech": {
+        "label": "UI - Text to Speech",
+        "passed": 64,
+        "failed": 1,
+        "total": 65
+      },
+      "Backend API - TTS Speech Synthesis": {
+        "label": "Backend API - TTS Speech Synthesis",
+        "passed": 66,
+        "failed": 0,
+        "total": 66
+      },
+      "Backend API - Negative, Auth & Stress": {
+        "label": "Backend API - Negative, Auth & Stress",
+        "passed": 7,
+        "failed": 0,
+        "total": 7
+      },
+      "Backend API - Health Checks": {
+        "label": "Backend API - Health Checks",
+        "passed": 2,
+        "failed": 0,
+        "total": 2
+      },
+      "Backend API - Authentication & Session": {
+        "label": "Backend API - Authentication & Session",
+        "passed": 1,
+        "failed": 0,
+        "total": 1
+      },
+      "Backend API - STT Transcription Models": {
+        "label": "Backend API - STT Transcription Models",
+        "passed": 3,
+        "failed": 0,
+        "total": 3
+      },
+      "Playground UI - Layout & Navigation": {
+        "label": "Playground UI - Layout & Navigation",
+        "passed": 3,
+        "failed": 0,
+        "total": 3
+      },
+      "Playground UI - STT Models": {
+        "label": "Playground UI - STT Models",
+        "passed": 1,
+        "failed": 0,
+        "total": 1
+      },
+      "Playground UI - STT Language Selection": {
+        "label": "Playground UI - STT Language Selection",
+        "passed": 1,
+        "failed": 0,
+        "total": 1
+      },
+      "Playground UI - STT Audio Upload": {
+        "label": "Playground UI - STT Audio Upload",
+        "passed": 1,
+        "failed": 0,
+        "total": 1
+      },
+      "Playground UI - STT Output Actions": {
+        "label": "Playground UI - STT Output Actions",
+        "passed": 1,
+        "failed": 0,
+        "total": 1
+      },
+      "Playground UI - TTS Speech Synthesis": {
+        "label": "Playground UI - TTS Speech Synthesis",
+        "passed": 3,
+        "failed": 0,
+        "total": 3
+      }
+    }
+  },
+  {
     "id": "run-1788242704227",
     "startedAt": "2026-09-01T06:05:04.227Z",
     "durationMs": 5300,
@@ -9018,98 +9152,6 @@
   {
     "id": "2026-07-03T11-30-04",
     "startedAt": "2026-07-03 11:30:04",
-    "durationMs": 60000,
-    "passRate": 92,
-    "runType": "Full Regression Run",
-    "browsersTested": [
-      "chromium",
-      "safari"
-    ],
-    "summary": {
-      "total": 60,
-      "passed": 55,
-      "failed": 5,
-      "timedOut": 0,
-      "skipped": 0
-    },
-    "modules": {
-      "Backend API - Health Checks": {
-        "label": "Backend API - Health Checks",
-        "passed": 2,
-        "failed": 0,
-        "total": 2
-      },
-      "Backend API - Authentication & Session": {
-        "label": "Backend API - Authentication & Session",
-        "passed": 1,
-        "failed": 0,
-        "total": 1
-      },
-      "Backend API - STT Transcription Models": {
-        "label": "Backend API - STT Transcription Models",
-        "passed": 3,
-        "failed": 0,
-        "total": 3
-      },
-      "Backend API - Intelligence Feature Matrix": {
-        "label": "Backend API - Intelligence Feature Matrix",
-        "passed": 1,
-        "failed": 0,
-        "total": 1
-      },
-      "Backend API - TTS Speech Synthesis": {
-        "label": "Backend API - TTS Speech Synthesis",
-        "passed": 3,
-        "failed": 0,
-        "total": 3
-      },
-      "Backend API - Negative, Auth & Stress": {
-        "label": "Backend API - Negative, Auth & Stress",
-        "passed": 1,
-        "failed": 0,
-        "total": 1
-      },
-      "Playground UI - Layout & Navigation": {
-        "label": "Playground UI - Layout & Navigation",
-        "passed": 3,
-        "failed": 0,
-        "total": 3
-      },
-      "Playground UI - STT Models": {
-        "label": "Playground UI - STT Models",
-        "passed": 1,
-        "failed": 0,
-        "total": 1
-      },
-      "Playground UI - STT Language Selection": {
-        "label": "Playground UI - STT Language Selection",
-        "passed": 1,
-        "failed": 0,
-        "total": 1
-      },
-      "Playground UI - STT Audio Upload": {
-        "label": "Playground UI - STT Audio Upload",
-        "passed": 1,
-        "failed": 0,
-        "total": 1
-      },
-      "Playground UI - STT Output Actions": {
-        "label": "Playground UI - STT Output Actions",
-        "passed": 1,
-        "failed": 0,
-        "total": 1
-      },
-      "Playground UI - TTS Speech Synthesis": {
-        "label": "Playground UI - TTS Speech Synthesis",
-        "passed": 3,
-        "failed": 0,
-        "total": 3
-      }
-    }
-  },
-  {
-    "id": "2026-07-03T08-30-02",
-    "startedAt": "2026-07-03 08:30:02",
     "durationMs": 60000,
     "passRate": 92,
     "runType": "Full Regression Run",
