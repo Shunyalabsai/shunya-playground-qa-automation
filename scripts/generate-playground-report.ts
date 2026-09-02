@@ -1659,10 +1659,25 @@ function main() {
   const logCount = Array.from(allLogs.values()).reduce((a, m) => a + m.size, 0);
   console.log(`   ${logCount} suite log section(s) embedded`);
 
-  const runs = buildRunsJson(summaries);
-  fs.writeFileSync(OUTPUT_RUNS_JSON, JSON.stringify(runs, null, 2), 'utf-8');
-  console.log(`Playground runs JSON written: ${OUTPUT_RUNS_JSON}`);
-  console.log(`   ${runs.length} run(s) listed`);
+  // Do NOT overwrite playground-runs.json if it already contains richer detailed test run objects
+  let shouldWriteRunsJson = true;
+  if (fs.existsSync(OUTPUT_RUNS_JSON)) {
+    try {
+      const existing = JSON.parse(fs.readFileSync(OUTPUT_RUNS_JSON, 'utf-8'));
+      if (Array.isArray(existing) && existing.length > 0 && (existing[0].modules || existing[0].results)) {
+        shouldWriteRunsJson = false;
+      }
+    } catch {}
+  }
+
+  if (shouldWriteRunsJson) {
+    const runs = buildRunsJson(summaries);
+    fs.writeFileSync(OUTPUT_RUNS_JSON, JSON.stringify(runs, null, 2), 'utf-8');
+    console.log(`Playground runs JSON written: ${OUTPUT_RUNS_JSON}`);
+    console.log(`   ${runs.length} run(s) listed`);
+  } else {
+    console.log(`ℹ️  Preserved rich historical playground-runs.json data (skipping simple overwrite)`);
+  }
 
   const todayStr = new Date().toLocaleDateString('en-CA', { timeZone: IST });
   const todaySummary = buildTodayEmailSummary(summaries, todayStr);
