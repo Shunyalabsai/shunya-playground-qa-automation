@@ -14,17 +14,11 @@
     <key>WorkingDirectory</key>
     <string>REPLACE_PROJECT_DIR</string>
 
-    <!-- Every 3 hours at :30 (8 runs/day), local time -->
+    <!-- Twice daily at 4:00 AM (04:00) and 5:00 PM (17:00), local time -->
     <key>StartCalendarInterval</key>
     <array>
-        <dict><key>Hour</key><integer>2</integer><key>Minute</key><integer>30</integer></dict>
-        <dict><key>Hour</key><integer>5</integer><key>Minute</key><integer>30</integer></dict>
-        <dict><key>Hour</key><integer>8</integer><key>Minute</key><integer>30</integer></dict>
-        <dict><key>Hour</key><integer>11</integer><key>Minute</key><integer>30</integer></dict>
-        <dict><key>Hour</key><integer>14</integer><key>Minute</key><integer>30</integer></dict>
-        <dict><key>Hour</key><integer>17</integer><key>Minute</key><integer>30</integer></dict>
-        <dict><key>Hour</key><integer>20</integer><key>Minute</key><integer>30</integer></dict>
-        <dict><key>Hour</key><integer>23</integer><key>Minute</key><integer>30</integer></dict>
+        <dict><key>Hour</key><integer>4</integer><key>Minute</key><integer>0</integer></dict>
+        <dict><key>Hour</key><integer>17</integer><key>Minute</key><integer>0</integer></dict>
     </array>
 
     <key>StandardOutPath</key>

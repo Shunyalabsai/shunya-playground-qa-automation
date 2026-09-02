@@ -18,6 +18,6 @@ launchctl bootout "gui/$(id -u)/$LABEL" 2>/dev/null || launchctl unload "$PLIST_
 launchctl bootstrap "gui/$(id -u)" "$PLIST_DST" 2>/dev/null || launchctl load "$PLIST_DST"
 
 echo "Installed: $PLIST_DST"
-echo "Schedule: 02:30, 05:30, 08:30, 11:30, 14:30, 17:30, 20:30, 23:30 (local time)"
+echo "Schedule: 04:00 AM & 05:00 PM (local time everyday)"
 echo "Logs: $PROJECT_DIR/logs/launchd-playground.log"
 echo "Status: npm run test:playground-daily:status"

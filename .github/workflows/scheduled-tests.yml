@@ -1,9 +1,12 @@
 name: Scheduled Playground Tests (Cloud Backup)
 
 on:
-  # Runs at 16:30 UTC daily = 22:00 IST (10 PM IST)
+  # Runs twice daily:
+  # 1. 22:30 UTC = 04:00 AM IST (Morning Run)
+  # 2. 11:30 UTC = 05:00 PM IST (Evening Run)
   schedule:
-    - cron: '30 16 * * *'
+    - cron: '30 22 * * *'
+    - cron: '30 11 * * *'
   # Allow manual trigger
   workflow_dispatch:
 
