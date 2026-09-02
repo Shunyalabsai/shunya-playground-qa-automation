@@ -214,7 +214,7 @@ PLAYGROUND_LOGIN_DEBUG=1 npm run playground:refresh-auth
 
 ### Scheduled runs
 
-#### Mac — launchd (every 3 hours)
+#### Mac — launchd (twice daily: 4:00 AM & 5:00 PM)
 
 ```bash
 cd ~/Playground_repo/playground-testing
@@ -233,7 +233,7 @@ Mac auth sync to server (automated script):
 
 #### Server — cron pipeline
 
-Runs at 08:30, 11:30, 14:30, 17:30, 20:30, 23:30 server time.
+Runs at 04:00 and 17:00 (4:00 AM and 5:00 PM) server time everyday.
 
 ```bash
 cd ~/projects/playground-testing
