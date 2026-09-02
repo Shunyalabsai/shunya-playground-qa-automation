@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Install or reload the macOS LaunchAgent for scheduled Playground UI tests.
-# Schedule: every 3 hours at :30 (see com.shunyalabs.playground-testing.plist).
+# Schedule: twice daily at 4:00 AM & 5:00 PM everyday (see com.shunyalabs.playground-testing.plist).
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"

@@ -4,7 +4,7 @@
 # Runs BOTH UI and Backend API tests for the Playground, generates reports,
 # writes results to Google Sheet, and saves dated logs.
 #
-# Managed by launchd: com.shunyalabs.playground-testing.plist (every 3h at :30)
+# Managed by launchd: com.shunyalabs.playground-testing.plist (4:00 AM and 5:00 PM everyday)
 # Project: /Users/unitedwecare/Playground_repo/playground-testing
 #
 # Manual run:

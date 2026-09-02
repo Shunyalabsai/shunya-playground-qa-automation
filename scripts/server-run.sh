@@ -9,7 +9,7 @@
 # Remove cron:    bash scripts/server-run.sh --uninstall
 # Manual run:     bash scripts/server-run.sh
 #
-# Runs at: 08:30, 11:30, 14:30, 17:30, 20:30, 23:30
+# Runs at: 04:00, 17:00 (4:00 AM and 5:00 PM everyday)
 # ─────────────────────────────────────────────────────────────
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -20,11 +20,11 @@ CRON_LOG="$LOG_DIR/server-cron.log"
 # ── Install cron job ─────────────────────────────────────────
 if [ "$1" == "--install" ]; then
   mkdir -p "$LOG_DIR"
-  CRON_LINE="30 8,11,14,17,20,23 * * * bash $SCRIPT_DIR/server-run.sh >> $CRON_LOG 2>&1"
+  CRON_LINE="0 4,17 * * * bash $SCRIPT_DIR/server-run.sh >> $CRON_LOG 2>&1"
   (crontab -l 2>/dev/null | grep -v "server-run.sh"; echo "$CRON_LINE") | crontab -
   echo "✅ Cron job installed on server!"
   echo ""
-  echo "   Runs at : 08:30, 11:30, 14:30, 17:30, 20:30, 23:30 (server time)"
+  echo "   Runs at : 04:00, 17:00 (4:00 AM and 5:00 PM server time everyday)"
   echo "   Log     : tail -f $CRON_LOG"
   echo "   Check   : crontab -l"
   echo "   Remove  : bash $SCRIPT_DIR/server-run.sh --uninstall"
