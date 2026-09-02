@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Every 3 hours: run UI suites once, generate report, push dashboard (email at 8 PM only).
+# Twice daily (4:00 AM & 5:00 PM): run UI suites once, generate report, push dashboard (email at 8 PM only).
 set -uo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -16,7 +16,7 @@ mkdir -p "$LOG_DIR" "$REPORTS_DIR"
 
 # ── Wall-clock self-destruct ────────────────────────────────────────────────
 # Hard ceiling on the entire run so a hung suite can never block the next
-# launchd trigger (schedule is every 3h = 180 min). Keep below that.
+# launchd trigger. Keep below that.
 RUN_DEADLINE_SECS=9000   # 150 minutes
 PARENT_PID=$$
 (
