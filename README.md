@@ -10,7 +10,7 @@ This repository provides full-stack automated regression, health monitoring, and
 
 * **ASR Model Matrix**: Exhaustive coverage across `zero-indic` (55+ Indic languages), `zero-codeswitch` (Hinglish conversational audio), and `zero-medasr` (clinical and medical consultations).
 * **Audio Intelligence Features**: Full validation for Translation, Transliteration, Speaker Diarization, Speaker Identification, Word Timestamps, Profanity Hashing, Custom Keyword Hashing, Intent Detection, Sentiment Analysis, Emotion Diarization, Summarisation, and Keyword Normalisation.
-* **TTS Speech Synthesis**: Multi-language, multi-voice (`shunya-female-1`, `shunya-male-1`), variable speed (0.5x – 2.0x), and format validation (`mp3`, `wav`).
+* **TTS Speech Synthesis**: Multi-language, multi-voice (`Meera (Maithili)` [Female Indic], `Rajesh (Hindi)` [Male Indic], `Standard Oriental`, `Standard Universal`), variable speed (0.5x – 2.0x), and format validation (`mp3`, `wav`).
 * **Live Google Sheets Synchronization**: Automated real-time streaming of test execution runs to Google Sheets with run summary cards, status chips, and contextual dataset metadata.
 * **Executive Stakeholder Dashboard**: Visual, responsive HTML dashboard with KPI cards, latency SLA tracking, and interactive calendar filtering.
 

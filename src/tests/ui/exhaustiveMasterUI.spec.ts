@@ -239,6 +239,42 @@ test.describe('Exhaustive Master UI Suite (118 Scenarios)', () => {
             await langSelect.selectOption({ label: tc.languageName }).catch(() => langSelect.selectOption(tc.languageName).catch(() => {}));
           }
 
+          // Gender & Voice selection for Zero Indic models (Female -> Meera Maithili)
+          let config: any = {};
+          try {
+            config = JSON.parse(tc.featureConfig || '{}');
+          } catch {}
+
+          const targetGender = config.gender || (tc.title.includes('Male Voice') ? 'Male' : 'Female');
+          const targetVoice = config.voice || (targetGender === 'Male' ? 'Rajesh (Hindi)' : 'Meera (Maithili)');
+          const isZeroIndic = !tc.model || tc.model === 'N/A' || tc.model.toLowerCase().includes('indic');
+
+          if (isZeroIndic) {
+            // Select Gender (Female / Male)
+            const genderBtn = page.locator('[role="button"]').filter({ hasText: /gender|female|male/i }).first();
+            if (await genderBtn.count() > 0) {
+              await genderBtn.click().catch(() => {});
+              await page.waitForTimeout(200);
+              const genderOpt = page.locator('button, [role="option"], div').filter({ hasText: new RegExp(`^${targetGender}$`, 'i') }).first();
+              if (await genderOpt.count() > 0) {
+                await genderOpt.click().catch(() => {});
+                await page.waitForTimeout(200);
+              }
+            }
+
+            // Select Voice (e.g. Meera (Maithili) / Rajesh (Hindi))
+            const voiceBtn = page.locator('[role="button"]').filter({ hasText: /voice|meera|rajesh|anjana/i }).first();
+            if (await voiceBtn.count() > 0) {
+              await voiceBtn.click().catch(() => {});
+              await page.waitForTimeout(200);
+              const voiceOpt = page.locator('button, [role="option"], div').filter({ hasText: new RegExp(targetVoice.replace(/[()]/g, '\\$&') + '|' + targetVoice.split(' ')[0], 'i') }).first();
+              if (await voiceOpt.count() > 0) {
+                await voiceOpt.click().catch(() => {});
+                await page.waitForTimeout(200);
+              }
+            }
+          }
+
           // Synthesis Mode (Batch vs Streaming)
           if (modeSelect && tc.title.includes('Streaming')) {
             await modeSelect.selectOption('Streaming').catch(() => {});

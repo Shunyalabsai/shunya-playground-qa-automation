@@ -46,14 +46,14 @@ test.describe('Exhaustive Master Backend API Suite (33 Scenarios)', () => {
         if (!API_CONFIG.apiKey) {
           test.skip(true, 'ASR_API_KEY required for TTS test');
         }
-        let config: any = { voice: 'shunya-female-1', speed: 1.0, format: 'mp3' };
+        let config: any = { voice: 'Meera', speed: 1.0, format: 'mp3' };
         try {
           config = JSON.parse(tc.featureConfig || '{}');
         } catch {}
 
         const postData: any = {
           input: tc.ttsInputText || 'Welcome to Shunya Labs speech synthesis.',
-          voice: config.voice || 'shunya-female-1',
+          voice: config.voice || 'Meera',
           speed: parseFloat(config.speed || '1.0'),
           response_format: config.format || config.response_format || 'mp3',
         };

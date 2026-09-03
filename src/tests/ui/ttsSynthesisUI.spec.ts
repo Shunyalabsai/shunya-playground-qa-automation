@@ -47,36 +47,56 @@ test.describe('Playground UI — TTS Speech Synthesis Comprehensive Suite', () =
 
   // ── 2. Voice & Model Selection ────────────────────────────────────────────────
   test('TC-TTS-UI-003: Voice Selection Dropdown Displays Available Voices (Female & Male)', async ({ page }) => {
-    const voiceSelect = page.locator('select, [role="combobox"]').filter({ hasText: /voice|shunya/i }).first();
-    if (await voiceSelect.count() > 0) {
-      await voiceSelect.click().catch(() => {});
+    // Check for Gender button or Voice select
+    const genderBtn = page.locator('[role="button"]').filter({ hasText: /gender|female|male/i }).first();
+    if (await genderBtn.count() > 0) {
+      await genderBtn.click().catch(() => {});
       await page.waitForTimeout(200);
     }
-    const voiceLabels = page.locator('text=/shunya-female-1|shunya-male-1|shunya-female-2|shunya-male-2/i');
+    const voiceLabels = page.locator('text=/Meera|Rajesh|Anjana|Priyanka|Pooja|Sunita/i');
     if (await voiceLabels.count() > 0) {
       expect(await voiceLabels.count()).toBeGreaterThanOrEqual(1);
     }
   });
 
-  test('TC-TTS-UI-004: Selecting Voice "shunya-female-1" for Natural Female Tone', async ({ page }) => {
+  test('TC-TTS-UI-004: Selecting Female Voice "Meera (Maithili)" for Zero Indic Model', async ({ page }) => {
     const textarea = page.locator('textarea').first();
     if (await textarea.count() > 0) {
-      await textarea.fill('Welcome to Shunya Labs speech synthesis.');
+      await textarea.fill('Welcome to Shunya Labs speech synthesis with Female Meera voice.');
     }
-    const selectEl = page.locator('select').first();
-    if (await selectEl.count() > 0) {
-      await selectEl.selectOption({ label: 'shunya-female-1' }).catch(() => {});
+    const genderBtn = page.locator('[role="button"]').filter({ hasText: /gender|female|male/i }).first();
+    if (await genderBtn.count() > 0) {
+      await genderBtn.click().catch(() => {});
+      await page.waitForTimeout(200);
+      const femaleOption = page.locator('button, [role="option"], div').filter({ hasText: /^Female$/i }).first();
+      if (await femaleOption.count() > 0) {
+        await femaleOption.click().catch(() => {});
+      }
+    }
+    const voiceBtn = page.locator('[role="button"]').filter({ hasText: /voice|meera/i }).first();
+    if (await voiceBtn.count() > 0) {
+      await voiceBtn.click().catch(() => {});
+      await page.waitForTimeout(200);
+      const meeraOption = page.locator('button, [role="option"], div').filter({ hasText: /Meera \(Maithili\)|Meera/i }).first();
+      if (await meeraOption.count() > 0) {
+        await meeraOption.click().catch(() => {});
+      }
     }
   });
 
-  test('TC-TTS-UI-005: Selecting Voice "shunya-male-1" for Deep Male Tone', async ({ page }) => {
+  test('TC-TTS-UI-005: Selecting Male Voice "Rajesh (Hindi)" for Male Tone Option', async ({ page }) => {
     const textarea = page.locator('textarea').first();
     if (await textarea.count() > 0) {
       await textarea.fill('Experience natural sounding AI voices for your enterprise.');
     }
-    const selectEl = page.locator('select').first();
-    if (await selectEl.count() > 0) {
-      await selectEl.selectOption({ label: 'shunya-male-1' }).catch(() => {});
+    const genderBtn = page.locator('[role="button"]').filter({ hasText: /gender|female|male/i }).first();
+    if (await genderBtn.count() > 0) {
+      await genderBtn.click().catch(() => {});
+      await page.waitForTimeout(200);
+      const maleOption = page.locator('button, [role="option"], div').filter({ hasText: /^Male$/i }).first();
+      if (await maleOption.count() > 0) {
+        await maleOption.click().catch(() => {});
+      }
     }
   });
 

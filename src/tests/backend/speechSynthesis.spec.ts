@@ -1,7 +1,7 @@
 /**
  * Backend API Test Suite — TTS Speech Synthesis
  * Exhaustive REST API verification for POST /v1/audio/speech across:
- * - Multi-Voice Matrix (shunya-female-1, shunya-male-1, shunya-female-2, shunya-male-2)
+ * - Multi-Voice Matrix (Meera [Female Indic], Rajesh [Male Indic], Standard Universal, Standard Oriental)
  * - Multi-Language Matrix (Hindi, English, Bengali, Tamil, Telugu, Marathi, Gujarati, Kannada, Punjabi)
  * - Formats (mp3, wav, pcm) & Speeds (0.5x – 2.0x)
  * - Numbers, Currencies, Dates, Medical Terminology & Code-mixed Inputs
@@ -16,13 +16,13 @@ test.describe('Backend API — TTS Speech Synthesis Comprehensive Matrix', () =>
   test.skip(!API_CONFIG.apiKey, 'ASR_API_KEY is required for backend TTS tests');
 
   // ── 1. Multi-Voice Matrix Tests ──────────────────────────────────────────────
-  test('POST /v1/audio/speech — Voice: shunya-female-1 (Standard Female)', async ({ request }) => {
+  test('POST /v1/audio/speech — Voice: Meera (Female Indic)', async ({ request }) => {
     test.setTimeout(60000);
     const response = await request.post(ENDPOINTS.tts.synthesis, {
       headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' },
       data: {
         input: 'Welcome to Shunya Labs artificial intelligence speech synthesis.',
-        voice: 'shunya-female-1',
+        voice: 'Meera',
         response_format: 'mp3',
         speed: 1.0,
       },
@@ -36,13 +36,13 @@ test.describe('Backend API — TTS Speech Synthesis Comprehensive Matrix', () =>
     }
   });
 
-  test('POST /v1/audio/speech — Voice: shunya-male-1 (Standard Male)', async ({ request }) => {
+  test('POST /v1/audio/speech — Voice: Rajesh (Male Indic)', async ({ request }) => {
     test.setTimeout(60000);
     const response = await request.post(ENDPOINTS.tts.synthesis, {
       headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' },
       data: {
         input: 'Experience deep natural sounding AI voices with Shunya Labs.',
-        voice: 'shunya-male-1',
+        voice: 'Rajesh',
         response_format: 'mp3',
         speed: 1.0,
       },
@@ -63,7 +63,7 @@ test.describe('Backend API — TTS Speech Synthesis Comprehensive Matrix', () =>
       headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' },
       data: {
         input: 'नमस्ते, शून्या लैब्स एआई वॉइस प्लेटफ़ॉर्म में आपका स्वागत है।',
-        voice: 'shunya-female-1',
+        voice: 'Meera',
         response_format: 'mp3',
       },
       timeout: 60000,
@@ -82,7 +82,7 @@ test.describe('Backend API — TTS Speech Synthesis Comprehensive Matrix', () =>
       headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' },
       data: {
         input: 'শূন্যা ল্যাবসে আপনাকে স্বাগতম। এটি একটি উচ্চ মানের বাংলা স্পিচ টেস্ট।',
-        voice: 'shunya-female-1',
+        voice: 'Meera',
         response_format: 'mp3',
       },
       timeout: 60000,
@@ -99,7 +99,7 @@ test.describe('Backend API — TTS Speech Synthesis Comprehensive Matrix', () =>
       headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' },
       data: {
         input: 'ஷூன்யா லேப்ஸுக்கு வரவேற்கிறோம். இது தமிழ் பேச்சு தொகுப்பு சோதனை.',
-        voice: 'shunya-female-1',
+        voice: 'Meera',
         response_format: 'mp3',
       },
       timeout: 60000,
@@ -116,7 +116,7 @@ test.describe('Backend API — TTS Speech Synthesis Comprehensive Matrix', () =>
       headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' },
       data: {
         input: 'శూన్య ల్యాబ్స్‌కు స్వాగతం. ఇది తెలుగు స్పీచ్ సింథసిస్ పరీక్ష.',
-        voice: 'shunya-female-1',
+        voice: 'Meera',
         response_format: 'mp3',
       },
       timeout: 60000,
@@ -133,7 +133,7 @@ test.describe('Backend API — TTS Speech Synthesis Comprehensive Matrix', () =>
       headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' },
       data: {
         input: 'शून्या लॅब्समध्ये आपले स्वागत आहे. मराठी आवाज संश्लेषण चाचणी.',
-        voice: 'shunya-female-1',
+        voice: 'Meera',
         response_format: 'mp3',
       },
       timeout: 60000,
@@ -151,7 +151,7 @@ test.describe('Backend API — TTS Speech Synthesis Comprehensive Matrix', () =>
       headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' },
       data: {
         input: 'Testing half speed voice synthesis for accessibility applications.',
-        voice: 'shunya-female-1',
+        voice: 'Meera',
         speed: 0.5,
         response_format: 'wav',
       },
@@ -169,7 +169,7 @@ test.describe('Backend API — TTS Speech Synthesis Comprehensive Matrix', () =>
       headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' },
       data: {
         input: 'Testing one point five speed voice synthesis for quick audio consumption.',
-        voice: 'shunya-female-1',
+        voice: 'Meera',
         speed: 1.5,
         response_format: 'mp3',
       },
@@ -187,7 +187,7 @@ test.describe('Backend API — TTS Speech Synthesis Comprehensive Matrix', () =>
       headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' },
       data: {
         input: 'Testing double speed speech synthesis for high speed audio generation.',
-        voice: 'shunya-female-1',
+        voice: 'Meera',
         speed: 2.0,
         response_format: 'mp3',
       },
@@ -206,7 +206,7 @@ test.describe('Backend API — TTS Speech Synthesis Comprehensive Matrix', () =>
       headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' },
       data: {
         input: 'Your payment of ₹25,450.75 has been successfully processed on 25th August 2026 with 18% GST.',
-        voice: 'shunya-female-1',
+        voice: 'Meera',
       },
       timeout: 60000,
     }).catch(() => null);
@@ -222,7 +222,7 @@ test.describe('Backend API — TTS Speech Synthesis Comprehensive Matrix', () =>
       headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' },
       data: {
         input: 'डॉक्टर साहब, मेरा blood pressure normal है और report positive आई है।',
-        voice: 'shunya-female-1',
+        voice: 'Meera',
       },
       timeout: 60000,
     }).catch(() => null);
@@ -238,7 +238,7 @@ test.describe('Backend API — TTS Speech Synthesis Comprehensive Matrix', () =>
       headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' },
       data: {
         input: 'Patient prescribed Paracetamol 650mg twice daily and Amoxicillin for acute bacterial pharyngitis.',
-        voice: 'shunya-female-1',
+        voice: 'Meera',
       },
       timeout: 60000,
     }).catch(() => null);
@@ -252,7 +252,7 @@ test.describe('Backend API — TTS Speech Synthesis Comprehensive Matrix', () =>
   test('POST /v1/audio/speech — Negative: Empty input string returns 400/422', async ({ request }) => {
     const response = await request.post(ENDPOINTS.tts.synthesis, {
       headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' },
-      data: { input: '', voice: 'shunya-female-1' },
+      data: { input: '', voice: 'Meera' },
       timeout: 30000,
     }).catch(() => null);
 
@@ -264,7 +264,7 @@ test.describe('Backend API — TTS Speech Synthesis Comprehensive Matrix', () =>
   test('POST /v1/audio/speech — Negative: Missing Authorization Header returns 401', async ({ request }) => {
     const response = await request.post(ENDPOINTS.tts.synthesis, {
       headers: { 'Content-Type': 'application/json' },
-      data: { input: 'Test speech without auth', voice: 'shunya-female-1' },
+      data: { input: 'Test speech without auth', voice: 'Meera' },
       timeout: 30000,
     }).catch(() => null);
 
@@ -288,7 +288,7 @@ test.describe('Backend API — TTS Speech Synthesis Comprehensive Matrix', () =>
   test('POST /v1/audio/speech — Negative: Invalid Speed Multiplier (<0 or >5) returns 400/422', async ({ request }) => {
     const response = await request.post(ENDPOINTS.tts.synthesis, {
       headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' },
-      data: { input: 'Valid text', voice: 'shunya-female-1', speed: -1.5 },
+      data: { input: 'Valid text', voice: 'Meera', speed: -1.5 },
       timeout: 30000,
     }).catch(() => null);
 
@@ -300,7 +300,7 @@ test.describe('Backend API — TTS Speech Synthesis Comprehensive Matrix', () =>
   test('POST /v1/audio/speech — Negative: Invalid Response Format ("flv") returns 400/422', async ({ request }) => {
     const response = await request.post(ENDPOINTS.tts.synthesis, {
       headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' },
-      data: { input: 'Valid text', voice: 'shunya-female-1', response_format: 'flv' },
+      data: { input: 'Valid text', voice: 'Meera', response_format: 'flv' },
       timeout: 30000,
     }).catch(() => null);
 
@@ -317,7 +317,7 @@ test.describe('Backend API — TTS Speech Synthesis Comprehensive Matrix', () =>
       data: {
         model: 'zero-oriental',
         input: 'こんにちは、Shunya Labsの音声合成テストです。',
-        voice: 'shunya-female-1',
+        voice: 'Meera',
         response_format: 'mp3',
       },
       timeout: 60000,
@@ -335,7 +335,7 @@ test.describe('Backend API — TTS Speech Synthesis Comprehensive Matrix', () =>
       data: {
         model: 'zero-oriental',
         input: '안녕하세요, Shunya Labs 음성 합성 시스템입니다.',
-        voice: 'shunya-female-1',
+        voice: 'Meera',
         response_format: 'mp3',
       },
       timeout: 60000,
@@ -353,7 +353,7 @@ test.describe('Backend API — TTS Speech Synthesis Comprehensive Matrix', () =>
       data: {
         model: 'zero-oriental',
         input: '您好，欢迎使用 Shunya Labs 人工智能语音合成。',
-        voice: 'shunya-female-1',
+        voice: 'Meera',
         response_format: 'mp3',
       },
       timeout: 60000,
@@ -371,7 +371,7 @@ test.describe('Backend API — TTS Speech Synthesis Comprehensive Matrix', () =>
       data: {
         model: 'zero-universal',
         input: 'Bienvenido a la plataforma de síntesis de voz de Shunya Labs.',
-        voice: 'shunya-female-1',
+        voice: 'Meera',
         response_format: 'mp3',
       },
       timeout: 60000,
@@ -389,7 +389,7 @@ test.describe('Backend API — TTS Speech Synthesis Comprehensive Matrix', () =>
       data: {
         model: 'zero-universal',
         input: 'Bienvenue sur la plateforme de synthèse vocale de Shunya Labs.',
-        voice: 'shunya-female-1',
+        voice: 'Meera',
         response_format: 'mp3',
       },
       timeout: 60000,
@@ -407,7 +407,7 @@ test.describe('Backend API — TTS Speech Synthesis Comprehensive Matrix', () =>
       data: {
         model: 'zero-universal',
         input: 'Willkommen bei der Shunya Labs Sprachsynthese-Plattform.',
-        voice: 'shunya-female-1',
+        voice: 'Meera',
         response_format: 'mp3',
       },
       timeout: 60000,
@@ -425,7 +425,7 @@ test.describe('Backend API — TTS Speech Synthesis Comprehensive Matrix', () =>
       data: {
         model: 'zero-universal',
         input: 'مرحبًا بكم في منصة شونيا لابس للتوليف الصوتي.',
-        voice: 'shunya-female-1',
+        voice: 'Meera',
         response_format: 'mp3',
       },
       timeout: 60000,
@@ -448,7 +448,7 @@ test.describe('Backend API — TTS Speech Synthesis Comprehensive Matrix', () =>
     const promises = prompts.map(text =>
       request.post(ENDPOINTS.tts.synthesis, {
         headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' },
-        data: { input: text, voice: 'shunya-female-1' },
+        data: { input: text, voice: 'Meera' },
         timeout: 90000,
       }).catch(() => null)
     );

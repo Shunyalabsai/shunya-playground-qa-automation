@@ -116,14 +116,14 @@ test.describe('Smoke Test Suite — Backend API (P0 Sanity)', () => {
   });
 
   // ── 4. Core TTS Speech Synthesis (Indic, Oriental, Universal) ────────────────
-  test('SMOKE-API-008: TTS Core Synthesis — zero-indic (Hindi & English)', async ({ request }) => {
+  test('SMOKE-API-008: TTS Core Synthesis — zero-indic with Female Meera Maithili Voice', async ({ request }) => {
     test.skip(!API_CONFIG.apiKey, 'ASR_API_KEY required');
     const res = await request.post(ENDPOINTS.tts.synthesis, {
       headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' },
       data: {
         model: 'zero-indic',
         input: 'नमस्ते, शून्या लैब्स एआई वॉइस प्लेटफ़ॉर्म में आपका स्वागत है।',
-        voice: 'shunya-female-1',
+        voice: 'Meera',
         speed: 1.0,
         response_format: 'mp3',
       },
@@ -144,7 +144,7 @@ test.describe('Smoke Test Suite — Backend API (P0 Sanity)', () => {
       data: {
         model: 'zero-oriental',
         input: 'こんにちは、Shunya Labsの音声合成テストです。',
-        voice: 'shunya-female-1',
+        voice: 'Standard Oriental',
         speed: 1.0,
         response_format: 'mp3',
       },
@@ -163,7 +163,7 @@ test.describe('Smoke Test Suite — Backend API (P0 Sanity)', () => {
       data: {
         model: 'zero-universal',
         input: 'Bienvenido a la plataforma de síntesis de voz de Shunya Labs.',
-        voice: 'shunya-female-1',
+        voice: 'Standard Universal',
         speed: 1.0,
         response_format: 'mp3',
       },
