@@ -50,6 +50,18 @@ if [ -f "$HOME/.nvm/nvm.sh" ]; then
 fi
 export PATH="/usr/local/bin:$HOME/.nvm/versions/node/$(ls "$HOME/.nvm/versions/node" 2>/dev/null | sort -V | tail -1)/bin:$PATH"
 
+# ── Smart Failover & Deduplication Check ─────────────────────────────────────
+echo "── Smart Failover & Deduplication Check ──────────"
+if npx ts-node --transpile-only "$SCRIPT_DIR/check-apps-script-status.ts"; then
+  echo ""
+  echo "════════════════════════════════════════════════════"
+  echo "  [SKIPPED] Apps Script / Cloud run already active for this slot."
+  echo "  LaunchAgent skipped to avoid duplicate dashboard runs."
+  echo "════════════════════════════════════════════════════"
+  exit 0
+fi
+echo "── Proceeding with Local Fallback Execution ──────"
+
 echo ""
 echo "── Running UI Test Suites ─────────────────────────"
 bash "$SCRIPT_DIR/run-playground-daily.sh" 2>&1 | tee -a "$LOG_DIR/playground-email-$DATE.log"
