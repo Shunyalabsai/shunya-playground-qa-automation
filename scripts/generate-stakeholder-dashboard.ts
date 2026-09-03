@@ -1414,6 +1414,25 @@ function esc(str) {
 
   console.log(`[DashboardGenerator] Wrote executive dashboard to: ${dashboardPath}`);
   console.log(`[DashboardGenerator] Wrote root index.html to: ${rootIndexPath}`);
+
+  // Automatically commit and push updated reports & dashboard to both remotes
+  try {
+    const { execSync } = require('child_process');
+    execSync('git add index.html docs/ .nojekyll reports/ 2>/dev/null || true', { cwd: rootDir });
+    const diff = execSync('git diff --staged --name-only', { cwd: rootDir }).toString().trim();
+    if (diff) {
+      const nowStr = new Date().toISOString().replace('T', ' ').substring(0, 19);
+      execSync(`git commit -m "chore(dashboard): auto-update test run results & dashboard [${nowStr}]"`, { cwd: rootDir });
+      console.log(`[DashboardGenerator] 🚀 Auto-committing run results...`);
+      execSync('git push origin main', { cwd: rootDir, stdio: 'inherit' });
+      console.log(`✅ [DashboardGenerator] Successfully auto-pushed latest dashboard to both remote repositories!`);
+    } else {
+      console.log(`[DashboardGenerator] ℹ️ Dashboard is already up to date with remote.`);
+    }
+  } catch (pushErr: any) {
+    console.warn(`[DashboardGenerator] Auto-push notice: ${pushErr.message}`);
+  }
+
   return dashboardPath;
 }
 
