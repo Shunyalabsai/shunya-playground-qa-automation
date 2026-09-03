@@ -16,7 +16,7 @@ import { test, expect } from '@playwright/test';
 import * as path from 'path';
 import * as fs from 'fs';
 import { generateTestCases } from '../../../scripts/populate-exhaustive-master-sheet';
-import { PLAYGROUND_URL, TEST_AUDIO_FILES } from '../../config/playground.config';
+import { PLAYGROUND_URL } from '../../config/playground.config';
 import { clickFeatureToggle, dismissOpenModals, featureRow } from './playgroundStt.helpers';
 
 const uiCases = generateTestCases().filter((t) => t.suite === 'UI');

@@ -43,7 +43,8 @@ test.describe('Smoke Test Suite — Backend API (P0 Sanity)', () => {
     if (!fs.existsSync(audioPath)) {
       audioPath = path.resolve(__dirname, '../../assets/sample.mp3');
     }
-    const fileBuffer = fs.existsSync(audioPath) ? fs.readFileSync(audioPath) : Buffer.from('dummy');
+    test.skip(!fs.existsSync(audioPath), 'Real test audio fixture not found');
+    const fileBuffer = fs.readFileSync(audioPath);
 
     const res = await request.post(ENDPOINTS.transcription, {
       headers: getAuthHeaders(),
@@ -63,7 +64,8 @@ test.describe('Smoke Test Suite — Backend API (P0 Sanity)', () => {
   test('SMOKE-API-005: STT Codeswitch Model — zero-codeswitch Hinglish Sanity', async ({ request }) => {
     test.skip(!API_CONFIG.apiKey, 'ASR_API_KEY required');
     const audioPath = path.resolve(__dirname, '../../../input/indicvoices_data/audio/Hindi/37.mp3');
-    const fileBuffer = fs.existsSync(audioPath) ? fs.readFileSync(audioPath) : Buffer.from('dummy');
+    test.skip(!fs.existsSync(audioPath), 'Real test audio fixture not found');
+    const fileBuffer = fs.readFileSync(audioPath);
 
     const res = await request.post(ENDPOINTS.transcription, {
       headers: getAuthHeaders(),
@@ -80,7 +82,8 @@ test.describe('Smoke Test Suite — Backend API (P0 Sanity)', () => {
   test('SMOKE-API-006: STT Medical Model — zero-medasr Clinical Sanity', async ({ request }) => {
     test.skip(!API_CONFIG.apiKey, 'ASR_API_KEY required');
     const audioPath = path.resolve(__dirname, '../../../input/indicvoices_data/audio/Hindi/37.mp3');
-    const fileBuffer = fs.existsSync(audioPath) ? fs.readFileSync(audioPath) : Buffer.from('dummy');
+    test.skip(!fs.existsSync(audioPath), 'Real test audio fixture not found');
+    const fileBuffer = fs.readFileSync(audioPath);
 
     const res = await request.post(ENDPOINTS.transcription, {
       headers: getAuthHeaders(),
@@ -98,7 +101,8 @@ test.describe('Smoke Test Suite — Backend API (P0 Sanity)', () => {
   test('SMOKE-API-007: STT Audio Intelligence — Translation & Word Timestamps', async ({ request }) => {
     test.skip(!API_CONFIG.apiKey, 'ASR_API_KEY required');
     const audioPath = path.resolve(__dirname, '../../../input/indicvoices_data/audio/Hindi/37.mp3');
-    const fileBuffer = fs.existsSync(audioPath) ? fs.readFileSync(audioPath) : Buffer.from('dummy');
+    test.skip(!fs.existsSync(audioPath), 'Real test audio fixture not found');
+    const fileBuffer = fs.readFileSync(audioPath);
 
     const res = await request.post(ENDPOINTS.transcription, {
       headers: getAuthHeaders(),

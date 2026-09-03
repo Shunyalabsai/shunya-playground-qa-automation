@@ -167,8 +167,12 @@ test.describe('Exhaustive Master Backend API Suite (33 Scenarios)', () => {
         }
 
         if (tc.scenarioType === 'Stress' || tc.title.includes('Concurrency Burst')) {
-          const audioPath = path.resolve(__dirname, '../../../', tc.audioPath || 'input/indicvoices_data/audio/Hindi/37.mp3');
-          const fileBuffer = fs.existsSync(audioPath) ? fs.readFileSync(audioPath) : Buffer.from('dummy-audio');
+          let audioPath = path.resolve(__dirname, '../../../', tc.audioPath || 'input/indicvoices_data/audio/Hindi/37.mp3');
+          if (!fs.existsSync(audioPath)) {
+            audioPath = path.resolve(__dirname, '../../../input/indicvoices_data/audio/Hindi/37.mp3');
+          }
+          test.skip(!fs.existsSync(audioPath), 'Real audio fixture not found');
+          const fileBuffer = fs.readFileSync(audioPath);
           const responses = await Promise.all([
             request.post(ENDPOINTS.transcription, {
               headers: getAuthHeaders(),
