@@ -3,65 +3,68 @@
  * GOOGLE APPS SCRIPT (GAS) QA AUTOMATION & SCHEDULER ENGINE
  * ============================================================================
  *
- * Supported Projects:
- * 1. Playground Automated Testing (playground-testing)
- * 2. Meera Voice Agent Platform (Meera_repo)
- * 3. ASR & TTS Backend QA Suite (asr-testing-v2)
+ * Configured Sheets:
+ * - Master Input Sheet ID:  1KWWMQN3ppFfux1mP8Wb34UmtrIEXhz2T6_1_goXI8JI
+ * - Output Sheet ID:        11leUutfqP4OXyIIaeTYqw_3gWc1w5fQLnQWuUHXPgW4
+ * - Results Tab:            Playground-Execution-Results
+ *
+ * Remote Dashboards Updated:
+ * 1. https://yamini-pal-singh.github.io/playground-testing/
+ * 2. https://shunyalabsai.github.io/shunya-playground-qa-automation/
  *
  * Capabilities:
  * - Time-Driven Triggers: Executes daily at 4:00 AM and 5:00 PM IST automatically.
- * - Cloud Dispatch: Triggers GitHub Actions workflows via repository_dispatch.
- * - Dashboard & Sheet Management: Updates Summary metrics, formats status badges,
- *   and archives test run history in Google Sheets.
- * - Webhook Endpoint (Web App): Receives real-time test completion webhooks (doPost/doGet).
+ * - Dual Cloud Dispatch: Triggers both GitHub repositories via repository_dispatch.
+ * - Dashboard & Sheet Management: Logs execution status in Output Google Sheet.
  * ============================================================================
  */
 
 var CONFIG = {
   TIMEZONE: 'Asia/Kolkata',
-  ACTIVE_PROJECT: 'PLAYGROUND',
 
-  PROJECTS: {
-    PLAYGROUND: {
-      NAME: 'Playground Automated Testing',
-      GITHUB_OWNER: 'yamini-pal-singh',
-      GITHUB_REPO: 'playground-testing',
-      SPREADSHEET_ID: '11leUutfqP4OXyIIaeTYqw_3gWc1w5fQLnQWuUHXPgW4',
-      DASHBOARD_URL: 'https://yamini-pal-singh.github.io/playground-testing/',
-      EVENT_TYPE: 'scheduled_daily_run'
-    },
-    MEERA: {
-      NAME: 'Meera Voice Agent Platform QA',
-      GITHUB_OWNER: 'yamini-pal-singh',
-      GITHUB_REPO: 'Meera_repo',
-      SPREADSHEET_ID: '1MgzIeVQOLdquLraUnPH33vm-MvWBcijYmIZerHMG7Ro',
-      DASHBOARD_URL: 'https://yamini-pal-singh.github.io/Meera_repo/',
-      EVENT_TYPE: 'meera_scheduled_run'
-    },
-    ASR_TTS: {
-      NAME: 'ASR & TTS Backend QA',
-      GITHUB_OWNER: 'Shunyalabsai',
-      GITHUB_REPO: 'asr-tts-backend-qa',
-      SPREADSHEET_ID: '1hWphhqgyjlgQD39TtnlkpHasDm0Vks1ZmfGYWNicN9c',
-      DASHBOARD_URL: 'https://shunyalabsai.github.io/asr-tts-backend-qa/',
-      EVENT_TYPE: 'scheduled_daily_run'
-    }
+  SHEETS: {
+    INPUT_SPREADSHEET_ID: '1KWWMQN3ppFfux1mP8Wb34UmtrIEXhz2T6_1_goXI8JI',
+    OUTPUT_SPREADSHEET_ID: '11leUutfqP4OXyIIaeTYqw_3gWc1w5fQLnQWuUHXPgW4',
+    RESULTS_TAB: 'Playground-Execution-Results',
+    HISTORY_TAB: 'Execution History'
   },
+
+  // Both Remote Repositories are triggered & updated
+  REPOSITORIES: [
+    {
+      OWNER: 'yamini-pal-singh',
+      REPO: 'playground-testing',
+      NAME: 'Yamini Playground Testing',
+      DASHBOARD_URL: 'https://yamini-pal-singh.github.io/playground-testing/'
+    },
+    {
+      OWNER: 'Shunyalabsai',
+      REPO: 'shunya-playground-qa-automation',
+      NAME: 'Shunya Labs QA Automation',
+      DASHBOARD_URL: 'https://shunyalabsai.github.io/shunya-playground-qa-automation/'
+    }
+  ],
+
+  EVENT_TYPE: 'scheduled_daily_run',
 
   getGithubToken: function() {
     return PropertiesService.getScriptProperties().getProperty('GITHUB_PAT') || '';
   }
 };
 
+/**
+ * Run this function ONCE in Apps Script editor to install 4:00 AM & 5:00 PM IST triggers.
+ */
 function setupDailyTriggers() {
   var triggers = ScriptApp.getProjectTriggers();
   for (var i = 0; i < triggers.length; i++) {
-    if (triggers[i].getHandlerFunction() === 'executeScheduledRun' ||
-        triggers[i].getHandlerFunction() === 'executeAllProjectsScheduledRun') {
+    var handler = triggers[i].getHandlerFunction();
+    if (handler === 'executeScheduledRun' || handler === 'morningRunJob' || handler === 'eveningRunJob') {
       ScriptApp.deleteTrigger(triggers[i]);
     }
   }
 
+  // 1. Morning Run: 4:00 AM IST
   ScriptApp.newTrigger('executeScheduledRun')
     .timeBased()
     .atHour(4)
@@ -70,6 +73,7 @@ function setupDailyTriggers() {
     .inTimezone(CONFIG.TIMEZONE)
     .create();
 
+  // 2. Evening Run: 5:00 PM IST
   ScriptApp.newTrigger('executeScheduledRun')
     .timeBased()
     .atHour(17)
@@ -78,36 +82,49 @@ function setupDailyTriggers() {
     .inTimezone(CONFIG.TIMEZONE)
     .create();
 
-  Logger.log('✅ Daily triggers installed: 4:00 AM & 5:00 PM (' + CONFIG.TIMEZONE + ')');
+  Logger.log('✅ Daily triggers installed successfully for 4:00 AM and 5:00 PM (' + CONFIG.TIMEZONE + ')');
 }
 
+/**
+ * Main execution function called by 4:00 AM & 5:00 PM triggers.
+ * Dispatches to both GitHub repositories.
+ */
 function executeScheduledRun() {
-  var project = CONFIG.PROJECTS[CONFIG.ACTIVE_PROJECT] || CONFIG.PROJECTS.PLAYGROUND;
   var now = new Date();
   var timestampStr = Utilities.formatDate(now, CONFIG.TIMEZONE, 'yyyy-MM-dd HH:mm:ss');
-  var slot = (now.getHours() < 12) ? 'Morning Run (4:00 AM)' : 'Evening Run (5:00 PM)';
+  var slot = (now.getHours() < 12) ? 'Morning Run (4:00 AM IST)' : 'Evening Run (5:00 PM IST)';
 
-  Logger.log('🚀 Triggering [' + project.NAME + '] ' + slot + ' at ' + timestampStr);
+  Logger.log('🚀 Triggering Scheduled QA Runs for slot: ' + slot + ' at ' + timestampStr);
 
-  var triggered = triggerGitHubWorkflow(project, project.EVENT_TYPE, {
-    trigger_slot: slot,
-    triggered_at: timestampStr,
-    source: 'Google Apps Script Scheduler'
-  });
+  var results = [];
+  for (var i = 0; i < CONFIG.REPOSITORIES.length; i++) {
+    var repo = CONFIG.REPOSITORIES[i];
+    var triggered = triggerGitHubWorkflow(repo, CONFIG.EVENT_TYPE, {
+      trigger_slot: slot,
+      triggered_at: timestampStr,
+      input_sheet: CONFIG.SHEETS.INPUT_SPREADSHEET_ID,
+      output_sheet: CONFIG.SHEETS.OUTPUT_SPREADSHEET_ID,
+      source: 'Google Apps Script Scheduler'
+    });
+    results.push({ repo: repo, status: triggered ? 'TRIGGERED' : 'FAILED_TO_DISPATCH' });
+  }
 
-  updateMasterDashboardStatus(project, timestampStr, slot, triggered ? 'TRIGGERED' : 'FAILED_TO_DISPATCH');
+  logExecutionHistory(timestampStr, slot, results);
 }
 
-function triggerGitHubWorkflow(project, eventType, clientPayload) {
+/**
+ * Sends repository_dispatch POST request to GitHub API.
+ */
+function triggerGitHubWorkflow(repo, eventType, clientPayload) {
   var token = CONFIG.getGithubToken();
   if (!token) {
     Logger.log('⚠️ GITHUB_PAT not found in Script Properties.');
     return false;
   }
 
-  var url = 'https://api.github.com/repos/' + project.GITHUB_OWNER + '/' + project.GITHUB_REPO + '/dispatches';
+  var url = 'https://api.github.com/repos/' + repo.OWNER + '/' + repo.REPO + '/dispatches';
   var payload = {
-    event_type: eventType || 'scheduled_daily_run',
+    event_type: eventType,
     client_payload: clientPayload || {}
   };
 
@@ -127,99 +144,76 @@ function triggerGitHubWorkflow(project, eventType, clientPayload) {
     var response = UrlFetchApp.fetch(url, options);
     var code = response.getResponseCode();
     if (code === 204 || code === 200 || code === 201) {
-      Logger.log('✅ [' + project.NAME + '] GitHub Action workflow triggered successfully');
+      Logger.log('✅ [' + repo.NAME + '] GitHub Action workflow triggered successfully');
       return true;
     } else {
-      Logger.log('❌ Trigger failed: HTTP ' + code + ' ' + response.getContentText());
+      Logger.log('❌ [' + repo.NAME + '] Trigger failed: HTTP ' + code + ' ' + response.getContentText());
       return false;
     }
   } catch (err) {
-    Logger.log('❌ Exception: ' + err.toString());
+    Logger.log('❌ [' + repo.NAME + '] Exception: ' + err.toString());
     return false;
   }
 }
 
-function updateMasterDashboardStatus(project, timestamp, slot, status, details) {
+/**
+ * Records the triggered slot in the Execution History tab of Output Sheet.
+ */
+function logExecutionHistory(timestamp, slot, dispatchResults) {
   var ss;
   try {
-    ss = SpreadsheetApp.openById(project.SPREADSHEET_ID);
+    ss = SpreadsheetApp.openById(CONFIG.SHEETS.OUTPUT_SPREADSHEET_ID);
   } catch (e) {
     ss = SpreadsheetApp.getActiveSpreadsheet();
   }
   if (!ss) return;
 
-  var sheetName = 'Execution History';
-  var sheet = ss.getSheetByName(sheetName);
+  var sheet = ss.getSheetByName(CONFIG.SHEETS.HISTORY_TAB);
   if (!sheet) {
-    sheet = ss.insertSheet(sheetName);
+    sheet = ss.insertSheet(CONFIG.SHEETS.HISTORY_TAB);
   }
 
   if (sheet.getLastRow() === 0) {
-    var headers = ['Timestamp (IST)', 'Project', 'Scheduled Slot', 'Status', 'Pass Rate', 'Passed / Total', 'Dashboard URL', 'Execution Details'];
+    var headers = ['Timestamp (IST)', 'Scheduled Slot', 'Repository 1 Status', 'Repository 2 Status', 'Dashboard Links', 'Input Sheet ID', 'Output Sheet ID'];
     sheet.appendRow(headers);
-    sheet.getRange('A1:H1').setFontWeight('bold').setBackground('#0f172a').setFontColor('#ffffff').setHorizontalAlignment('center');
+    sheet.getRange('A1:G1').setFontWeight('bold').setBackground('#0f172a').setFontColor('#ffffff').setHorizontalAlignment('center');
     sheet.setFrozenRows(1);
   }
 
-  var passRate = (details && details.passRate !== undefined) ? details.passRate + '%' : '--';
-  var counts = (details && details.passed !== undefined) ? (details.passed + ' / ' + details.total) : '--';
-  var notes = (details && details.notes) ? details.notes : 'Auto-triggered by GAS Scheduler';
+  var r1 = dispatchResults[0] ? dispatchResults[0].status : 'N/A';
+  var r2 = dispatchResults[1] ? dispatchResults[1].status : 'N/A';
+  var dashboards = '1. ' + CONFIG.REPOSITORIES[0].DASHBOARD_URL + '\n2. ' + CONFIG.REPOSITORIES[1].DASHBOARD_URL;
 
   sheet.insertRowBefore(2);
-  var rowData = [timestamp, project.NAME, slot, status, passRate, counts, project.DASHBOARD_URL, notes];
+  var rowData = [
+    timestamp,
+    slot,
+    r1,
+    r2,
+    dashboards,
+    CONFIG.SHEETS.INPUT_SPREADSHEET_ID,
+    CONFIG.SHEETS.OUTPUT_SPREADSHEET_ID
+  ];
 
-  var rowRange = sheet.getRange(2, 1, 1, 8);
+  var rowRange = sheet.getRange(2, 1, 1, 7);
   rowRange.setValues([rowData]);
   rowRange.setFontFamily('Arial').setFontSize(10).setVerticalAlignment('middle');
 
-  var statusCell = sheet.getRange(2, 4);
-  statusCell.setFontWeight('bold').setHorizontalAlignment('center');
-  if (status === 'TRIGGERED' || status === 'PASSED' || status === 'SUCCESS') {
-    statusCell.setBackground('#dcfce7').setFontColor('#15803d');
-  } else if (status === 'FAILED' || status === 'FAILED_TO_DISPATCH') {
-    statusCell.setBackground('#fee2e2').setFontColor('#b91c1c');
-  } else {
-    statusCell.setBackground('#fef3c7').setFontColor('#b45309');
-  }
+  // Format Status Badge
+  var statusCell1 = sheet.getRange(2, 3);
+  var statusCell2 = sheet.getRange(2, 4);
+  [statusCell1, statusCell2].forEach(function(cell) {
+    cell.setFontWeight('bold').setHorizontalAlignment('center');
+    var val = cell.getValue();
+    if (val === 'TRIGGERED' || val === 'PASSED' || val === 'SUCCESS') {
+      cell.setBackground('#dcfce7').setFontColor('#15803d');
+    } else {
+      cell.setBackground('#fee2e2').setFontColor('#b91c1c');
+    }
+  });
 
   rowRange.setBorder(null, null, true, null, null, null, '#cbd5e1', SpreadsheetApp.BorderStyle.SOLID);
-  for (var col = 1; col <= 8; col++) {
+  for (var col = 1; col <= 7; col++) {
     sheet.autoResizeColumn(col);
   }
-}
-
-function doPost(e) {
-  try {
-    var rawData = e.postData ? e.postData.contents : '{}';
-    var data = JSON.parse(rawData);
-    var now = new Date();
-    var timestampStr = Utilities.formatDate(now, CONFIG.TIMEZONE, 'yyyy-MM-dd HH:mm:ss');
-    var slot = (now.getHours() < 12) ? 'Morning Run (4:00 AM)' : 'Evening Run (5:00 PM)';
-
-    var projectKey = data.project || CONFIG.ACTIVE_PROJECT;
-    var project = CONFIG.PROJECTS[projectKey] || CONFIG.PROJECTS.PLAYGROUND;
-    var status = data.status || (data.failed === 0 ? 'PASSED' : 'FAILED');
-
-    updateMasterDashboardStatus(project, timestampStr, slot, status, {
-      passRate: data.passRate,
-      passed: data.passed,
-      total: data.total,
-      notes: data.notes || 'Webhook result from test runner'
-    });
-
-    return ContentService.createTextOutput(JSON.stringify({ success: true, timestamp: timestampStr, status: status }))
-      .setMimeType(ContentService.MimeType.JSON);
-  } catch (err) {
-    return ContentService.createTextOutput(JSON.stringify({ success: false, error: err.toString() }))
-      .setMimeType(ContentService.MimeType.JSON);
-  }
-}
-
-function doGet(e) {
-  return ContentService.createTextOutput(JSON.stringify({
-    status: 'online',
-    active_project: CONFIG.ACTIVE_PROJECT,
-    timezone: CONFIG.TIMEZONE,
-    schedule: '4:00 AM & 5:00 PM IST daily'
-  })).setMimeType(ContentService.MimeType.JSON);
 }

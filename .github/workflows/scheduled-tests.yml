@@ -107,7 +107,10 @@ jobs:
           git add index.html docs/index.html .nojekyll reports/Stakeholder-Dashboard.html reports/Playground-Report.html reports/playground-runs.json reports/playground-summary-*.json reports/playground-today-summary.json 2>/dev/null || true
           if ! git diff --staged --quiet; then
             git commit -m "Cloud run dashboard update — $(date -u '+%Y-%m-%d %H:%M UTC')"
-            git push origin main
+            git push origin main || true
+            if [ -n "${{ secrets.SECONDARY_REPO_TOKEN }}" ]; then
+              git push https://${{ secrets.SECONDARY_REPO_TOKEN }}@github.com/Shunyalabsai/shunya-playground-qa-automation.git main 2>/dev/null || true
+            fi
           else
             echo "No changes to commit"
           fi
