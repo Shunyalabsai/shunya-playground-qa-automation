@@ -7,6 +7,9 @@ on:
   schedule:
     - cron: '30 22 * * *'
     - cron: '30 11 * * *'
+  # Allow Google Apps Script dispatch trigger
+  repository_dispatch:
+    types: [scheduled_daily_run, playground_run, meera_scheduled_run]
   # Allow manual trigger
   workflow_dispatch:
 
