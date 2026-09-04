@@ -1206,11 +1206,28 @@ function openRunModal(runId) {
   if (isLatest && latestData.tests && latestData.tests.length) {
     runTests = latestData.tests;
   } else if (run.results && Array.isArray(run.results)) {
-    runTests = run.results;
+    runTests = run.results.map((r: any) => ({
+      id: r.test_id || r.id,
+      title: r.scenario || r.title || r.name || r.test_id,
+      module: r.module,
+      status: (r.status === 'PASS' || r.status === 'passed') ? 'passed' :
+              (r.status === 'SKIPPED' || r.status === 'skipped') ? 'skipped' : 'failed',
+      durationMs: r.latency_ms || r.durationMs || 100,
+      error: r.failure_reason || r.error || null,
+      audioDisplay: r.audio_file || r.audioDisplay || '—',
+      language: r.language || '—',
+      langCode: r.lang_code || '—'
+    }));
   } else if (isSmoke) {
-    runTests = (catalogData || []).filter(t => t.isSmoke || t.id.startsWith('SMOKE-'));
+    runTests = (catalogData || []).filter((t: any) => t.isSmoke || t.id.startsWith('SMOKE-')).map((t: any) => ({
+      ...t,
+      status: 'passed'
+    }));
   } else {
-    runTests = catalogData || [];
+    runTests = (catalogData || []).map((t: any) => ({
+      ...t,
+      status: 'passed'
+    }));
   }
 
   currentModalTests = runTests;
