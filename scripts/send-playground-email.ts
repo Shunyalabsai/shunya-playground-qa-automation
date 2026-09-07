@@ -71,7 +71,7 @@ function parseRecipients(raw: string | undefined): string {
     .join(', ');
 }
 
-/** Newest completed run (per-run JSON preferred over daily summary overwrite). */
+/** Newest completed run (supports both modern Playwright runner and legacy formats). */
 function loadLatestSummary(): PlaygroundSummary {
   const reportsDir = path.resolve(__dirname, '..', 'reports');
 
@@ -80,6 +80,47 @@ function loadLatestSummary(): PlaygroundSummary {
     process.exit(1);
   }
 
+  // 1. Try reading from master playground-runs.json first
+  const masterRunsPath = path.join(reportsDir, 'playground-runs.json');
+  if (fs.existsSync(masterRunsPath)) {
+    try {
+      const parsed = JSON.parse(fs.readFileSync(masterRunsPath, 'utf-8'));
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        const latest = parsed[0];
+        const results = latest.results || [];
+        const total = latest.totalTests ?? latest.summary?.total ?? results.length;
+        const passed = latest.passedTests ?? latest.summary?.passed ?? results.filter((r: any) => r.status === 'PASS' || r.status === 'passed').length;
+        const failed = latest.failedTests ?? latest.summary?.failed ?? results.filter((r: any) => r.status === 'FAIL' || r.status === 'failed').length;
+        const suites: SuiteResult[] = results.map((r: any) => ({
+          category: r.module || 'Test Suite',
+          name: r.test_id ? `[${r.test_id}] ${r.scenario || r.feature || ''}` : (r.name || 'Test Case'),
+          status: (r.status === 'PASS' || r.status === 'passed') ? 'pass' : 'fail',
+          duration_s: Math.round((r.latency_ms || 0) / 1000),
+          failure_reason: r.failure_reason || '',
+        }));
+
+        const dateStr = latest.date || (latest.startedAt ? latest.startedAt.split('T')[0] : new Date().toISOString().split('T')[0]);
+        const tsStr = latest.timestamp || latest.startedAt || new Date().toISOString();
+
+        console.log(`📂 Reading latest run from master runs: ${masterRunsPath}`);
+        console.log(`   ${tsStr} | ${passed}/${total} passed (${failed} failed)`);
+
+        return {
+          runDate: dateStr,
+          runTimestamp: tsStr,
+          endTimestamp: tsStr,
+          totalSuites: total,
+          passed,
+          failed,
+          suites,
+        };
+      }
+    } catch (e: any) {
+      console.warn('Could not read playground-runs.json:', e.message);
+    }
+  }
+
+  // 2. Fallback to individual playground-run-*.json or playground-summary-*.json
   const candidates: { file: string; summary: PlaygroundSummary }[] = [];
 
   for (const file of fs.readdirSync(reportsDir)) {
@@ -87,19 +128,40 @@ function loadLatestSummary(): PlaygroundSummary {
     const isSummary = file.startsWith('playground-summary-') && file.endsWith('.json');
     if (!isRun && !isSummary) continue;
     try {
-      const summary = JSON.parse(
-        fs.readFileSync(path.join(reportsDir, file), 'utf-8'),
-      ) as PlaygroundSummary;
-      if (summary.runDate && typeof summary.totalSuites === 'number') {
-        candidates.push({ file, summary });
+      const data = JSON.parse(fs.readFileSync(path.join(reportsDir, file), 'utf-8'));
+      if (data.totalSuites !== undefined || data.totalTests !== undefined) {
+        const results = data.results || data.suites || [];
+        const total = data.totalSuites ?? data.totalTests ?? results.length;
+        const passed = data.passed ?? data.passedTests ?? 0;
+        const failed = data.failed ?? data.failedTests ?? 0;
+        const dateStr = data.runDate || data.date || (data.timestamp ? data.timestamp.split('T')[0] : '');
+        const tsStr = data.runTimestamp || data.timestamp || '';
+        const suites: SuiteResult[] = Array.isArray(results) ? results.map((r: any) => ({
+          category: r.category || r.module || 'Test Suite',
+          name: r.name || (r.test_id ? `[${r.test_id}] ${r.scenario || ''}` : 'Test'),
+          status: (r.status === 'PASS' || r.status === 'passed' || r.status === 'pass') ? 'pass' : 'fail',
+          duration_s: r.duration_s ?? Math.round((r.latency_ms || 0) / 1000),
+          failure_reason: r.failure_reason || '',
+        })) : [];
+
+        candidates.push({
+          file,
+          summary: {
+            runDate: dateStr,
+            runTimestamp: tsStr,
+            endTimestamp: data.endTimestamp || tsStr,
+            totalSuites: total,
+            passed,
+            failed,
+            suites,
+          },
+        });
       }
-    } catch {
-      console.warn(`Skipping invalid report file: ${file}`);
-    }
+    } catch {}
   }
 
   if (candidates.length === 0) {
-    console.error('❌ No playground-run-*.json or playground-summary-*.json found in', reportsDir);
+    console.error('❌ No valid test report found in', reportsDir);
     process.exit(1);
   }
 
@@ -111,7 +173,7 @@ function loadLatestSummary(): PlaygroundSummary {
 
   const { file, summary } = candidates[0];
   console.log(`📂 Reading latest run: ${path.join(reportsDir, file)}`);
-  console.log(`   ${summary.runTimestamp} → ${summary.endTimestamp || '—'} | ${summary.passed}/${summary.totalSuites} passed`);
+  console.log(`   ${summary.runTimestamp} | ${summary.passed}/${summary.totalSuites} passed`);
   return summary;
 }
 
