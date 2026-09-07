@@ -756,10 +756,10 @@ export function generateTestCases(): DeepTestCase[] {
       validation: 'Sentiment polarity score and label returned in output',
     },
     {
-      name: 'Emotion Diarization (Group Meeting Audio)',
+      name: 'Emotion Diarization (Multi-Speaker Conversation)',
       featureName: 'Emotion Diarization',
       config: { emotion: 'true', enable_emotion_diarization: 'true' },
-      sample: 'input/speaker_diarization/Emo_dia_group_meeting.mp3',
+      sample: 'input/speaker_diarization/QA-02.mp3',
       model: 'zero-indic',
       lang: 'auto',
       langName: 'Hindi/English',
