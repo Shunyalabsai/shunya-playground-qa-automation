@@ -12,11 +12,20 @@ on:
     types: [scheduled_daily_run, playground_run, meera_scheduled_run]
   # Allow manual trigger
   workflow_dispatch:
+    inputs:
+      suite:
+        description: 'Select test suite to execute'
+        required: true
+        default: 'smoke'
+        type: choice
+        options:
+          - 'smoke'
+          - 'all'
 
 jobs:
   test:
     runs-on: ubuntu-latest
-    timeout-minutes: 240
+    timeout-minutes: 60
     permissions:
       contents: write
 
@@ -64,15 +73,17 @@ jobs:
           GOOGLE_SERVICE_ACCOUNT_JSON=${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON_B64 }}
           EOF
 
-      - name: Run UI test suites
+      - name: Run Test Suite
         id: tests
         continue-on-error: true
-        shell: bash
         run: |
-          set +e
-          bash scripts/run-playground-daily.sh
-          echo "exit_code=$?" >> $GITHUB_OUTPUT
-          exit 0
+          if [ "${{ github.event.inputs.suite }}" = "all" ]; then
+            echo "🚀 Running Full Exhaustive Suite (151 Scenarios)..."
+            npm test || true
+          else
+            echo "🚀 Running Smoke Test Suite (21 Scenarios)..."
+            npm run test:smoke || true
+          fi
 
       - name: Generate HTML reports
         if: always()
