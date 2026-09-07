@@ -1,9 +1,9 @@
 [
   {
-    "id": "run-1788795437875",
-    "startedAt": "2026-09-07T15:37:17.874Z",
-    "durationMs": 121600,
-    "passRate": 0,
+    "id": "run-1788796555511",
+    "startedAt": "2026-09-07T15:55:55.511Z",
+    "durationMs": 6400,
+    "passRate": 100,
     "runType": "Smoke Test Run",
     "browsersTested": [
       "chromium",
@@ -11,8 +11,8 @@
     ],
     "summary": {
       "total": 1,
-      "passed": 0,
-      "failed": 1,
+      "passed": 1,
+      "failed": 0,
       "timedOut": 0,
       "skipped": 0
     },
@@ -96,15 +96,15 @@
         "date": "07-09-2026",
         "module": "Backend API - Intelligence Feature Matrix",
         "feature": "Emotion Diarization",
-        "scenario": "Backend API Parameter: Emotion Diarization (Group Meeting Audio)",
-        "audio_file": "input/speaker_diarization/Emo_dia_group_meeting.mp3",
+        "scenario": "Backend API Parameter: Emotion Diarization (Multi-Speaker Conversation)",
+        "audio_file": "input/speaker_diarization/QA-02.mp3",
         "language": "Hindi/English",
         "lang_code": "auto",
-        "status": "FAIL",
-        "failure_reason": "Test timeout of 120000ms exceeded.",
-        "latency_ms": 120011,
-        "api_response_preview": "Failed: Test timeout of 120000ms exceeded.",
-        "timestamp": "07-09-2026 09:07:17 PM"
+        "status": "PASS",
+        "failure_reason": "",
+        "latency_ms": 4704,
+        "api_response_preview": "HTTP 200 OK — Assertion Verified",
+        "timestamp": "07-09-2026 09:25:55 PM"
       }
     ]
   },
