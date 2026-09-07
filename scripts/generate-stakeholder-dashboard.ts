@@ -34,15 +34,15 @@ export async function generateStakeholderDashboard(): Promise<string> {
   const totalCanonicalCount = combinedTestCases.length; // 172
   const smokeCount = smokeTestCases.length; // 21
 
-  // 2. Load genuine historical runs from playground-runs.json (only real runs)
+  // 2. Load genuine historical runs from playground-runs.json (only real runs with >= 5 tests)
   const masterRunsPath = path.join(reportsDir, 'playground-runs.json');
   let historicalRuns: any[] = [];
   if (fs.existsSync(masterRunsPath)) {
     try {
       const parsed = JSON.parse(fs.readFileSync(masterRunsPath, 'utf8'));
       if (Array.isArray(parsed)) {
-        // Load all authentic runs sorted newest first
-        historicalRuns = parsed.filter(r => r && (r.runId || r.id) && (r.timestamp || r.startedAt || r.runDate));
+        // Load all authentic runs with at least 5 tests (filters out temporary single-test checks)
+        historicalRuns = parsed.filter(r => r && (r.runId || r.id) && (r.timestamp || r.startedAt || r.runDate) && ((r.summary?.total || r.totalTests || (r.results?.length || 0)) >= 5));
       }
     } catch {}
   }
@@ -1190,17 +1190,8 @@ function selectCalDay(day) {
 function openRunModal(runId) {
   const run = historyData.find(r => r.id === runId) || latestData;
   const isLatest = latestData && latestData.id === run.id;
-  const s = run.summary;
+  const s = run.summary || {};
   const isSmoke = run.runType === 'Smoke Test Run' || (s.total <= 25 && s.total > 0);
-
-  let body = \`
-    <div class="grid stats" style="margin-bottom:16px">
-      <div class="card stat-card"><div class="label">Total Tests</div><div class="value">\${s.total}</div></div>
-      <div class="card stat-card"><div class="label">Passed</div><div class="value" style="color:var(--pass)">\${s.passed}</div></div>
-      <div class="card stat-card"><div class="label">Failed</div><div class="value" style="color:var(--fail)">\${s.failed + (s.timedOut||0)}</div></div>
-      <div class="card stat-card"><div class="label">Pass Rate</div><div class="value" style="color:\${(run.passRate||100)>=80?'var(--pass)':'var(--warn)'}">\${run.passRate||100}%</div></div>
-    </div>
-  \`;
 
   let runTests = [];
   if (isLatest && latestData.tests && latestData.tests.length) {
@@ -1232,9 +1223,21 @@ function openRunModal(runId) {
 
   currentModalTests = runTests;
 
+  const totalCount = runTests.length || s.total || 0;
+  const passedCount = runTests.length ? runTests.filter(t => t.status === 'passed').length : (s.passed || 0);
+  const failedCount = runTests.length ? runTests.filter(t => t.status === 'failed').length : ((s.failed || 0) + (s.timedOut || 0));
+  const passRate = totalCount > 0 ? Math.round((passedCount / totalCount) * 100) : (run.passRate || 100);
+
+  let body = \`
+    <div class="grid stats" style="margin-bottom:16px">
+      <div class="card stat-card"><div class="label">Total Tests</div><div class="value">\${totalCount}</div></div>
+      <div class="card stat-card"><div class="label">Passed</div><div class="value" style="color:var(--pass)">\${passedCount}</div></div>
+      <div class="card stat-card"><div class="label">Failed</div><div class="value" style="color:var(--fail)">\${failedCount}</div></div>
+      <div class="card stat-card"><div class="label">Pass Rate</div><div class="value" style="color:\${passRate >= 80 ? 'var(--pass)' : 'var(--warn)'}">\${passRate}%</div></div>
+    </div>
+  \`;
+
   if (runTests.length > 0) {
-    const passedCount = runTests.filter(t => t.status === 'passed').length;
-    const failedCount = runTests.filter(t => t.status === 'failed').length;
     body += \`
       <div class="modal-filters">
         <span class="filter-label">Filter:</span>
