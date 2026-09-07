@@ -276,8 +276,16 @@ test.describe('Exhaustive Master UI Suite (118 Scenarios)', () => {
           }
 
           // Synthesis Mode (Batch vs Streaming)
-          if (modeSelect && tc.title.includes('Streaming')) {
-            await modeSelect.selectOption('Streaming').catch(() => {});
+          if (tc.title.includes('Streaming') || tc.title.includes('Mode Toggle') || tc.title.includes('Synthesis Mode')) {
+            if (modeSelect) {
+              await modeSelect.selectOption({ label: 'Streaming' }).catch(() => modeSelect.selectOption('Streaming').catch(() => {}));
+              await page.waitForTimeout(150);
+            }
+            const streamingBtn = page.locator('button, [role="tab"], [role="radio"], [role="option"]').filter({ hasText: /^Streaming$/i }).first();
+            if ((await streamingBtn.count()) > 0) {
+              await streamingBtn.click().catch(() => {});
+              await page.waitForTimeout(150);
+            }
           }
 
           // Voice Mode (Preset vs Clone Voice)
