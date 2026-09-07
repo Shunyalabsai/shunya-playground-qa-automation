@@ -1,5 +1,114 @@
 [
   {
+    "id": "run-1788795437875",
+    "startedAt": "2026-09-07T15:37:17.874Z",
+    "durationMs": 121600,
+    "passRate": 0,
+    "runType": "Smoke Test Run",
+    "browsersTested": [
+      "chromium",
+      "safari"
+    ],
+    "summary": {
+      "total": 1,
+      "passed": 0,
+      "failed": 1,
+      "timedOut": 0,
+      "skipped": 0
+    },
+    "modules": {
+      "Backend API - Health Checks": {
+        "label": "Backend API - Health Checks",
+        "passed": 2,
+        "failed": 0,
+        "total": 2
+      },
+      "Backend API - Authentication & Session": {
+        "label": "Backend API - Authentication & Session",
+        "passed": 1,
+        "failed": 0,
+        "total": 1
+      },
+      "Backend API - STT Transcription Models": {
+        "label": "Backend API - STT Transcription Models",
+        "passed": 3,
+        "failed": 0,
+        "total": 3
+      },
+      "Backend API - Intelligence Feature Matrix": {
+        "label": "Backend API - Intelligence Feature Matrix",
+        "passed": 1,
+        "failed": 0,
+        "total": 1
+      },
+      "Backend API - TTS Speech Synthesis": {
+        "label": "Backend API - TTS Speech Synthesis",
+        "passed": 3,
+        "failed": 0,
+        "total": 3
+      },
+      "Backend API - Negative, Auth & Stress": {
+        "label": "Backend API - Negative, Auth & Stress",
+        "passed": 1,
+        "failed": 0,
+        "total": 1
+      },
+      "Playground UI - Layout & Navigation": {
+        "label": "Playground UI - Layout & Navigation",
+        "passed": 3,
+        "failed": 0,
+        "total": 3
+      },
+      "Playground UI - STT Models": {
+        "label": "Playground UI - STT Models",
+        "passed": 1,
+        "failed": 0,
+        "total": 1
+      },
+      "Playground UI - STT Language Selection": {
+        "label": "Playground UI - STT Language Selection",
+        "passed": 1,
+        "failed": 0,
+        "total": 1
+      },
+      "Playground UI - STT Audio Upload": {
+        "label": "Playground UI - STT Audio Upload",
+        "passed": 1,
+        "failed": 0,
+        "total": 1
+      },
+      "Playground UI - STT Output Actions": {
+        "label": "Playground UI - STT Output Actions",
+        "passed": 1,
+        "failed": 0,
+        "total": 1
+      },
+      "Playground UI - TTS Speech Synthesis": {
+        "label": "Playground UI - TTS Speech Synthesis",
+        "passed": 3,
+        "failed": 0,
+        "total": 3
+      }
+    },
+    "results": [
+      {
+        "test_id": "TC-FEAT-API-026",
+        "date": "07-09-2026",
+        "module": "Backend API - Intelligence Feature Matrix",
+        "feature": "Emotion Diarization",
+        "scenario": "Backend API Parameter: Emotion Diarization (Group Meeting Audio)",
+        "audio_file": "input/speaker_diarization/Emo_dia_group_meeting.mp3",
+        "language": "Hindi/English",
+        "lang_code": "auto",
+        "status": "FAIL",
+        "failure_reason": "Test timeout of 120000ms exceeded.",
+        "latency_ms": 120011,
+        "api_response_preview": "Failed: Test timeout of 120000ms exceeded.",
+        "timestamp": "07-09-2026 09:07:17 PM"
+      }
+    ]
+  },
+  {
     "id": "run-1788791642912",
     "startedAt": "2026-09-07T14:34:02.911Z",
     "durationMs": 693900,
