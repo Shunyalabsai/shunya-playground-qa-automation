@@ -1141,6 +1141,10 @@ function renderCalendar(runs) {
     <div id="calendarRuns"></div>
     <div class="calendar-footer">Total runs recorded: \${runs.length} | Retention window: Last 100 executions</div>
   \`;
+
+  // Automatically select today if current month, or the first day with recorded runs
+  const defaultDay = isCurrentMonth ? today.getDate() : (Object.keys(runsByDate).length ? parseInt(Object.keys(runsByDate)[0].split('-')[2]) : 1);
+  selectCalDay(defaultDay);
 }
 
 function changeMonth(delta) {

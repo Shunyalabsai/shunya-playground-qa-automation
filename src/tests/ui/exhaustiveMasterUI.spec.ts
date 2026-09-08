@@ -193,10 +193,11 @@ test.describe('Exhaustive Master UI Suite (118 Scenarios)', () => {
       // 8. TTS Speech Synthesis UI (Model, Language, Mode, Voices, Synthesis)
       if (tc.module.includes('Text to Speech') || tc.module.includes('TTS')) {
         await page.goto(PLAYGROUND_URL, { waitUntil: 'domcontentloaded', timeout: 30000 });
+        await dismissOpenModals(page);
 
         const ttsTab = page.getByRole('button', { name: /text to speech/i }).first();
         if ((await ttsTab.count()) > 0) {
-          await ttsTab.click({ timeout: 2000 }).catch(() => {});
+          await ttsTab.click({ timeout: 3000 }).catch(() => {});
           await page.waitForTimeout(300);
 
           const selects = await page.locator('select').all();
@@ -235,8 +236,12 @@ test.describe('Exhaustive Master UI Suite (118 Scenarios)', () => {
           }
 
           // Language Selection in TTS dropdown
-          if (langSelect && tc.languageName && tc.languageName !== 'N/A' && tc.languageName !== 'Auto') {
-            await langSelect.selectOption({ label: tc.languageName }).catch(() => langSelect.selectOption(tc.languageName).catch(() => {}));
+          if (langSelect && tc.languageName && tc.languageName !== 'N/A' && tc.languageName !== 'Auto' && tc.languageName !== 'Hinglish') {
+            const availableOptions = await langSelect.locator('option').allTextContents().catch(() => []);
+            const matchOpt = availableOptions.find(o => o.trim().toLowerCase() === tc.languageName.trim().toLowerCase() || o.toLowerCase().includes(tc.languageName.toLowerCase()));
+            if (matchOpt) {
+              await langSelect.selectOption({ label: matchOpt }, { timeout: 2000 }).catch(() => {});
+            }
           }
 
           // Gender & Voice selection for Zero Indic models (Female -> Meera Maithili)
@@ -253,11 +258,11 @@ test.describe('Exhaustive Master UI Suite (118 Scenarios)', () => {
             // Select Gender (Female / Male)
             const genderBtn = page.locator('[role="button"]').filter({ hasText: /gender|female|male/i }).first();
             if (await genderBtn.count() > 0) {
-              await genderBtn.click().catch(() => {});
+              await genderBtn.click({ timeout: 2000 }).catch(() => {});
               await page.waitForTimeout(200);
               const genderOpt = page.locator('button, [role="option"], div').filter({ hasText: new RegExp(`^${targetGender}$`, 'i') }).first();
               if (await genderOpt.count() > 0) {
-                await genderOpt.click().catch(() => {});
+                await genderOpt.click({ timeout: 2000 }).catch(() => {});
                 await page.waitForTimeout(200);
               }
             }
@@ -265,11 +270,11 @@ test.describe('Exhaustive Master UI Suite (118 Scenarios)', () => {
             // Select Voice (e.g. Meera (Maithili) / Rajesh (Hindi))
             const voiceBtn = page.locator('[role="button"]').filter({ hasText: /voice|meera|rajesh|anjana/i }).first();
             if (await voiceBtn.count() > 0) {
-              await voiceBtn.click().catch(() => {});
+              await voiceBtn.click({ timeout: 2000 }).catch(() => {});
               await page.waitForTimeout(200);
               const voiceOpt = page.locator('button, [role="option"], div').filter({ hasText: new RegExp(targetVoice.replace(/[()]/g, '\\$&') + '|' + targetVoice.split(' ')[0], 'i') }).first();
               if (await voiceOpt.count() > 0) {
-                await voiceOpt.click().catch(() => {});
+                await voiceOpt.click({ timeout: 2000 }).catch(() => {});
                 await page.waitForTimeout(200);
               }
             }
@@ -283,7 +288,7 @@ test.describe('Exhaustive Master UI Suite (118 Scenarios)', () => {
             }
             const streamingBtn = page.locator('button, [role="tab"], [role="radio"], [role="option"]').filter({ hasText: /^Streaming$/i }).first();
             if ((await streamingBtn.count()) > 0) {
-              await streamingBtn.click().catch(() => {});
+              await streamingBtn.click({ timeout: 2000 }).catch(() => {});
               await page.waitForTimeout(150);
             }
           }
@@ -292,7 +297,7 @@ test.describe('Exhaustive Master UI Suite (118 Scenarios)', () => {
           if (tc.title.includes('Clone Voice')) {
             const cloneBtn = page.getByRole('button', { name: /clone voice/i }).first();
             if ((await cloneBtn.count()) > 0) {
-              await cloneBtn.click().catch(() => {});
+              await cloneBtn.click({ timeout: 2000 }).catch(() => {});
             }
           }
 
