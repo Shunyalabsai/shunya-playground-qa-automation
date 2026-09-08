@@ -689,7 +689,7 @@ export function generateTestCases(): DeepTestCase[] {
       name: 'Speaker Diarization (Rajya Sabha Budget Session Parliamentary Debate)',
       featureName: 'Speaker Diarization',
       config: { diarize: 'true', enable_diarization: 'true' },
-      sample: 'input/speaker_diarization/RS  Zero Hour  Budget Session 2026  12 March, 2026.mp3',
+      sample: 'input/speaker_diarization/QA-19.mp3',
       model: 'zero-indic',
       lang: 'hi',
       langName: 'Hindi',
