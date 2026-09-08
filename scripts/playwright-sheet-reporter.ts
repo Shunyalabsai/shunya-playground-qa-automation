@@ -184,7 +184,14 @@ export default class PlaywrightSheetReporter implements Reporter {
       console.warn('[PlaywrightSheetReporter] Could not write run json:', e.message);
     }
 
-    // 2. Append to master playground-runs.json
+    const isSuiteRun = totalTests >= 10;
+
+    if (!isSuiteRun) {
+      console.log(`[PlaywrightSheetReporter] ℹ️ Ad-hoc test execution detected (${totalTests} tests). Preserving official stakeholder dashboard and runs history.`);
+      return;
+    }
+
+    // 2. Append to master playground-runs.json (only full suites: Smoke >= 21 tests, Regression >= 33 tests)
     const runsMasterPath = path.join(reportsDir, 'playground-runs.json');
     try {
       let masterRuns: any[] = [];
