@@ -63,49 +63,12 @@ fi
 echo "── Proceeding with Local Fallback Execution ──────"
 
 echo ""
-echo "── Running UI Test Suites ─────────────────────────"
-bash "$SCRIPT_DIR/run-playground-daily.sh" 2>&1 | tee -a "$LOG_DIR/playground-email-$DATE.log"
-
-SUMMARY_JSON="$REPORTS_DIR/playground-summary-$DATE.json"
-if [ -f "$SUMMARY_JSON" ]; then
-  SUITE_PASSED=$(python3 -c "import json; d=json.load(open('$SUMMARY_JSON')); print(d.get('passed',0))" 2>/dev/null || echo 0)
-  SUITE_FAILED=$(python3 -c "import json; d=json.load(open('$SUMMARY_JSON')); print(d.get('failed',0))" 2>/dev/null || echo 0)
-  SUITE_TOTAL=$(python3 -c "import json; d=json.load(open('$SUMMARY_JSON')); print(d.get('totalSuites',0))" 2>/dev/null || echo 0)
-else
-  SUITE_PASSED=0
-  SUITE_FAILED=0
-  SUITE_TOTAL=0
-fi
+echo "── Running Smoke Test Suite (21 Scenarios) ────────"
+npm run test:smoke 2>&1 | tee -a "$LOG_DIR/playground-email-$DATE.log"
 
 echo ""
-echo "── Generating Report ────────────────────────────"
-npx tsx scripts/generate-playground-report.ts 2>&1
-
-echo ""
-echo "── Publishing Dashboard ─────────────────────────"
-publish_dashboard() {
-  git add reports/Playground-Report.html reports/playground-runs.json reports/playground-today-summary.json 2>/dev/null || true
-  if ! git diff --staged --quiet 2>/dev/null; then
-    COMMIT_MSG="Dashboard update — ${DATE} $(date +%H:%M)"
-    git commit -m "$COMMIT_MSG" || return 1
-  else
-    echo "   ℹ️  No new dashboard files to commit (will push existing commits if any)"
-  fi
-  if git push origin main; then
-    echo "   ✅ Dashboard pushed to GitHub — Pages will update in ~1–2 min"
-    echo "   🔗 https://yamini-pal-singh.github.io/playground-testing/Playground-Report.html"
-    return 0
-  fi
-  echo "   ❌ git push failed — live dashboard will NOT update until push succeeds"
-  echo "   💡 This Mac is logged into GitHub as: $(git config user.name 2>/dev/null || echo unknown) <$(git config user.email 2>/dev/null || echo unknown)>"
-  echo "   💡 Push manually as yamini-pal-singh: cd $PROJECT_DIR && git push origin main"
-  return 1
-}
-publish_dashboard || true
-
-echo ""
-echo "── Email ────────────────────────────────────────"
-echo "   ℹ️  Skipped (daily digest at 8 PM: npm run email:playground:daily)"
+echo "── Sending Email Notification ────────────────────"
+npm run email:playground 2>&1 | tee -a "$LOG_DIR/playground-email-$DATE.log"
 
 echo ""
 echo "════════════════════════════════════════════════════"

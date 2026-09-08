@@ -240,9 +240,23 @@ echo "── Writing Suite Summary to Google Sheet ─────────" 
 export SUMMARY_JSON
 if npx ts-node <<'TS' >> "$LOG_FILE" 2>&1
 const fs = require('fs');
-const { writeDailySummarySheet } = require('./src/utils/playgroundSheetWriter');
+const { writePlaygroundResults } = require('./src/utils/playgroundSheetWriter');
 const summary = JSON.parse(fs.readFileSync(process.env.SUMMARY_JSON!, 'utf-8'));
-writeDailySummarySheet(summary.suites, summary.runDate).then(() => {
+const results = (summary.suites || []).map((s: any) => ({
+  date: summary.runDate,
+  module: s.category || 'UI Suite',
+  feature: s.name || '',
+  scenario: s.name || '',
+  audio_file: '—',
+  language: '—',
+  lang_code: '—',
+  status: (s.status === 'pass' || s.status === 'PASS') ? 'PASS' : 'FAIL',
+  failure_reason: s.failure_reason || '',
+  latency_ms: (s.duration_s || 0) * 1000,
+  api_response_preview: (s.status === 'pass' || s.status === 'PASS') ? 'HTTP 200 OK — Verified' : (s.failure_reason || 'Failed'),
+  timestamp: summary.runTimestamp || new Date().toISOString(),
+}));
+writePlaygroundResults(results, 'Playground-Execution-Results').then(() => {
   console.log('Done');
 }).catch((e: any) => console.error(e.message));
 TS

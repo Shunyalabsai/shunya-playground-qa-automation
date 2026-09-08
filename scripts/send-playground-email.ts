@@ -510,10 +510,11 @@ async function sendEmail() {
   const dateDisplay = formatDate(runDate);
 
   const smtpAuth = resolveSmtpAuth();
+  const smtpPort = parseInt(process.env.SMTP_PORT || '465', 10);
   const transporter = nodemailer.createTransport({
     host: process.env.SMTP_HOST || 'smtp.gmail.com',
-    port: parseInt(process.env.SMTP_PORT || '587', 10),
-    secure: false,
+    port: smtpPort,
+    secure: smtpPort === 465,
     auth: smtpAuth,
   });
 
@@ -527,15 +528,23 @@ async function sendEmail() {
   const recipientCount = recipients.split(',').length;
   console.log(`📧 Recipients (${recipientCount}): ${recipients}`);
 
-  // Attach the full HTML dashboard report if it exists
+  // Attach dashboard report if under Gmail 15MB limit
+  const dashboardPath = path.resolve(__dirname, '..', 'reports', 'Stakeholder-Dashboard.html');
   const reportPath = path.resolve(__dirname, '..', 'reports', 'Playground-Report.html');
+  const targetAttachment = fs.existsSync(dashboardPath) ? dashboardPath : (fs.existsSync(reportPath) ? reportPath : null);
   const attachments: any[] = [];
-  if (fs.existsSync(reportPath)) {
-    attachments.push({
-      filename: `Playground-Dashboard-${runDate}.html`,
-      path: reportPath,
-      contentType: 'text/html',
-    });
+  if (targetAttachment && fs.existsSync(targetAttachment)) {
+    const stats = fs.statSync(targetAttachment);
+    if (stats.size < 15 * 1024 * 1024) {
+      attachments.push({
+        filename: `Playground-Dashboard-${runDate}.html`,
+        path: targetAttachment,
+        contentType: 'text/html',
+      });
+      console.log(`📎 Attached dashboard report: ${path.basename(targetAttachment)} (${(stats.size / 1024 / 1024).toFixed(1)} MB)`);
+    } else {
+      console.log(`ℹ️ Dashboard file (${(stats.size / 1024 / 1024).toFixed(1)} MB) exceeds 15MB email limit; available via online dashboard link.`);
+    }
   }
 
   const dailyTag = process.env.PLAYGROUND_DAILY_EMAIL === '1' ? '[Daily] ' : '';
