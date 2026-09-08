@@ -1139,7 +1139,7 @@ function renderCalendar(runs) {
     </div>
     <div class="calendar-grid">\${cells}</div>
     <div id="calendarRuns"></div>
-    <div class="calendar-footer">Total runs recorded: \${runs.length} | Retention window: Last 100 executions</div>
+    <div class="calendar-footer">Total runs recorded: \${runs.length} | Live Historical Execution Log</div>
   \`;
 
   // Automatically select today if current month, or the first day with recorded runs

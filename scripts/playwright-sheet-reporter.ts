@@ -204,8 +204,7 @@ export default class PlaywrightSheetReporter implements Reporter {
       // Append genuine run record with individual results
       masterRuns.unshift(runRecord);
 
-      // Keep last 100 genuine runs
-      if (masterRuns.length > 100) masterRuns = masterRuns.slice(0, 100);
+      // Preserve all authentic test suite executions in history
       fs.writeFileSync(runsMasterPath, JSON.stringify(masterRuns, null, 2), 'utf8');
     } catch (e: any) {
       console.warn('[PlaywrightSheetReporter] Could not update playground-runs.json:', e.message);
