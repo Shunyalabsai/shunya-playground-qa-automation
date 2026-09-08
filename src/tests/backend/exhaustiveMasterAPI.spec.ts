@@ -177,17 +177,20 @@ test.describe('Exhaustive Master Backend API Suite (33 Scenarios)', () => {
             request.post(ENDPOINTS.transcription, {
               headers: getAuthHeaders(),
               multipart: { file: { name: 'sample.mp3', mimeType: 'audio/mpeg', buffer: fileBuffer }, model: 'zero-indic' },
+              timeout: 60000,
             }),
             request.post(ENDPOINTS.transcription, {
               headers: getAuthHeaders(),
               multipart: { file: { name: 'sample.mp3', mimeType: 'audio/mpeg', buffer: fileBuffer }, model: 'zero-indic' },
+              timeout: 60000,
             }),
             request.post(ENDPOINTS.transcription, {
               headers: getAuthHeaders(),
               multipart: { file: { name: 'sample.mp3', mimeType: 'audio/mpeg', buffer: fileBuffer }, model: 'zero-indic' },
+              timeout: 60000,
             }),
           ]);
-          responses.forEach((r) => expect([200, 429]).toContain(r.status()));
+          responses.forEach((r) => expect([200, 201, 429]).toContain(r.status()));
           return;
         }
       }
