@@ -259,10 +259,10 @@ function buildEmailHTML(summary: PlaygroundSummary): string {
   const categories = groupByCategory(suites);
   const failedSuites = suites.filter(s => s.status === 'fail');
 
-  const reportBaseUrl = process.env.REPORT_BASE_URL || 'https://yamini-pal-singh.github.io/playground-testing';
-  const dashboardUrl = `${reportBaseUrl}/Playground-Report.html`;
-  const playgroundSheetId = process.env.GOOGLE_SHEET_ID_PLAYGROUND_OUTPUT || '1Mw1CFU6yV6Q-8N_qLU09gAdj6fe2qg0ZsqZPn9SUE3s';
-  const masterSheetUrl = `https://docs.google.com/spreadsheets/d/${playgroundSheetId}/edit#gid=1927033749`;
+  const orgDashboardUrl = 'https://shunyalabsai.github.io/shunya-playground-qa-automation/';
+  const dashboardUrl = process.env.REPORT_BASE_URL || orgDashboardUrl;
+  const playgroundSheetId = process.env.GOOGLE_SHEET_ID_PLAYGROUND_OUTPUT || '11leUutfqP4OXyIIaeTYqw_3gWc1w5fQLnQWuUHXPgW4';
+  const masterSheetUrl = `https://docs.google.com/spreadsheets/d/${playgroundSheetId}/edit`;
 
   // Build category rows with grouped suites
   let categoryTableRows = '';
@@ -474,7 +474,7 @@ function buildEmailHTML(summary: PlaygroundSummary): string {
       <td style="padding:0 6px;">
         <a href="${dashboardUrl}"
            style="display:inline-block;background:linear-gradient(135deg,#1565C0,#00838F);color:white;padding:14px 28px;border-radius:10px;text-decoration:none;font-weight:700;font-size:13px;letter-spacing:0.3px;">
-          &#128202; View Full Dashboard
+          &#128202; View Live Dashboard
         </a>
       </td>
       <td style="padding:0 6px;">
