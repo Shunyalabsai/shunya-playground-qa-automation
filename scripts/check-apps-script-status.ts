@@ -61,8 +61,8 @@ async function checkGoogleSheet(): Promise<boolean> {
           const rowHour = parseInt(timestamp.split(' ')[1]?.split(':')[0] || '-1', 10);
           if (rowHour >= 0) {
             const rowIsMorning = rowHour < 12;
-            if (rowIsMorning === isMorning && (status.includes('TRIGGERED') || status.includes('PASS') || status.includes('SUCCESS'))) {
-              console.log(`[Smart Failover] Found matching Apps Script trigger in Execution History: ${timestamp} (${slot}) - Status: ${status}`);
+            if (rowIsMorning === isMorning && (status.includes('PASS') || status.includes('SUCCESS') || status.includes('COMPLETED'))) {
+              console.log(`[Smart Failover] Found completed test run in Execution History: ${timestamp} (${slot}) - Status: ${status}`);
               return true;
             }
           }

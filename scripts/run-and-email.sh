@@ -72,5 +72,5 @@ npm run email:playground 2>&1 | tee -a "$LOG_DIR/playground-email-$DATE.log"
 
 echo ""
 echo "════════════════════════════════════════════════════"
-echo "  Done — $(date '+%H:%M:%S') | Suites: $SUITE_PASSED/$SUITE_TOTAL passed"
+echo "  Done — $(date '+%H:%M:%S') | Smoke Test Run Completed"
 echo "════════════════════════════════════════════════════"
