@@ -1,5 +1,414 @@
 [
   {
+    "id": "run-1789042824582",
+    "startedAt": "2026-09-10T12:20:24.581Z",
+    "durationMs": 38400,
+    "passRate": 100,
+    "runType": "Smoke Test Run",
+    "browsersTested": [
+      "chromium",
+      "safari"
+    ],
+    "summary": {
+      "total": 21,
+      "passed": 21,
+      "failed": 0,
+      "timedOut": 0,
+      "skipped": 0
+    },
+    "modules": {
+      "Backend API - Health Checks": {
+        "label": "Backend API - Health Checks",
+        "passed": 2,
+        "failed": 0,
+        "total": 2
+      },
+      "Backend API - Authentication & Session": {
+        "label": "Backend API - Authentication & Session",
+        "passed": 1,
+        "failed": 0,
+        "total": 1
+      },
+      "Backend API - STT Transcription Models": {
+        "label": "Backend API - STT Transcription Models",
+        "passed": 3,
+        "failed": 0,
+        "total": 3
+      },
+      "Backend API - Intelligence Feature Matrix": {
+        "label": "Backend API - Intelligence Feature Matrix",
+        "passed": 1,
+        "failed": 0,
+        "total": 1
+      },
+      "Backend API - TTS Speech Synthesis": {
+        "label": "Backend API - TTS Speech Synthesis",
+        "passed": 3,
+        "failed": 0,
+        "total": 3
+      },
+      "Backend API - Negative, Auth & Stress": {
+        "label": "Backend API - Negative, Auth & Stress",
+        "passed": 1,
+        "failed": 0,
+        "total": 1
+      },
+      "Playground UI - Layout & Navigation": {
+        "label": "Playground UI - Layout & Navigation",
+        "passed": 3,
+        "failed": 0,
+        "total": 3
+      },
+      "Playground UI - STT Models": {
+        "label": "Playground UI - STT Models",
+        "passed": 1,
+        "failed": 0,
+        "total": 1
+      },
+      "Playground UI - STT Language Selection": {
+        "label": "Playground UI - STT Language Selection",
+        "passed": 1,
+        "failed": 0,
+        "total": 1
+      },
+      "Playground UI - STT Audio Upload": {
+        "label": "Playground UI - STT Audio Upload",
+        "passed": 1,
+        "failed": 0,
+        "total": 1
+      },
+      "Playground UI - STT Output Actions": {
+        "label": "Playground UI - STT Output Actions",
+        "passed": 1,
+        "failed": 0,
+        "total": 1
+      },
+      "Playground UI - TTS Speech Synthesis": {
+        "label": "Playground UI - TTS Speech Synthesis",
+        "passed": 3,
+        "failed": 0,
+        "total": 3
+      }
+    },
+    "results": [
+      {
+        "test_id": "SMOKE-API-001",
+        "date": "10-09-2026",
+        "module": "Backend API - Health Checks",
+        "feature": "None",
+        "scenario": "ASR Microservice Health Check (GET /health)",
+        "audio_file": "—",
+        "language": "—",
+        "lang_code": "—",
+        "status": "PASS",
+        "failure_reason": "",
+        "latency_ms": 282,
+        "api_response_preview": "HTTP 200 OK — Assertion Verified",
+        "timestamp": "10-09-2026 05:49:47 PM"
+      },
+      {
+        "test_id": "SMOKE-API-002",
+        "date": "10-09-2026",
+        "module": "Backend API - Health Checks",
+        "feature": "None",
+        "scenario": "TTS Microservice Health Check (GET /health)",
+        "audio_file": "—",
+        "language": "—",
+        "lang_code": "—",
+        "status": "PASS",
+        "failure_reason": "",
+        "latency_ms": 236,
+        "api_response_preview": "HTTP 200 OK — Assertion Verified",
+        "timestamp": "10-09-2026 05:49:47 PM"
+      },
+      {
+        "test_id": "SMOKE-API-003",
+        "date": "10-09-2026",
+        "module": "Backend API - Authentication & Session",
+        "feature": "Auth Token",
+        "scenario": "JWT Authentication Token Exchange (POST /auth/token)",
+        "audio_file": "—",
+        "language": "—",
+        "lang_code": "—",
+        "status": "PASS",
+        "failure_reason": "",
+        "latency_ms": 2,
+        "api_response_preview": "HTTP 200 OK — Assertion Verified",
+        "timestamp": "10-09-2026 05:49:47 PM"
+      },
+      {
+        "test_id": "SMOKE-API-004",
+        "date": "10-09-2026",
+        "module": "Backend API - STT Transcription Models",
+        "feature": "Basic Transcription",
+        "scenario": "STT Core Model — zero-indic Transcription Sanity",
+        "audio_file": "input/indicvoices_data/audio/Hindi/37.mp3",
+        "language": "Hindi",
+        "lang_code": "hi",
+        "status": "PASS",
+        "failure_reason": "",
+        "latency_ms": 311,
+        "api_response_preview": "HTTP 200 OK — Assertion Verified",
+        "timestamp": "10-09-2026 05:49:48 PM"
+      },
+      {
+        "test_id": "SMOKE-API-005",
+        "date": "10-09-2026",
+        "module": "Backend API - STT Transcription Models",
+        "feature": "Codeswitch Transcription",
+        "scenario": "STT Codeswitch Model — zero-codeswitch Hinglish Sanity",
+        "audio_file": "input/indicvoices_data/audio/Hindi/37.mp3",
+        "language": "Hinglish",
+        "lang_code": "hi-en",
+        "status": "PASS",
+        "failure_reason": "",
+        "latency_ms": 547,
+        "api_response_preview": "HTTP 200 OK — Assertion Verified",
+        "timestamp": "10-09-2026 05:49:48 PM"
+      },
+      {
+        "test_id": "SMOKE-API-006",
+        "date": "10-09-2026",
+        "module": "Backend API - STT Transcription Models",
+        "feature": "Medical ASR Transcription",
+        "scenario": "STT Medical Model — zero-medasr Clinical Sanity",
+        "audio_file": "input/indicvoices_data/audio/Hindi/37.mp3",
+        "language": "English",
+        "lang_code": "en",
+        "status": "PASS",
+        "failure_reason": "",
+        "latency_ms": 333,
+        "api_response_preview": "HTTP 200 OK — Assertion Verified",
+        "timestamp": "10-09-2026 05:49:49 PM"
+      },
+      {
+        "test_id": "SMOKE-API-007",
+        "date": "10-09-2026",
+        "module": "Backend API - Intelligence Feature Matrix",
+        "feature": "Translation, Timestamps",
+        "scenario": "STT Audio Intelligence — Translation & Word Timestamps",
+        "audio_file": "input/indicvoices_data/audio/Hindi/37.mp3",
+        "language": "Hindi",
+        "lang_code": "hi",
+        "status": "PASS",
+        "failure_reason": "",
+        "latency_ms": 217,
+        "api_response_preview": "HTTP 200 OK — Assertion Verified",
+        "timestamp": "10-09-2026 05:49:49 PM"
+      },
+      {
+        "test_id": "SMOKE-API-008",
+        "date": "10-09-2026",
+        "module": "Backend API - TTS Speech Synthesis",
+        "feature": "TTS Speech Synthesis",
+        "scenario": "TTS Core Synthesis — zero-indic (Hindi & English)",
+        "audio_file": "TTS Text: \"नमस्ते, शून्या लैब्स एआई वॉइस ...\"",
+        "language": "Hindi",
+        "lang_code": "hi",
+        "status": "PASS",
+        "failure_reason": "",
+        "latency_ms": 1374,
+        "api_response_preview": "HTTP 200 OK — Assertion Verified",
+        "timestamp": "10-09-2026 05:49:50 PM"
+      },
+      {
+        "test_id": "SMOKE-API-009",
+        "date": "10-09-2026",
+        "module": "Backend API - TTS Speech Synthesis",
+        "feature": "TTS Speech Synthesis",
+        "scenario": "TTS Model — zero-oriental Synthesis (Japanese: ja)",
+        "audio_file": "TTS Text: \"こんにちは、Shunya Labsの音声合成テストです。...\"",
+        "language": "Japanese",
+        "lang_code": "ja",
+        "status": "PASS",
+        "failure_reason": "",
+        "latency_ms": 2023,
+        "api_response_preview": "HTTP 200 OK — Assertion Verified",
+        "timestamp": "10-09-2026 05:49:52 PM"
+      },
+      {
+        "test_id": "SMOKE-API-010",
+        "date": "10-09-2026",
+        "module": "Backend API - TTS Speech Synthesis",
+        "feature": "TTS Speech Synthesis",
+        "scenario": "TTS Model — zero-universal Synthesis (Spanish: es)",
+        "audio_file": "TTS Text: \"Bienvenido a la plataforma de ...\"",
+        "language": "Spanish",
+        "lang_code": "es",
+        "status": "PASS",
+        "failure_reason": "",
+        "latency_ms": 2584,
+        "api_response_preview": "HTTP 200 OK — Assertion Verified",
+        "timestamp": "10-09-2026 05:49:55 PM"
+      },
+      {
+        "test_id": "SMOKE-API-011",
+        "date": "10-09-2026",
+        "module": "Backend API - Negative, Auth & Stress",
+        "feature": "None",
+        "scenario": "Negative Security — Missing Auth Returns 401 Unauthorized",
+        "audio_file": "—",
+        "language": "—",
+        "lang_code": "—",
+        "status": "PASS",
+        "failure_reason": "",
+        "latency_ms": 79,
+        "api_response_preview": "HTTP 200 OK — Assertion Verified",
+        "timestamp": "10-09-2026 05:49:55 PM"
+      },
+      {
+        "test_id": "SMOKE-UI-001",
+        "date": "10-09-2026",
+        "module": "Playground UI - Layout & Navigation",
+        "feature": "App Shell",
+        "scenario": "Playground App Shell & Authentication State Sanity",
+        "audio_file": "—",
+        "language": "—",
+        "lang_code": "—",
+        "status": "PASS",
+        "failure_reason": "",
+        "latency_ms": 3268,
+        "api_response_preview": "HTTP 200 OK — Assertion Verified",
+        "timestamp": "10-09-2026 05:50:00 PM"
+      },
+      {
+        "test_id": "SMOKE-UI-002",
+        "date": "10-09-2026",
+        "module": "Playground UI - Layout & Navigation",
+        "feature": "Navigation Tabs",
+        "scenario": "Primary Workspace Navigation (STT <-> TTS Tabs)",
+        "audio_file": "—",
+        "language": "—",
+        "lang_code": "—",
+        "status": "PASS",
+        "failure_reason": "",
+        "latency_ms": 2840,
+        "api_response_preview": "HTTP 200 OK — Assertion Verified",
+        "timestamp": "10-09-2026 05:50:03 PM"
+      },
+      {
+        "test_id": "SMOKE-UI-003",
+        "date": "10-09-2026",
+        "module": "Playground UI - STT Models",
+        "feature": "Model Selection",
+        "scenario": "STT Model Selection Dropdown (Zero Indic, Codeswitch, Med)",
+        "audio_file": "—",
+        "language": "—",
+        "lang_code": "—",
+        "status": "PASS",
+        "failure_reason": "",
+        "latency_ms": 2226,
+        "api_response_preview": "HTTP 200 OK — Assertion Verified",
+        "timestamp": "10-09-2026 05:50:05 PM"
+      },
+      {
+        "test_id": "SMOKE-UI-004",
+        "date": "10-09-2026",
+        "module": "Playground UI - STT Language Selection",
+        "feature": "Language Search",
+        "scenario": "STT Language Search and Selection Modal/Dropdown",
+        "audio_file": "—",
+        "language": "Hindi",
+        "lang_code": "hi",
+        "status": "PASS",
+        "failure_reason": "",
+        "latency_ms": 2747,
+        "api_response_preview": "HTTP 200 OK — Assertion Verified",
+        "timestamp": "10-09-2026 05:50:08 PM"
+      },
+      {
+        "test_id": "SMOKE-UI-005",
+        "date": "10-09-2026",
+        "module": "Playground UI - STT Audio Upload",
+        "feature": "File Upload",
+        "scenario": "STT File Upload & \"Run Analysis\" CTA Enablement",
+        "audio_file": "input/indicvoices_data/audio/Hindi/37.mp3",
+        "language": "Hindi",
+        "lang_code": "hi",
+        "status": "PASS",
+        "failure_reason": "",
+        "latency_ms": 2639,
+        "api_response_preview": "HTTP 200 OK — Assertion Verified",
+        "timestamp": "10-09-2026 05:50:10 PM"
+      },
+      {
+        "test_id": "SMOKE-UI-006",
+        "date": "10-09-2026",
+        "module": "Playground UI - STT Output Actions",
+        "feature": "Output Views",
+        "scenario": "STT Output Display Tabs Switch (Transcript vs JSON)",
+        "audio_file": "—",
+        "language": "—",
+        "lang_code": "—",
+        "status": "PASS",
+        "failure_reason": "",
+        "latency_ms": 2448,
+        "api_response_preview": "HTTP 200 OK — Assertion Verified",
+        "timestamp": "10-09-2026 05:50:13 PM"
+      },
+      {
+        "test_id": "SMOKE-UI-007",
+        "date": "10-09-2026",
+        "module": "Playground UI - TTS Speech Synthesis",
+        "feature": "TTS Model Cascades",
+        "scenario": "TTS Workspace Model Switch (Zero Indic, Zero Oriental, Zero Universal)",
+        "audio_file": "—",
+        "language": "—",
+        "lang_code": "—",
+        "status": "PASS",
+        "failure_reason": "",
+        "latency_ms": 3112,
+        "api_response_preview": "HTTP 200 OK — Assertion Verified",
+        "timestamp": "10-09-2026 05:50:16 PM"
+      },
+      {
+        "test_id": "SMOKE-UI-008",
+        "date": "10-09-2026",
+        "module": "Playground UI - TTS Speech Synthesis",
+        "feature": "TTS Text Input",
+        "scenario": "TTS Textarea Input & Voice/Speed Controls Sanity",
+        "audio_file": "TTS Text: \"नमस्ते, शून्या लैब्स टेस्ट स्प...\"",
+        "language": "Hindi",
+        "lang_code": "hi",
+        "status": "PASS",
+        "failure_reason": "",
+        "latency_ms": 2446,
+        "api_response_preview": "HTTP 200 OK — Assertion Verified",
+        "timestamp": "10-09-2026 05:50:18 PM"
+      },
+      {
+        "test_id": "SMOKE-UI-009",
+        "date": "10-09-2026",
+        "module": "Playground UI - TTS Speech Synthesis",
+        "feature": "Audio Player Controls",
+        "scenario": "TTS Synthesized Audio Player & Download Controls",
+        "audio_file": "—",
+        "language": "Hindi",
+        "lang_code": "hi",
+        "status": "PASS",
+        "failure_reason": "",
+        "latency_ms": 2992,
+        "api_response_preview": "HTTP 200 OK — Assertion Verified",
+        "timestamp": "10-09-2026 05:50:21 PM"
+      },
+      {
+        "test_id": "SMOKE-UI-010",
+        "date": "10-09-2026",
+        "module": "Playground UI - Layout & Navigation",
+        "feature": "Responsive Mobile Layout",
+        "scenario": "Responsive Layout — Mobile Viewport (375x812) Smoke Check",
+        "audio_file": "—",
+        "language": "—",
+        "lang_code": "—",
+        "status": "PASS",
+        "failure_reason": "",
+        "latency_ms": 2577,
+        "api_response_preview": "HTTP 200 OK — Assertion Verified",
+        "timestamp": "10-09-2026 05:50:24 PM"
+      }
+    ]
+  },
+  {
     "id": "run-1789037384777",
     "startedAt": "2026-09-10T10:49:44.776Z",
     "durationMs": 505800,
@@ -108984,98 +109393,6 @@
       "total": 60,
       "passed": 40,
       "failed": 20,
-      "timedOut": 0,
-      "skipped": 0
-    },
-    "modules": {
-      "Backend API - Health Checks": {
-        "label": "Backend API - Health Checks",
-        "passed": 2,
-        "failed": 0,
-        "total": 2
-      },
-      "Backend API - Authentication & Session": {
-        "label": "Backend API - Authentication & Session",
-        "passed": 1,
-        "failed": 0,
-        "total": 1
-      },
-      "Backend API - STT Transcription Models": {
-        "label": "Backend API - STT Transcription Models",
-        "passed": 3,
-        "failed": 0,
-        "total": 3
-      },
-      "Backend API - Intelligence Feature Matrix": {
-        "label": "Backend API - Intelligence Feature Matrix",
-        "passed": 1,
-        "failed": 0,
-        "total": 1
-      },
-      "Backend API - TTS Speech Synthesis": {
-        "label": "Backend API - TTS Speech Synthesis",
-        "passed": 3,
-        "failed": 0,
-        "total": 3
-      },
-      "Backend API - Negative, Auth & Stress": {
-        "label": "Backend API - Negative, Auth & Stress",
-        "passed": 1,
-        "failed": 0,
-        "total": 1
-      },
-      "Playground UI - Layout & Navigation": {
-        "label": "Playground UI - Layout & Navigation",
-        "passed": 3,
-        "failed": 0,
-        "total": 3
-      },
-      "Playground UI - STT Models": {
-        "label": "Playground UI - STT Models",
-        "passed": 1,
-        "failed": 0,
-        "total": 1
-      },
-      "Playground UI - STT Language Selection": {
-        "label": "Playground UI - STT Language Selection",
-        "passed": 1,
-        "failed": 0,
-        "total": 1
-      },
-      "Playground UI - STT Audio Upload": {
-        "label": "Playground UI - STT Audio Upload",
-        "passed": 1,
-        "failed": 0,
-        "total": 1
-      },
-      "Playground UI - STT Output Actions": {
-        "label": "Playground UI - STT Output Actions",
-        "passed": 1,
-        "failed": 0,
-        "total": 1
-      },
-      "Playground UI - TTS Speech Synthesis": {
-        "label": "Playground UI - TTS Speech Synthesis",
-        "passed": 3,
-        "failed": 0,
-        "total": 3
-      }
-    }
-  },
-  {
-    "id": "2026-07-13T14-30-17",
-    "startedAt": "2026-07-13T09:00:17.000Z",
-    "durationMs": 60000,
-    "passRate": 80,
-    "runType": "Full Regression Run",
-    "browsersTested": [
-      "chromium",
-      "safari"
-    ],
-    "summary": {
-      "total": 60,
-      "passed": 48,
-      "failed": 12,
       "timedOut": 0,
       "skipped": 0
     },
