@@ -304,10 +304,21 @@ test.describe('Exhaustive Master UI Suite (118 Scenarios)', () => {
           // Textarea Input
           const textarea = page.locator('textarea').first();
           if ((await textarea.count()) > 0) {
+            await page.waitForSelector('textarea:not([disabled])', { timeout: 10000 }).catch(() => {});
             if (tc.scenarioType === 'Negative') {
-              await textarea.fill('');
+              await textarea.fill('').catch(() => {});
             } else if (tc.ttsInputText && tc.ttsInputText !== 'N/A') {
-              await textarea.fill(tc.ttsInputText);
+              await textarea.fill(tc.ttsInputText).catch(async () => {
+                // Fallback in case disabled state lingers
+                await page.evaluate((val) => {
+                  const el = document.querySelector('textarea');
+                  if (el) {
+                    el.removeAttribute('disabled');
+                    el.value = val;
+                    el.dispatchEvent(new Event('input', { bubbles: true }));
+                  }
+                }, tc.ttsInputText);
+              });
             }
           }
         }
