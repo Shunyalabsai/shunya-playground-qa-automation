@@ -98,20 +98,15 @@ function checkGitRemote(): boolean {
     // Fetch latest remote info quietly
     execSync('git fetch origin main --quiet', { cwd: projectDir, timeout: 15000 });
 
-    const latestCommitDateStr = execSync('git log -1 --format=%cI origin/main', { cwd: projectDir, timeout: 5000 })
-      .toString()
-      .trim();
+    // Strictly check for automated commits made by github-actions in the last 45 minutes
+    const automatedCommits = execSync(
+      'git log -1 --since="45 minutes ago" --author="github-actions" --pretty=format:"%h %an %ad %s" origin/main',
+      { cwd: projectDir, encoding: 'utf8', timeout: 5000 }
+    ).trim();
 
-    if (latestCommitDateStr) {
-      const commitDate = new Date(latestCommitDateStr);
-      const now = new Date();
-      const diffMinutes = (now.getTime() - commitDate.getTime()) / (1000 * 60);
-
-      // If a cloud run was pushed to origin/main in the last 60 minutes
-      if (diffMinutes >= 0 && diffMinutes <= 60) {
-        console.log(`[Smart Failover] Remote origin/main has a recent update from ${diffMinutes.toFixed(1)} minutes ago.`);
-        return true;
-      }
+    if (automatedCommits) {
+      console.log(`[Smart Failover] Recent GitHub Actions automated commit found: ${automatedCommits}`);
+      return true;
     }
   } catch (err: any) {
     console.warn(`[Smart Failover] Git remote check error: ${err.message}`);

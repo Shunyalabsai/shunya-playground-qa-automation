@@ -1418,24 +1418,6 @@ function esc(str) {
   if (!fs.existsSync(nojekyllPath)) fs.writeFileSync(nojekyllPath, '', 'utf8');
   if (fs.existsSync(docsDir)) fs.writeFileSync(docsIndexPath, html, 'utf8');
 
-  // Also sync to parent workspace root if operating in a subfolder
-  const parentRootDir = path.resolve(rootDir, '..');
-  const parentIndexPath = path.join(parentRootDir, 'index.html');
-  const parentReportsDir = path.join(parentRootDir, 'reports');
-  const parentDocsDir = path.join(parentRootDir, 'docs');
-
-  try {
-    if (fs.existsSync(parentRootDir) && parentRootDir !== rootDir) {
-      fs.writeFileSync(parentIndexPath, html, 'utf8');
-      if (fs.existsSync(parentReportsDir)) {
-        fs.writeFileSync(path.join(parentReportsDir, 'Stakeholder-Dashboard.html'), html, 'utf8');
-      }
-      if (fs.existsSync(parentDocsDir)) {
-        fs.writeFileSync(path.join(parentDocsDir, 'index.html'), html, 'utf8');
-      }
-    }
-  } catch {}
-
   console.log(`[DashboardGenerator] Wrote executive dashboard to: ${dashboardPath}`);
   console.log(`[DashboardGenerator] Wrote root index.html to: ${rootIndexPath}`);
 
