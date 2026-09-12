@@ -21,7 +21,7 @@ function getCurrentSlot(): { slotName: string; isMorning: boolean; todayStr: str
   const now = new Date();
   const hours = now.getHours();
   const isMorning = hours < 12;
-  const slotName = isMorning ? 'Morning Run (4:00 AM)' : 'Evening Run (5:00 PM)';
+  const slotName = isMorning ? 'Morning Run (4:30 AM)' : 'Evening Run (5:30 PM)';
 
   // Format YYYY-MM-DD
   const y = now.getFullYear();
