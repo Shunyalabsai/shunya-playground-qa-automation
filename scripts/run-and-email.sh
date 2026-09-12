@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Twice daily (4:00 AM & 5:00 PM): run UI suites once, generate report, push dashboard (email at 8 PM only).
+# Twice daily (4:30 AM & 5:30 PM): run UI suites once, generate report, push dashboard & email report.
 set -uo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
