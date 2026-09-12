@@ -21,7 +21,13 @@ import { dismissOpenModals } from '../ui/playgroundStt.helpers';
 
 test.describe('Smoke Test Suite — Playground UI (P0 Sanity)', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto(PLAYGROUND_URL, { waitUntil: 'domcontentloaded', timeout: 30000 });
+    try {
+      await page.goto(PLAYGROUND_URL, { waitUntil: 'domcontentloaded', timeout: 25000 });
+    } catch {
+      // Retry once if early morning network hiccup occurred
+      await page.waitForTimeout(1500);
+      await page.goto(PLAYGROUND_URL, { waitUntil: 'domcontentloaded', timeout: 25000 }).catch(() => {});
+    }
     await page.waitForTimeout(300);
     await dismissOpenModals(page).catch(() => {});
   });

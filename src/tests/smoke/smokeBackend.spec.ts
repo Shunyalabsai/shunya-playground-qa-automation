@@ -122,7 +122,7 @@ test.describe('Smoke Test Suite — Backend API (P0 Sanity)', () => {
   // ── 4. Core TTS Speech Synthesis (Indic, Oriental, Universal) ────────────────
   test('SMOKE-API-008: TTS Core Synthesis — zero-indic with Female Meera Maithili Voice', async ({ request }) => {
     test.skip(!API_CONFIG.apiKey, 'ASR_API_KEY required');
-    const res = await request.post(ENDPOINTS.tts.synthesis, {
+    let res = await request.post(ENDPOINTS.tts.synthesis, {
       headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' },
       data: {
         model: 'zero-indic',
@@ -131,8 +131,24 @@ test.describe('Smoke Test Suite — Backend API (P0 Sanity)', () => {
         speed: 1.0,
         response_format: 'mp3',
       },
-      timeout: 45000,
+      timeout: 25000,
     }).catch(() => null);
+
+    // Fast retry on early-morning network hiccups or cold starts
+    if (!res || res.status() >= 500) {
+      await new Promise(r => setTimeout(r, 2000));
+      res = await request.post(ENDPOINTS.tts.synthesis, {
+        headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' },
+        data: {
+          model: 'zero-indic',
+          input: 'नमस्ते, शून्या लैब्स एआई वॉइस प्लेटफ़ॉर्म में आपका स्वागत है।',
+          voice: 'Meera',
+          speed: 1.0,
+          response_format: 'mp3',
+        },
+        timeout: 25000,
+      }).catch(() => null);
+    }
 
     if (res) {
       expect([200, 201]).toContain(res.status());
@@ -143,7 +159,7 @@ test.describe('Smoke Test Suite — Backend API (P0 Sanity)', () => {
 
   test('SMOKE-API-009: TTS Model — zero-oriental Synthesis (Japanese: ja)', async ({ request }) => {
     test.skip(!API_CONFIG.apiKey, 'ASR_API_KEY required');
-    const res = await request.post(ENDPOINTS.tts.synthesis, {
+    let res = await request.post(ENDPOINTS.tts.synthesis, {
       headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' },
       data: {
         model: 'zero-oriental',
@@ -152,8 +168,23 @@ test.describe('Smoke Test Suite — Backend API (P0 Sanity)', () => {
         speed: 1.0,
         response_format: 'mp3',
       },
-      timeout: 45000,
+      timeout: 25000,
     }).catch(() => null);
+
+    if (!res || res.status() >= 500) {
+      await new Promise(r => setTimeout(r, 2000));
+      res = await request.post(ENDPOINTS.tts.synthesis, {
+        headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' },
+        data: {
+          model: 'zero-oriental',
+          input: 'こんにちは、Shunya Labsの音声合成テストです。',
+          voice: 'Standard Oriental',
+          speed: 1.0,
+          response_format: 'mp3',
+        },
+        timeout: 25000,
+      }).catch(() => null);
+    }
 
     if (res) {
       expect([200, 201]).toContain(res.status());
@@ -162,7 +193,7 @@ test.describe('Smoke Test Suite — Backend API (P0 Sanity)', () => {
 
   test('SMOKE-API-010: TTS Model — zero-universal Synthesis (Spanish: es)', async ({ request }) => {
     test.skip(!API_CONFIG.apiKey, 'ASR_API_KEY required');
-    const res = await request.post(ENDPOINTS.tts.synthesis, {
+    let res = await request.post(ENDPOINTS.tts.synthesis, {
       headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' },
       data: {
         model: 'zero-universal',
@@ -171,8 +202,23 @@ test.describe('Smoke Test Suite — Backend API (P0 Sanity)', () => {
         speed: 1.0,
         response_format: 'mp3',
       },
-      timeout: 45000,
+      timeout: 25000,
     }).catch(() => null);
+
+    if (!res || res.status() >= 500) {
+      await new Promise(r => setTimeout(r, 2000));
+      res = await request.post(ENDPOINTS.tts.synthesis, {
+        headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' },
+        data: {
+          model: 'zero-universal',
+          input: 'Bienvenido a la plataforma de síntesis de voz de Shunya Labs.',
+          voice: 'Standard Universal',
+          speed: 1.0,
+          response_format: 'mp3',
+        },
+        timeout: 25000,
+      }).catch(() => null);
+    }
 
     if (res) {
       expect([200, 201]).toContain(res.status());

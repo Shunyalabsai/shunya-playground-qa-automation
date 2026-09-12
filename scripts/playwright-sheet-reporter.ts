@@ -184,10 +184,10 @@ export default class PlaywrightSheetReporter implements Reporter {
       console.warn('[PlaywrightSheetReporter] Could not write run json:', e.message);
     }
 
-    const isSuiteRun = totalTests >= 10;
+    const isSuiteRun = totalTests >= 21;
 
     if (!isSuiteRun) {
-      console.log(`[PlaywrightSheetReporter] ℹ️ Ad-hoc test execution detected (${totalTests} tests). Preserving official stakeholder dashboard and runs history.`);
+      console.log(`[PlaywrightSheetReporter] ℹ️ Ad-hoc / partial test execution detected (${totalTests} tests). Preserving official stakeholder dashboard and runs history.`);
       return;
     }
 

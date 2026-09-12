@@ -516,6 +516,9 @@ async function sendEmail() {
     port: smtpPort,
     secure: smtpPort === 465,
     auth: smtpAuth,
+    connectionTimeout: 20000,
+    greetingTimeout: 15000,
+    socketTimeout: 30000,
   });
 
   const statusEmoji = passRate >= 95 ? '\u{1F7E2}' : passRate >= 80 ? '\u{1F7E1}' : '\u{1F534}';
