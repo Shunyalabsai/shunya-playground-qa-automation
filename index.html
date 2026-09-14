@@ -98,7 +98,8 @@ header{position:sticky;top:0;z-index:50;display:flex;align-items:center;justify-
 .module-header h3{font-size:15px;font-weight:700;color:#fff}
 .module-header .test-count-tag{font-size:11px;font-weight:700;background:rgba(139,92,246,.2);color:#c4b5fd;padding:2px 8px;border-radius:6px}
 .module-tests{padding:8px 16px;max-height:340px;overflow-y:auto;flex:1}
-.test-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid rgba(38,40,58,.5);font-size:13px}
+.test-row{display:flex;align-items:center;gap:12px;padding:10px 12px;margin:2px 0;border-radius:6px;border-bottom:1px solid rgba(38,40,58,.5);font-size:13px;cursor:pointer;transition:all .15s ease}
+.test-row:hover{background:rgba(139,92,246,.12);border-color:rgba(139,92,246,.4);transform:translateX(2px)}
 .test-row:last-child{border-bottom:none}
 .status-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
 .status-dot.passed{background:var(--pass);box-shadow:0 0 8px rgba(34,197,94,.5)}
@@ -107,6 +108,10 @@ header{position:sticky;top:0;z-index:50;display:flex;align-items:center;justify-
 .test-title{color:var(--text);font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .test-meta-sub{font-size:11px;color:var(--muted);display:flex;gap:8px;margin-top:2px;align-items:center}
 .test-duration{color:var(--muted);font-size:12px;font-family:monospace;flex-shrink:0}
+.stat-card.clickable{cursor:pointer;transition:all .2s ease}
+.stat-card.clickable:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.4);border-color:rgba(139,92,246,.5)}
+.modal-test{background:var(--panel);border:1px solid var(--panel-border);border-radius:8px;padding:12px 14px;margin-bottom:8px;cursor:pointer;transition:all .15s ease}
+.modal-test:hover{background:rgba(139,92,246,.15);border-color:rgba(139,92,246,.5);transform:translateY(-1px)}
 
 /* ── Dedicated All Test Cases Tab ── */
 .test-explorer-card{background:var(--panel);border:1px solid var(--panel-border);border-radius:var(--radius);padding:24px}
@@ -229,17 +234,17 @@ table.data-table tr:hover td{background:rgba(139,92,246,.05)}
 <div class="tab-content active" id="currentTab">
   <!-- Stats -->
   <div class="grid stats">
-    <div class="card stat-card">
+    <div class="card stat-card clickable" onclick="switchTab('testcases', document.querySelectorAll('.tab')[1])" title="View All Executed Tests">
       <div class="label">Total Executed</div>
       <div class="value">21</div>
       <div class="sub">36.6s execution time</div>
     </div>
-    <div class="card stat-card">
+    <div class="card stat-card clickable" onclick="filterByStatusQuick('passed')" title="Filter Passed Tests">
       <div class="label">Passed</div>
       <div class="value" style="color:var(--pass)">21</div>
       <div class="sub">100% of executed</div>
     </div>
-    <div class="card stat-card">
+    <div class="card stat-card clickable" onclick="filterByStatusQuick('failed')" title="Click to inspect failed tests">
       <div class="label">Failed</div>
       <div class="value" style="color:var(--fail)">0</div>
       <div class="sub">Zero failures</div>
@@ -533,7 +538,7 @@ function renderModules(data) {
     const skipped = mod.tests.filter(t => t.status === 'skipped').length;
     const isSmokeMod = mod.tests.some(t => t.isSmoke);
     const testRows = mod.tests.map(t => `
-      <div class="test-row">
+      <div class="test-row" onclick="openTestModalById('${t.id}')" title="Click to inspect test details (${esc(t.title)})">
         <div class="status-dot ${t.status}"></div>
         <div class="test-info">
           <div class="test-title" title="${esc(t.title)}">${esc(t.title)}</div>
@@ -543,10 +548,13 @@ function renderModules(data) {
             <span>&middot;</span>
             <span>${t.language !== '—' ? t.language : t.suite}</span>
             ${t.status === 'skipped' ? `<span style="color:#fbbf24;font-size:10px;margin-left:4px">⚠️ ${esc(t.error || 'Skipped in execution')}</span>` : ''}
-            ${t.status === 'failed' ? `<span style="color:#f87171;font-size:10px;margin-left:4px">❌ ${esc(t.error || 'Test failed')}</span>` : ''}
+            ${t.status === 'failed' ? `<span style="color:#f87171;font-size:10px;margin-left:4px">❌ ${esc(t.error || 'Test failed — Click to view')}</span>` : ''}
           </div>
         </div>
-        <div class="test-duration">${formatDuration(t.durationMs)}</div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <div class="test-duration">${formatDuration(t.durationMs)}</div>
+          <span style="font-size:11px;color:var(--muted)">🔍</span>
+        </div>
       </div>
     `).join('');
 
@@ -560,7 +568,7 @@ function renderModules(data) {
           <div style="display:flex;align-items:center;gap:6px">
             ${isSmokeMod ? `<span class="pill-smoke" style="font-size:10px;padding:2px 8px"><span class="smoke-flame">🔥</span> Smoke Suite</span>` : ''}
             ${passed > 0 ? `<span class="pill pill-pass">${passed} passed</span>` : ''}
-            ${failed > 0 ? `<span class="pill pill-fail">${failed} failed</span>` : ''}
+            ${failed > 0 ? `<span class="pill pill-fail" style="cursor:pointer" onclick="filterByStatusQuick('failed')" title="Click to view failed tests">${failed} failed</span>` : ''}
             ${skipped > 0 ? `<span class="pill pill-skip">${skipped} skipped</span>` : ''}
           </div>
         </div>
@@ -581,6 +589,10 @@ function renderAllTestCasesTable(tests) {
   tests.forEach(t => {
     const pClass = (t.priority || 'P1').toLowerCase();
     const tr = document.createElement('tr');
+    tr.style.cursor = 'pointer';
+    tr.onclick = (e) => {
+      if (e.target.tagName !== 'BUTTON') openTestModalById(t.id);
+    };
     tr.innerHTML = `
       <td>${t.isSmoke ? `<span class="badge-smoke-id"><span class="smoke-flame">🔥</span>${t.id}</span>` : `<span class="badge-id">${t.id}</span>`}</td>
       <td style="font-weight:600;font-size:12px;color:var(--muted)">
@@ -609,7 +621,8 @@ function renderAllTestCasesTable(tests) {
 
   const countBadge = document.getElementById('tcCountBadge');
   if (countBadge) {
-    countBadge.textContent = `Showing ${tests.length} of ${latestData.tests.length}`;
+    const totalCount = (catalogData && catalogData.length) ? catalogData.length : latestData.tests.length;
+    countBadge.textContent = `Showing ${tests.length} of ${totalCount}`;
   }
 }
 
@@ -620,19 +633,30 @@ function setTcCategory(cat, btn) {
   filterTestCasesTable();
 }
 
+function filterByStatusQuick(status) {
+  switchTab('testcases', document.querySelectorAll('.tab')[1]);
+  const statusEl = document.getElementById('statusFilter');
+  if (statusEl) {
+    statusEl.value = status;
+    filterTestCasesTable();
+  }
+}
+
 function filterTestCasesTable() {
   const query = (document.getElementById('testCaseSearch')?.value || '').toLowerCase();
   const priority = document.getElementById('priorityFilter')?.value || 'all';
   const status = document.getElementById('statusFilter')?.value || 'all';
 
-  const filtered = latestData.tests.filter(t => {
+  const sourceTests = (catalogData && catalogData.length) ? catalogData : latestData.tests;
+
+  const filtered = sourceTests.filter(t => {
     const matchesQuery =
       t.id.toLowerCase().includes(query) ||
       t.title.toLowerCase().includes(query) ||
       t.module.toLowerCase().includes(query) ||
       t.feature.toLowerCase().includes(query) ||
       t.language.toLowerCase().includes(query) ||
-      t.audioPath.toLowerCase().includes(query);
+      (t.audioPath && t.audioPath.toLowerCase().includes(query));
 
     let matchesCat = true;
     if (tcCategoryFilter === 'Smoke') matchesCat = t.isSmoke === true;
@@ -653,7 +677,14 @@ function filterTestCasesTable() {
 }
 
 function openTestModalById(testId) {
-  const t = latestData.tests.find(item => item.id === testId);
+  let t = (latestData && latestData.tests && latestData.tests.find(item => item.id === testId))
+       || (catalogData && catalogData.find(item => item.id === testId))
+       || (currentModalTests && currentModalTests.find(item => item.id === testId));
+
+  if (!t && currentModalTests && currentModalTests.length) {
+    t = currentModalTests.find(item => item.id === testId || item.test_id === testId);
+  }
+
   if (!t) return;
 
   const body = `
@@ -960,12 +991,12 @@ function openRunModal(runId) {
 function renderModalTestsHTML(tests, filter) {
   const filtered = filter === 'all' ? tests :
     filter === 'passed' ? tests.filter(t => t.status === 'passed') :
-    tests.filter(t => t.status !== 'passed');
+    tests.filter(t => t.status === 'failed' || t.status === 'skipped');
 
   if (!filtered.length) return '<p style="color:var(--muted);padding:14px">No tests match this filter.</p>';
 
   return filtered.map(t => `
-    <div class="modal-test">
+    <div class="modal-test" onclick="openTestModalById('${t.id}')" title="Click to inspect test details (${esc(t.title)})">
       <div class="mt-head">
         <div class="mt-title">${esc(t.title)}</div>
         <span class="pill ${t.status === 'passed' ? 'pill-pass' : (t.status === 'skipped' ? 'pill-skip' : 'pill-fail')}">${t.status}</span>
@@ -973,6 +1004,7 @@ function renderModalTestsHTML(tests, filter) {
       <div class="mt-meta">
         <span class="mt-tag">${t.id} &middot; ${t.module}</span>
         <span>${formatDuration(t.durationMs)}</span>
+        ${t.error ? `<span style="color:#f87171;font-size:11px;margin-left:6px">❌ ${esc(t.error)}</span>` : ''}
       </div>
     </div>
   `).join('');
