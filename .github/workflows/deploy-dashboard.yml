@@ -33,15 +33,20 @@ jobs:
       - name: Prepare pages directory
         run: |
           mkdir -p pages-output/reports
-          cp reports/Stakeholder-Dashboard.html pages-output/index.html
-          cp reports/Stakeholder-Dashboard.html pages-output/Stakeholder-Dashboard.html
-          cp reports/Stakeholder-Dashboard.html pages-output/reports/Stakeholder-Dashboard.html
-          cp reports/Playground-Report.html pages-output/Playground-Report.html
-          cp reports/Playground-Report.html pages-output/reports/Playground-Report.html
-          cp reports/playground-runs.json pages-output/playground-runs.json
-          cp reports/playground-runs.json pages-output/reports/playground-runs.json
+          if [ -f "index.html" ]; then
+            cp index.html pages-output/index.html
+          elif [ -f "reports/Stakeholder-Dashboard.html" ]; then
+            cp reports/Stakeholder-Dashboard.html pages-output/index.html
+          fi
+          cp reports/Stakeholder-Dashboard.html pages-output/Stakeholder-Dashboard.html 2>/dev/null || true
+          cp reports/Stakeholder-Dashboard.html pages-output/reports/Stakeholder-Dashboard.html 2>/dev/null || true
+          cp reports/Playground-Report.html pages-output/Playground-Report.html 2>/dev/null || true
+          cp reports/Playground-Report.html pages-output/reports/Playground-Report.html 2>/dev/null || true
+          cp reports/playground-runs.json pages-output/playground-runs.json 2>/dev/null || true
+          cp reports/playground-runs.json pages-output/reports/playground-runs.json 2>/dev/null || true
           cp reports/playground-today-summary.json pages-output/playground-today-summary.json 2>/dev/null || true
           cp reports/playground-today-summary.json pages-output/reports/playground-today-summary.json 2>/dev/null || true
+          touch pages-output/.nojekyll
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
