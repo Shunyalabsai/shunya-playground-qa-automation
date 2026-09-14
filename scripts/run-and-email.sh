@@ -42,13 +42,22 @@ echo "════════════════════════�
 echo "  Playground Scheduled Run — $(date '+%Y-%m-%d %H:%M:%S')"
 echo "════════════════════════════════════════════════════"
 
+# Environment & PATH Setup
+export PATH="/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/opt/homebrew/bin:$HOME/.nvm/versions/node/$(ls "$HOME/.nvm/versions/node" 2>/dev/null | sort -V | tail -1)/bin:$PATH"
+export HOME="/Users/unitedwecare"
+export CI=true
+
 if [ -f "$HOME/.nvm/nvm.sh" ]; then
   export NVM_DIR="$HOME/.nvm"
   # shellcheck disable=SC1090
   source "$NVM_DIR/nvm.sh"
   nvm use default 2>/dev/null || true
 fi
-export PATH="/usr/local/bin:$HOME/.nvm/versions/node/$(ls "$HOME/.nvm/versions/node" 2>/dev/null | sort -V | tail -1)/bin:$PATH"
+
+# Prevent system sleep during the entire scheduled run execution
+if command -v caffeinate >/dev/null 2>&1; then
+  caffeinate -dimsu -w $$ &
+fi
 
 # ── Smart Failover & Deduplication Check ─────────────────────────────────────
 echo "── Smart Failover & Deduplication Check ──────────"

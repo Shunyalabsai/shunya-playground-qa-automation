@@ -45,43 +45,31 @@ async function checkGoogleSheet(): Promise<boolean> {
     const sheets = google.sheets({ version: 'v4', auth });
     const { todayStr, isMorning } = getCurrentSlot();
 
-    // 1. Check 'Execution History' tab
+    // 1. Check 'Execution History' tab for recent run completed within the last 45 minutes
     const historyRes = await sheets.spreadsheets.values.get({
       spreadsheetId: SPREADSHEET_ID,
       range: 'Execution History!A2:D10',
     }).catch(() => null);
 
     if (historyRes && historyRes.data.values && historyRes.data.values.length > 0) {
+      const nowMs = Date.now();
       for (const row of historyRes.data.values) {
-        const timestamp = String(row[0] || '');
+        const timestampStr = String(row[0] || '');
         const slot = String(row[1] || '');
         const status = String(row[2] || row[3] || '');
 
-        if (timestamp.includes(todayStr)) {
-          const rowHour = parseInt(timestamp.split(' ')[1]?.split(':')[0] || '-1', 10);
-          if (rowHour >= 0) {
-            const rowIsMorning = rowHour < 12;
-            if (rowIsMorning === isMorning && (status.includes('PASS') || status.includes('SUCCESS') || status.includes('COMPLETED'))) {
-              console.log(`[Smart Failover] Found completed test run in Execution History: ${timestamp} (${slot}) - Status: ${status}`);
+        if (timestampStr) {
+          const parsedTime = new Date(timestampStr).getTime();
+          const ageMinutes = (nowMs - parsedTime) / (1000 * 60);
+
+          // Only consider runs completed in the last 45 minutes
+          if (!isNaN(parsedTime) && ageMinutes >= 0 && ageMinutes <= 45) {
+            const isCompleted = status.includes('PASS') || status.includes('SUCCESS') || status.includes('COMPLETED');
+            if (isCompleted) {
+              console.log(`[Smart Failover] Found recent cloud test run in Execution History (${ageMinutes.toFixed(1)} mins ago): ${timestampStr} (${slot}) - Status: ${status}`);
               return true;
             }
           }
-        }
-      }
-    }
-
-    // 2. Check 'Playground-Execution-Results' tab (Run Summary / Date)
-    const resultsRes = await sheets.spreadsheets.values.get({
-      spreadsheetId: SPREADSHEET_ID,
-      range: 'Playground-Execution-Results!A2:D5',
-    }).catch(() => null);
-
-    if (resultsRes && resultsRes.data.values && resultsRes.data.values.length > 0) {
-      for (const row of resultsRes.data.values) {
-        const rowText = row.join(' ');
-        if (rowText.includes(todayStr)) {
-          console.log(`[Smart Failover] Found matching completed test run in Playground-Execution-Results for today: ${todayStr}`);
-          return true;
         }
       }
     }
