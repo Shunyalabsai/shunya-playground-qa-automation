@@ -48,10 +48,29 @@ const SERVICES: ServiceCheck[] = [
   },
 ];
 
-async function sendFailureEmail(failedServices: { name: string; url: string; status: number | string; error?: string; impact: string; resolution: string }[], timestamp: string) {
+const HEALTH_ALERT_RECIPIENTS = [
+  'saheb@shunyalabs.ai',
+  'arti@shunyalabs.ai',
+  'ritu@shunyalabs.ai',
+  'yamini@shunyalabs.ai',
+  'sumit@shunyalabs.ai',
+  'saira@shunyalabs.ai',
+];
+
+interface FailedServicePayload {
+  name: string;
+  url: string;
+  status: number | string;
+  latencyMs: number;
+  error?: string;
+  impact: string;
+  resolution: string;
+}
+
+async function sendFailureEmail(failedServices: FailedServicePayload[], timestamp: string) {
   const user = (process.env.SMTP_USER || process.env.GMAIL_USER || '').trim();
   const pass = (process.env.SMTP_PASS || process.env.GMAIL_APP_PASSWORD || '').replace(/\s+/g, '');
-  const recipient = 'yamini@shunyalabs.ai';
+  const recipientList = process.env.HEALTH_ALERT_EMAIL_TO || HEALTH_ALERT_RECIPIENTS.join(', ');
 
   if (!user || !pass) {
     console.warn('⚠️ SMTP credentials not found in .env; skipping failure email alert.');
@@ -74,7 +93,7 @@ async function sendFailureEmail(failedServices: { name: string; url: string; sta
       <tr style="border-bottom:1px solid #334155;">
         <td style="padding:12px;font-weight:700;color:#f87171;">#${idx + 1} ${f.name}</td>
         <td style="padding:12px;color:#cbd5e1;font-family:monospace;font-size:12px;">${f.url}</td>
-        <td style="padding:12px;color:#fca5a5;font-weight:600;">${f.status}</td>
+        <td style="padding:12px;color:#fca5a5;font-weight:600;">${f.status} <span style="font-size:11px;color:#94a3b8;">(${f.latencyMs}ms)</span></td>
         <td style="padding:12px;color:#e2e8f0;font-size:12px;">${f.error || 'Unexpected Status'}</td>
       </tr>
       <tr style="background:#1e293b;border-bottom:2px solid #0f172a;">
@@ -87,10 +106,10 @@ async function sendFailureEmail(failedServices: { name: string; url: string; sta
 
   const html = `
     <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#0f172a;padding:24px;color:#f8fafc;">
-      <div style="max-width:640px;margin:0 auto;background:#1e293b;border-radius:12px;padding:24px;border:1px solid #ef4444;">
-        <h2 style="color:#ef4444;margin-top:0;font-size:20px;">🚨 Service Health Outage Detected</h2>
+      <div style="max-width:680px;margin:0 auto;background:#1e293b;border-radius:12px;padding:24px;border:1px solid #ef4444;">
+        <h2 style="color:#ef4444;margin-top:0;font-size:20px;">🚨 Playground Microservice Health Failure Alert</h2>
         <p style="color:#94a3b8;font-size:13px;margin-bottom:18px;">
-          The automated 15-minute health checker detected that one or more critical Playground microservices are degraded or unreachable.
+          The automated 15-minute API health monitor detected that one or more critical Playground microservices are currently degraded, returning error status codes, or unreachable.
         </p>
         <p style="font-size:12px;color:#cbd5e1;margin-bottom:16px;"><strong>Timestamp:</strong> ${timestamp}</p>
 
@@ -99,7 +118,7 @@ async function sendFailureEmail(failedServices: { name: string; url: string; sta
             <tr style="background:#334155;color:#94a3b8;font-size:11px;text-transform:uppercase;">
               <th style="padding:10px 12px;text-align:left;">Service</th>
               <th style="padding:10px 12px;text-align:left;">Endpoint</th>
-              <th style="padding:10px 12px;text-align:left;">Status</th>
+              <th style="padding:10px 12px;text-align:left;">Status / Latency</th>
               <th style="padding:10px 12px;text-align:left;">Error Reason</th>
             </tr>
           </thead>
@@ -118,13 +137,13 @@ async function sendFailureEmail(failedServices: { name: string; url: string; sta
     </div>`;
 
   try {
-    await transporter.sendMail({
+    const info = await transporter.sendMail({
       from: process.env.REPORT_EMAIL_FROM || user,
-      to: recipient,
+      to: recipientList,
       subject: `🚨 [CRITICAL ALERT] Playground API Health Check Failed (${failedServices.length} Service${failedServices.length > 1 ? 's' : ''} Down) — ${timestamp}`,
       html,
     });
-    console.log(`[HealthCheck] 🚨 Failure alert email sent to ${recipient}`);
+    console.log(`[HealthCheck] 🚨 Failure alert email sent to ${HEALTH_ALERT_RECIPIENTS.length} recipients (MessageId: ${info.messageId})`);
   } catch (err: any) {
     console.error(`[HealthCheck] Could not send failure alert email: ${err.message}`);
   }
@@ -215,6 +234,7 @@ async function runHealthChecks() {
       name: f.service,
       url: f.url,
       status: f.status || 'Unreachable / Timeout',
+      latencyMs: f.latencyMs || 0,
       error: f.error || `HTTP ${f.status}`,
       impact: servicesMap.get(f.service)?.impact || 'Service degraded.',
       resolution: servicesMap.get(f.service)?.resolution || 'Check server logs.',
