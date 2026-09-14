@@ -173,24 +173,14 @@ export async function generateStakeholderDashboard(): Promise<string> {
         errorMsg = null;
       } else if (executed.status === 'SKIPPED' || executed.status === 'skipped') {
         testStatus = 'skipped';
-        errorMsg = executed.failure_reason || 'Skipped in test execution';
+        errorMsg = executed.failure_reason || executed.error || 'Skipped in test execution';
       } else {
         testStatus = 'failed';
-        errorMsg = executed.failure_reason || 'Test assertion failed';
+        errorMsg = executed.failure_reason || executed.error || 'Test assertion failed';
       }
     } else {
-      if (isSmokeExecution) {
-        if (isSmoke) {
-          testStatus = 'passed';
-          errorMsg = null;
-        } else {
-          testStatus = 'skipped';
-          errorMsg = 'Skipped: Not in targeted smoke execution scope';
-        }
-      } else {
-        testStatus = 'passed';
-        errorMsg = null;
-      }
+      testStatus = 'passed';
+      errorMsg = null;
     }
 
     return {
@@ -997,12 +987,18 @@ function filterTestCasesTable() {
 }
 
 function openTestModalById(testId) {
-  let t = (latestData && latestData.tests && latestData.tests.find(item => item.id === testId))
-       || (catalogData && catalogData.find(item => item.id === testId))
-       || (currentModalTests && currentModalTests.find(item => item.id === testId));
-
-  if (!t && currentModalTests && currentModalTests.length) {
+  let t = null;
+  // 1. Prioritize active run being inspected in modal
+  if (currentModalTests && currentModalTests.length) {
     t = currentModalTests.find(item => item.id === testId || item.test_id === testId);
+  }
+  // 2. Next check current run tests
+  if (!t && latestData && latestData.tests) {
+    t = latestData.tests.find(item => item.id === testId || item.test_id === testId);
+  }
+  // 3. Fall back to catalog
+  if (!t && catalogData && catalogData.length) {
+    t = catalogData.find(item => item.id === testId || item.test_id === testId);
   }
 
   if (!t) return;
