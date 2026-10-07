@@ -1,5 +1,504 @@
 [
   {
+    "id": "run-1791416716387",
+    "startedAt": "2026-10-07T23:45:16.386Z",
+    "durationMs": 1653700,
+    "passRate": 18.5,
+    "runType": "Smoke Test Run",
+    "browsersTested": [
+      "chromium",
+      "safari"
+    ],
+    "summary": {
+      "total": 27,
+      "passed": 5,
+      "failed": 22,
+      "timedOut": 0,
+      "skipped": 0
+    },
+    "modules": {
+      "Backend API - Health Checks": {
+        "label": "Backend API - Health Checks",
+        "passed": 0,
+        "failed": 2,
+        "total": 2
+      },
+      "Backend API - Authentication & Session": {
+        "label": "Backend API - Authentication & Session",
+        "passed": 1,
+        "failed": 0,
+        "total": 1
+      },
+      "Backend API - STT Transcription Models": {
+        "label": "Backend API - STT Transcription Models",
+        "passed": 0,
+        "failed": 3,
+        "total": 3
+      },
+      "Backend API - Intelligence Feature Matrix": {
+        "label": "Backend API - Intelligence Feature Matrix",
+        "passed": 0,
+        "failed": 1,
+        "total": 1
+      },
+      "Backend API - TTS Speech Synthesis": {
+        "label": "Backend API - TTS Speech Synthesis",
+        "passed": 3,
+        "failed": 0,
+        "total": 3
+      },
+      "Backend API - Negative, Auth & Stress": {
+        "label": "Backend API - Negative, Auth & Stress",
+        "passed": 0,
+        "failed": 1,
+        "total": 1
+      },
+      "Playground UI - Layout & Navigation": {
+        "label": "Playground UI - Layout & Navigation",
+        "passed": 2,
+        "failed": 1,
+        "total": 3
+      },
+      "Playground UI - STT Models": {
+        "label": "Playground UI - STT Models",
+        "passed": 1,
+        "failed": 0,
+        "total": 1
+      },
+      "Playground UI - STT Language Selection": {
+        "label": "Playground UI - STT Language Selection",
+        "passed": 1,
+        "failed": 0,
+        "total": 1
+      },
+      "Playground UI - STT Audio Upload": {
+        "label": "Playground UI - STT Audio Upload",
+        "passed": 1,
+        "failed": 0,
+        "total": 1
+      },
+      "Playground UI - STT Output Actions": {
+        "label": "Playground UI - STT Output Actions",
+        "passed": 1,
+        "failed": 0,
+        "total": 1
+      },
+      "Playground UI - TTS Speech Synthesis": {
+        "label": "Playground UI - TTS Speech Synthesis",
+        "passed": 3,
+        "failed": 0,
+        "total": 3
+      }
+    },
+    "results": [
+      {
+        "test_id": "SMOKE-API-001",
+        "date": "08-10-2026",
+        "module": "Backend API - Health Checks",
+        "feature": "None",
+        "scenario": "ASR Microservice Health Check (GET /health)",
+        "audio_file": "—",
+        "language": "—",
+        "lang_code": "—",
+        "status": "FAIL",
+        "failure_reason": "Error: apiRequestContext.get: getaddrinfo ENOTFOUND asrv2prod.shunyalabs.ai",
+        "latency_ms": 32,
+        "api_response_preview": "Failed: Error: apiRequestContext.get: getaddrinfo ENOTFOUND asrv2prod.shunyalabs.ai",
+        "timestamp": "08-10-2026 04:47:43 AM"
+      },
+      {
+        "test_id": "SMOKE-API-001",
+        "date": "08-10-2026",
+        "module": "Backend API - Health Checks",
+        "feature": "None",
+        "scenario": "ASR Microservice Health Check (GET /health)",
+        "audio_file": "—",
+        "language": "—",
+        "lang_code": "—",
+        "status": "FAIL",
+        "failure_reason": "Error: apiRequestContext.get: getaddrinfo ENOTFOUND asrv2prod.shunyalabs.ai",
+        "latency_ms": 56,
+        "api_response_preview": "Failed: Error: apiRequestContext.get: getaddrinfo ENOTFOUND asrv2prod.shunyalabs.ai",
+        "timestamp": "08-10-2026 04:47:44 AM"
+      },
+      {
+        "test_id": "SMOKE-API-001",
+        "date": "08-10-2026",
+        "module": "Backend API - Health Checks",
+        "feature": "None",
+        "scenario": "ASR Microservice Health Check (GET /health)",
+        "audio_file": "—",
+        "language": "—",
+        "lang_code": "—",
+        "status": "FAIL",
+        "failure_reason": "Error: apiRequestContext.get: getaddrinfo ENOTFOUND asrv2prod.shunyalabs.ai",
+        "latency_ms": 39,
+        "api_response_preview": "Failed: Error: apiRequestContext.get: getaddrinfo ENOTFOUND asrv2prod.shunyalabs.ai",
+        "timestamp": "08-10-2026 04:47:45 AM"
+      },
+      {
+        "test_id": "SMOKE-API-002",
+        "date": "08-10-2026",
+        "module": "Backend API - Health Checks",
+        "feature": "None",
+        "scenario": "TTS Microservice Health Check (GET /health)",
+        "audio_file": "—",
+        "language": "—",
+        "lang_code": "—",
+        "status": "FAIL",
+        "failure_reason": "Error: apiRequestContext.get: getaddrinfo ENOTFOUND ttsv2.shunyalabs.ai",
+        "latency_ms": 41,
+        "api_response_preview": "Failed: Error: apiRequestContext.get: getaddrinfo ENOTFOUND ttsv2.shunyalabs.ai",
+        "timestamp": "08-10-2026 04:47:46 AM"
+      },
+      {
+        "test_id": "SMOKE-API-002",
+        "date": "08-10-2026",
+        "module": "Backend API - Health Checks",
+        "feature": "None",
+        "scenario": "TTS Microservice Health Check (GET /health)",
+        "audio_file": "—",
+        "language": "—",
+        "lang_code": "—",
+        "status": "FAIL",
+        "failure_reason": "Error: apiRequestContext.get: getaddrinfo ENOTFOUND ttsv2.shunyalabs.ai",
+        "latency_ms": 44,
+        "api_response_preview": "Failed: Error: apiRequestContext.get: getaddrinfo ENOTFOUND ttsv2.shunyalabs.ai",
+        "timestamp": "08-10-2026 04:47:47 AM"
+      },
+      {
+        "test_id": "SMOKE-API-002",
+        "date": "08-10-2026",
+        "module": "Backend API - Health Checks",
+        "feature": "None",
+        "scenario": "TTS Microservice Health Check (GET /health)",
+        "audio_file": "—",
+        "language": "—",
+        "lang_code": "—",
+        "status": "FAIL",
+        "failure_reason": "Error: apiRequestContext.get: getaddrinfo ENOTFOUND ttsv2.shunyalabs.ai",
+        "latency_ms": 33,
+        "api_response_preview": "Failed: Error: apiRequestContext.get: getaddrinfo ENOTFOUND ttsv2.shunyalabs.ai",
+        "timestamp": "08-10-2026 04:47:48 AM"
+      },
+      {
+        "test_id": "SMOKE-API-003",
+        "date": "08-10-2026",
+        "module": "Backend API - Authentication & Session",
+        "feature": "Auth Token",
+        "scenario": "JWT Authentication Token Exchange (POST /auth/token)",
+        "audio_file": "—",
+        "language": "—",
+        "lang_code": "—",
+        "status": "PASS",
+        "failure_reason": "",
+        "latency_ms": 7,
+        "api_response_preview": "HTTP 200 OK — Assertion Verified",
+        "timestamp": "08-10-2026 04:47:49 AM"
+      },
+      {
+        "test_id": "SMOKE-API-004",
+        "date": "08-10-2026",
+        "module": "Backend API - STT Transcription Models",
+        "feature": "Basic Transcription",
+        "scenario": "STT Core Model — zero-indic Transcription Sanity",
+        "audio_file": "input/indicvoices_data/audio/Hindi/37.mp3",
+        "language": "Hindi",
+        "lang_code": "hi",
+        "status": "FAIL",
+        "failure_reason": "Error: apiRequestContext.post: getaddrinfo ENOTFOUND asrv2prod.shunyalabs.ai",
+        "latency_ms": 40,
+        "api_response_preview": "Failed: Error: apiRequestContext.post: getaddrinfo ENOTFOUND asrv2prod.shunyalabs.ai",
+        "timestamp": "08-10-2026 04:47:49 AM"
+      },
+      {
+        "test_id": "SMOKE-API-004",
+        "date": "08-10-2026",
+        "module": "Backend API - STT Transcription Models",
+        "feature": "Basic Transcription",
+        "scenario": "STT Core Model — zero-indic Transcription Sanity",
+        "audio_file": "input/indicvoices_data/audio/Hindi/37.mp3",
+        "language": "Hindi",
+        "lang_code": "hi",
+        "status": "FAIL",
+        "failure_reason": "Error: apiRequestContext.post: getaddrinfo ENOTFOUND asrv2prod.shunyalabs.ai",
+        "latency_ms": 46,
+        "api_response_preview": "Failed: Error: apiRequestContext.post: getaddrinfo ENOTFOUND asrv2prod.shunyalabs.ai",
+        "timestamp": "08-10-2026 04:47:50 AM"
+      },
+      {
+        "test_id": "SMOKE-API-004",
+        "date": "08-10-2026",
+        "module": "Backend API - STT Transcription Models",
+        "feature": "Basic Transcription",
+        "scenario": "STT Core Model — zero-indic Transcription Sanity",
+        "audio_file": "input/indicvoices_data/audio/Hindi/37.mp3",
+        "language": "Hindi",
+        "lang_code": "hi",
+        "status": "FAIL",
+        "failure_reason": "Error: apiRequestContext.post: getaddrinfo ENOTFOUND asrv2prod.shunyalabs.ai",
+        "latency_ms": 29,
+        "api_response_preview": "Failed: Error: apiRequestContext.post: getaddrinfo ENOTFOUND asrv2prod.shunyalabs.ai",
+        "timestamp": "08-10-2026 04:47:51 AM"
+      },
+      {
+        "test_id": "SMOKE-API-005",
+        "date": "08-10-2026",
+        "module": "Backend API - STT Transcription Models",
+        "feature": "Codeswitch Transcription",
+        "scenario": "STT Codeswitch Model — zero-codeswitch Hinglish Sanity",
+        "audio_file": "input/indicvoices_data/audio/Hindi/37.mp3",
+        "language": "Hinglish",
+        "lang_code": "hi-en",
+        "status": "FAIL",
+        "failure_reason": "Error: apiRequestContext.post: getaddrinfo ENOTFOUND asrv2prod.shunyalabs.ai",
+        "latency_ms": 29,
+        "api_response_preview": "Failed: Error: apiRequestContext.post: getaddrinfo ENOTFOUND asrv2prod.shunyalabs.ai",
+        "timestamp": "08-10-2026 04:47:52 AM"
+      },
+      {
+        "test_id": "SMOKE-API-005",
+        "date": "08-10-2026",
+        "module": "Backend API - STT Transcription Models",
+        "feature": "Codeswitch Transcription",
+        "scenario": "STT Codeswitch Model — zero-codeswitch Hinglish Sanity",
+        "audio_file": "input/indicvoices_data/audio/Hindi/37.mp3",
+        "language": "Hinglish",
+        "lang_code": "hi-en",
+        "status": "FAIL",
+        "failure_reason": "Error: apiRequestContext.post: getaddrinfo ENOTFOUND asrv2prod.shunyalabs.ai",
+        "latency_ms": 41,
+        "api_response_preview": "Failed: Error: apiRequestContext.post: getaddrinfo ENOTFOUND asrv2prod.shunyalabs.ai",
+        "timestamp": "08-10-2026 04:47:53 AM"
+      },
+      {
+        "test_id": "SMOKE-API-005",
+        "date": "08-10-2026",
+        "module": "Backend API - STT Transcription Models",
+        "feature": "Codeswitch Transcription",
+        "scenario": "STT Codeswitch Model — zero-codeswitch Hinglish Sanity",
+        "audio_file": "input/indicvoices_data/audio/Hindi/37.mp3",
+        "language": "Hinglish",
+        "lang_code": "hi-en",
+        "status": "FAIL",
+        "failure_reason": "Error: apiRequestContext.post: getaddrinfo ENOTFOUND asrv2prod.shunyalabs.ai",
+        "latency_ms": 29,
+        "api_response_preview": "Failed: Error: apiRequestContext.post: getaddrinfo ENOTFOUND asrv2prod.shunyalabs.ai",
+        "timestamp": "08-10-2026 04:47:53 AM"
+      },
+      {
+        "test_id": "SMOKE-API-006",
+        "date": "08-10-2026",
+        "module": "Backend API - STT Transcription Models",
+        "feature": "Medical ASR Transcription",
+        "scenario": "STT Medical Model — zero-medasr Clinical Sanity",
+        "audio_file": "input/indicvoices_data/audio/Hindi/37.mp3",
+        "language": "English",
+        "lang_code": "en",
+        "status": "FAIL",
+        "failure_reason": "Error: apiRequestContext.post: getaddrinfo ENOTFOUND asrv2prod.shunyalabs.ai",
+        "latency_ms": 30,
+        "api_response_preview": "Failed: Error: apiRequestContext.post: getaddrinfo ENOTFOUND asrv2prod.shunyalabs.ai",
+        "timestamp": "08-10-2026 04:47:54 AM"
+      },
+      {
+        "test_id": "SMOKE-API-006",
+        "date": "08-10-2026",
+        "module": "Backend API - STT Transcription Models",
+        "feature": "Medical ASR Transcription",
+        "scenario": "STT Medical Model — zero-medasr Clinical Sanity",
+        "audio_file": "input/indicvoices_data/audio/Hindi/37.mp3",
+        "language": "English",
+        "lang_code": "en",
+        "status": "FAIL",
+        "failure_reason": "Error: apiRequestContext.post: getaddrinfo ENOTFOUND asrv2prod.shunyalabs.ai",
+        "latency_ms": 41,
+        "api_response_preview": "Failed: Error: apiRequestContext.post: getaddrinfo ENOTFOUND asrv2prod.shunyalabs.ai",
+        "timestamp": "08-10-2026 04:47:55 AM"
+      },
+      {
+        "test_id": "SMOKE-API-006",
+        "date": "08-10-2026",
+        "module": "Backend API - STT Transcription Models",
+        "feature": "Medical ASR Transcription",
+        "scenario": "STT Medical Model — zero-medasr Clinical Sanity",
+        "audio_file": "input/indicvoices_data/audio/Hindi/37.mp3",
+        "language": "English",
+        "lang_code": "en",
+        "status": "FAIL",
+        "failure_reason": "Error: apiRequestContext.post: getaddrinfo ENOTFOUND asrv2prod.shunyalabs.ai",
+        "latency_ms": 30,
+        "api_response_preview": "Failed: Error: apiRequestContext.post: getaddrinfo ENOTFOUND asrv2prod.shunyalabs.ai",
+        "timestamp": "08-10-2026 04:47:56 AM"
+      },
+      {
+        "test_id": "SMOKE-API-007",
+        "date": "08-10-2026",
+        "module": "Backend API - Intelligence Feature Matrix",
+        "feature": "Translation, Timestamps",
+        "scenario": "STT Audio Intelligence — Translation & Word Timestamps",
+        "audio_file": "input/indicvoices_data/audio/Hindi/37.mp3",
+        "language": "Hindi",
+        "lang_code": "hi",
+        "status": "FAIL",
+        "failure_reason": "Error: apiRequestContext.post: getaddrinfo ENOTFOUND asrv2prod.shunyalabs.ai",
+        "latency_ms": 29,
+        "api_response_preview": "Failed: Error: apiRequestContext.post: getaddrinfo ENOTFOUND asrv2prod.shunyalabs.ai",
+        "timestamp": "08-10-2026 04:47:57 AM"
+      },
+      {
+        "test_id": "SMOKE-API-007",
+        "date": "08-10-2026",
+        "module": "Backend API - Intelligence Feature Matrix",
+        "feature": "Translation, Timestamps",
+        "scenario": "STT Audio Intelligence — Translation & Word Timestamps",
+        "audio_file": "input/indicvoices_data/audio/Hindi/37.mp3",
+        "language": "Hindi",
+        "lang_code": "hi",
+        "status": "FAIL",
+        "failure_reason": "Error: apiRequestContext.post: getaddrinfo ENOTFOUND asrv2prod.shunyalabs.ai",
+        "latency_ms": 41,
+        "api_response_preview": "Failed: Error: apiRequestContext.post: getaddrinfo ENOTFOUND asrv2prod.shunyalabs.ai",
+        "timestamp": "08-10-2026 04:47:57 AM"
+      },
+      {
+        "test_id": "SMOKE-API-007",
+        "date": "08-10-2026",
+        "module": "Backend API - Intelligence Feature Matrix",
+        "feature": "Translation, Timestamps",
+        "scenario": "STT Audio Intelligence — Translation & Word Timestamps",
+        "audio_file": "input/indicvoices_data/audio/Hindi/37.mp3",
+        "language": "Hindi",
+        "lang_code": "hi",
+        "status": "FAIL",
+        "failure_reason": "Error: apiRequestContext.post: getaddrinfo ENOTFOUND asrv2prod.shunyalabs.ai",
+        "latency_ms": 30,
+        "api_response_preview": "Failed: Error: apiRequestContext.post: getaddrinfo ENOTFOUND asrv2prod.shunyalabs.ai",
+        "timestamp": "08-10-2026 04:47:58 AM"
+      },
+      {
+        "test_id": "SMOKE-API-008",
+        "date": "08-10-2026",
+        "module": "Backend API - TTS Speech Synthesis",
+        "feature": "TTS Speech Synthesis",
+        "scenario": "TTS Core Synthesis — zero-indic (Hindi & English)",
+        "audio_file": "TTS Text: \"नमस्ते, शून्या लैब्स एआई वॉइस ...\"",
+        "language": "Hindi",
+        "lang_code": "hi",
+        "status": "PASS",
+        "failure_reason": "",
+        "latency_ms": 2045,
+        "api_response_preview": "HTTP 200 OK — Assertion Verified",
+        "timestamp": "08-10-2026 04:48:01 AM"
+      },
+      {
+        "test_id": "SMOKE-API-009",
+        "date": "08-10-2026",
+        "module": "Backend API - TTS Speech Synthesis",
+        "feature": "TTS Speech Synthesis",
+        "scenario": "TTS Model — zero-oriental Synthesis (Japanese: ja)",
+        "audio_file": "TTS Text: \"こんにちは、Shunya Labsの音声合成テストです。...\"",
+        "language": "Japanese",
+        "lang_code": "ja",
+        "status": "PASS",
+        "failure_reason": "",
+        "latency_ms": 2017,
+        "api_response_preview": "HTTP 200 OK — Assertion Verified",
+        "timestamp": "08-10-2026 04:48:03 AM"
+      },
+      {
+        "test_id": "SMOKE-API-010",
+        "date": "08-10-2026",
+        "module": "Backend API - TTS Speech Synthesis",
+        "feature": "TTS Speech Synthesis",
+        "scenario": "TTS Model — zero-universal Synthesis (Spanish: es)",
+        "audio_file": "TTS Text: \"Bienvenido a la plataforma de ...\"",
+        "language": "Spanish",
+        "lang_code": "es",
+        "status": "PASS",
+        "failure_reason": "",
+        "latency_ms": 2024,
+        "api_response_preview": "HTTP 200 OK — Assertion Verified",
+        "timestamp": "08-10-2026 04:48:05 AM"
+      },
+      {
+        "test_id": "SMOKE-API-011",
+        "date": "08-10-2026",
+        "module": "Backend API - Negative, Auth & Stress",
+        "feature": "None",
+        "scenario": "Negative Security — Missing Auth Returns 401 Unauthorized",
+        "audio_file": "—",
+        "language": "—",
+        "lang_code": "—",
+        "status": "FAIL",
+        "failure_reason": "Error: apiRequestContext.post: getaddrinfo ENOTFOUND asrv2prod.shunyalabs.ai",
+        "latency_ms": 6,
+        "api_response_preview": "Failed: Error: apiRequestContext.post: getaddrinfo ENOTFOUND asrv2prod.shunyalabs.ai",
+        "timestamp": "08-10-2026 04:48:05 AM"
+      },
+      {
+        "test_id": "SMOKE-API-011",
+        "date": "08-10-2026",
+        "module": "Backend API - Negative, Auth & Stress",
+        "feature": "None",
+        "scenario": "Negative Security — Missing Auth Returns 401 Unauthorized",
+        "audio_file": "—",
+        "language": "—",
+        "lang_code": "—",
+        "status": "FAIL",
+        "failure_reason": "Error: apiRequestContext.post: getaddrinfo ENOTFOUND asrv2prod.shunyalabs.ai",
+        "latency_ms": 40,
+        "api_response_preview": "Failed: Error: apiRequestContext.post: getaddrinfo ENOTFOUND asrv2prod.shunyalabs.ai",
+        "timestamp": "08-10-2026 04:48:06 AM"
+      },
+      {
+        "test_id": "SMOKE-API-011",
+        "date": "08-10-2026",
+        "module": "Backend API - Negative, Auth & Stress",
+        "feature": "None",
+        "scenario": "Negative Security — Missing Auth Returns 401 Unauthorized",
+        "audio_file": "—",
+        "language": "—",
+        "lang_code": "—",
+        "status": "FAIL",
+        "failure_reason": "Error: apiRequestContext.post: getaddrinfo ENOTFOUND asrv2prod.shunyalabs.ai",
+        "latency_ms": 29,
+        "api_response_preview": "Failed: Error: apiRequestContext.post: getaddrinfo ENOTFOUND asrv2prod.shunyalabs.ai",
+        "timestamp": "08-10-2026 04:48:07 AM"
+      },
+      {
+        "test_id": "SMOKE-UI-001",
+        "date": "08-10-2026",
+        "module": "Playground UI - Layout & Navigation",
+        "feature": "App Shell",
+        "scenario": "Playground App Shell & Authentication State Sanity",
+        "audio_file": "—",
+        "language": "—",
+        "lang_code": "—",
+        "status": "FAIL",
+        "failure_reason": "TimeoutError: browserType.launch: Timeout 180000ms exceeded.",
+        "latency_ms": 1,
+        "api_response_preview": "Failed: TimeoutError: browserType.launch: Timeout 180000ms exceeded.",
+        "timestamp": "08-10-2026 04:57:27 AM"
+      },
+      {
+        "test_id": "SMOKE-UI-002",
+        "date": "08-10-2026",
+        "module": "Playground UI - Layout & Navigation",
+        "feature": "Navigation Tabs",
+        "scenario": "Primary Workspace Navigation (STT <-> TTS Tabs)",
+        "audio_file": "—",
+        "language": "—",
+        "lang_code": "—",
+        "status": "PASS",
+        "failure_reason": "",
+        "latency_ms": 2431,
+        "api_response_preview": "HTTP 200 OK — Assertion Verified",
+        "timestamp": "08-10-2026 04:57:31 AM"
+      }
+    ]
+  },
+  {
     "id": "run-1791288046746",
     "startedAt": "2026-10-06T12:00:46.746Z",
     "durationMs": 37800,
@@ -126100,98 +126599,6 @@
   {
     "id": "2026-07-29T11-30-04",
     "startedAt": "2026-07-29T06:00:04.000Z",
-    "durationMs": 60000,
-    "passRate": 32,
-    "runType": "Full Regression Run",
-    "browsersTested": [
-      "chromium",
-      "safari"
-    ],
-    "summary": {
-      "total": 60,
-      "passed": 19,
-      "failed": 41,
-      "timedOut": 0,
-      "skipped": 0
-    },
-    "modules": {
-      "Backend API - Health Checks": {
-        "label": "Backend API - Health Checks",
-        "passed": 2,
-        "failed": 0,
-        "total": 2
-      },
-      "Backend API - Authentication & Session": {
-        "label": "Backend API - Authentication & Session",
-        "passed": 1,
-        "failed": 0,
-        "total": 1
-      },
-      "Backend API - STT Transcription Models": {
-        "label": "Backend API - STT Transcription Models",
-        "passed": 3,
-        "failed": 0,
-        "total": 3
-      },
-      "Backend API - Intelligence Feature Matrix": {
-        "label": "Backend API - Intelligence Feature Matrix",
-        "passed": 1,
-        "failed": 0,
-        "total": 1
-      },
-      "Backend API - TTS Speech Synthesis": {
-        "label": "Backend API - TTS Speech Synthesis",
-        "passed": 3,
-        "failed": 0,
-        "total": 3
-      },
-      "Backend API - Negative, Auth & Stress": {
-        "label": "Backend API - Negative, Auth & Stress",
-        "passed": 1,
-        "failed": 0,
-        "total": 1
-      },
-      "Playground UI - Layout & Navigation": {
-        "label": "Playground UI - Layout & Navigation",
-        "passed": 3,
-        "failed": 0,
-        "total": 3
-      },
-      "Playground UI - STT Models": {
-        "label": "Playground UI - STT Models",
-        "passed": 1,
-        "failed": 0,
-        "total": 1
-      },
-      "Playground UI - STT Language Selection": {
-        "label": "Playground UI - STT Language Selection",
-        "passed": 1,
-        "failed": 0,
-        "total": 1
-      },
-      "Playground UI - STT Audio Upload": {
-        "label": "Playground UI - STT Audio Upload",
-        "passed": 1,
-        "failed": 0,
-        "total": 1
-      },
-      "Playground UI - STT Output Actions": {
-        "label": "Playground UI - STT Output Actions",
-        "passed": 1,
-        "failed": 0,
-        "total": 1
-      },
-      "Playground UI - TTS Speech Synthesis": {
-        "label": "Playground UI - TTS Speech Synthesis",
-        "passed": 3,
-        "failed": 0,
-        "total": 3
-      }
-    }
-  },
-  {
-    "id": "2026-07-29T05-30-01",
-    "startedAt": "2026-07-29T00:00:01.000Z",
     "durationMs": 60000,
     "passRate": 32,
     "runType": "Full Regression Run",
