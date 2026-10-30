@@ -2,6 +2,9 @@ node_modules/
 playwright-report/
 test-results/
 logs/*.log
+logs/health-alert-state.json
+logs/health-check-launchd.log
+logs/health-check-launchd-error.log
 logs/run-*/
 logs/.playground-email-sent-*
 .daily-batch.lock/

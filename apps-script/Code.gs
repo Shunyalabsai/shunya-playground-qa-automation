@@ -32,7 +32,100 @@ function openDashboard() {
   SpreadsheetApp.getUi().showModalDialog(html, "Opening Dashboard...");
 }
 
+function classifyHealthFailure(statusCode, errorText, fallbackResolution) {
+  var message = String(errorText || "");
+  if (/ENOTFOUND|ENODATA|EAI_AGAIN|getaddrinfo|DNS|Address unavailable|unable to resolve/i.test(message)) {
+    return {
+      kind: "dns",
+      statusLabel: "DNS lookup failed",
+      resolution: "The hostname did not resolve, so this check never reached the server. Check the DNS record for this host. Do not restart the container until the name resolves."
+    };
+  }
+  if (/timeout|ETIMEDOUT|timed out/i.test(message)) {
+    return {
+      kind: "timeout",
+      statusLabel: "Connection timeout",
+      resolution: "The host resolved, but the connection did not complete in time. Check instance health, the network path, and whether the process is listening."
+    };
+  }
+  if (/refused|ECONNREFUSED|ECONNRESET|unreachable/i.test(message)) {
+    return {
+      kind: "connection",
+      statusLabel: "Connection refused",
+      resolution: "The host is reachable but refused the connection. Check that the service process is running and the port is open."
+    };
+  }
+  if (statusCode > 0) {
+    return {
+      kind: "http",
+      statusLabel: "HTTP " + statusCode,
+      resolution: fallbackResolution
+    };
+  }
+  return {
+    kind: "unknown",
+    statusLabel: "Unreachable",
+    resolution: fallbackResolution || "The health check failed before an HTTP status was returned. Check DNS, network, and whether the service process is running."
+  };
+}
+
+var HEALTH_CHECK_ATTEMPTS = 3;
+var HEALTH_CHECK_RETRY_MS = 4000;
+var HEALTH_DNS_STATE_KEY = "HEALTH_DNS_STRIKES";
+
+function loadDnsStrikes() {
+  var raw = PropertiesService.getScriptProperties().getProperty(HEALTH_DNS_STATE_KEY);
+  if (!raw) return {};
+  try {
+    var parsed = JSON.parse(raw);
+    return parsed && typeof parsed === "object" ? parsed : {};
+  } catch (e) {
+    return {};
+  }
+}
+
+function saveDnsStrikes(strikes) {
+  PropertiesService.getScriptProperties().setProperty(HEALTH_DNS_STATE_KEY, JSON.stringify(strikes));
+}
+
+function probeMonitoredService(service) {
+  var last = { ok: false, statusCode: 0, latencyMs: 0, error: "No attempt made" };
+  for (var attempt = 1; attempt <= HEALTH_CHECK_ATTEMPTS; attempt++) {
+    var startTime = new Date().getTime();
+    try {
+      var response = UrlFetchApp.fetch(service.url, {
+        muteHttpExceptions: true,
+        followRedirects: false,
+        headers: { "User-Agent": "Playground-Cloud-HealthCheck/1.0" }
+      });
+      var statusCode = response.getResponseCode();
+      var isExpected = service.expectedStatus.indexOf(statusCode) !== -1 || (statusCode >= 200 && statusCode < 400);
+      last = {
+        ok: isExpected,
+        statusCode: statusCode,
+        latencyMs: new Date().getTime() - startTime,
+        error: isExpected ? "" : "Unexpected HTTP status code: " + statusCode
+      };
+      if (isExpected) return last;
+    } catch (err) {
+      last = {
+        ok: false,
+        statusCode: 0,
+        latencyMs: new Date().getTime() - startTime,
+        error: err.toString()
+      };
+    }
+    if (attempt < HEALTH_CHECK_ATTEMPTS) {
+      Logger.log("↻ " + service.name + " failed (" + last.error + "). Retry " + attempt + " of " + (HEALTH_CHECK_ATTEMPTS - 1) + ".");
+      Utilities.sleep(HEALTH_CHECK_RETRY_MS);
+    }
+  }
+  return last;
+}
+
 // ── 2. 15-Minute API Health Check (Failure-Only Alert) ───────────────────────
+// MailApp sends as the Google account that owns this script. Run it as
+// saira@shunyalabs.ai so the From address matches the Node health checker.
 function run15MinuteApiHealthCheck() {
   var alertRecipients = [
     "saheb@shunyalabs.ai",
@@ -69,56 +162,58 @@ function run15MinuteApiHealthCheck() {
 
   var failedServices = [];
   var timestamp = Utilities.formatDate(new Date(), "Asia/Kolkata", "yyyy-MM-dd HH:mm:ss");
+  var dnsStrikes = loadDnsStrikes();
 
   for (var i = 0; i < services.length; i++) {
     var s = services[i];
-    var startTime = new Date().getTime();
-    try {
-      var response = UrlFetchApp.fetch(s.url, {
-        muteHttpExceptions: true,
-        followRedirects: false,
-        headers: { "User-Agent": "Playground-Cloud-HealthCheck/1.0" }
-      });
-      var latencyMs = new Date().getTime() - startTime;
-      var statusCode = response.getResponseCode();
-
-      var isExpected = s.expectedStatus.indexOf(statusCode) !== -1 || (statusCode >= 200 && statusCode < 400);
-
-      if (!isExpected) {
-        failedServices.push({
-          name: s.name,
-          url: s.url,
-          status: statusCode,
-          latencyMs: latencyMs,
-          reason: "Unexpected HTTP status code: " + statusCode,
-          impact: s.impact,
-          resolution: s.resolution
-        });
-      }
-    } catch (err) {
-      var errLatencyMs = new Date().getTime() - startTime;
-      failedServices.push({
-        name: s.name,
-        url: s.url,
-        status: "Unreachable / Timeout",
-        latencyMs: errLatencyMs,
-        reason: err.toString(),
-        impact: s.impact,
-        resolution: s.resolution
-      });
+    var probe = probeMonitoredService(s);
+    if (probe.ok) {
+      if (dnsStrikes[s.name]) delete dnsStrikes[s.name];
+      Logger.log("✅ " + s.name + " " + probe.statusCode + " (" + probe.latencyMs + "ms)");
+      continue;
     }
+
+    var classified = classifyHealthFailure(probe.statusCode, probe.error, s.resolution);
+    var previousDnsStrikes = dnsStrikes[s.name] || 0;
+    var alert = classified.kind !== "dns" || previousDnsStrikes >= 1;
+    if (classified.kind === "dns") dnsStrikes[s.name] = previousDnsStrikes + 1;
+    else delete dnsStrikes[s.name];
+
+    if (!alert) {
+      Logger.log("Suppressed one-off DNS miss for " + s.name + " (" + probe.error + "). Will alert if the next check also fails DNS.");
+      continue;
+    }
+
+    failedServices.push({
+      name: s.name,
+      url: s.url,
+      status: classified.statusLabel,
+      latencyMs: probe.latencyMs,
+      reason: probe.error,
+      impact: s.impact,
+      resolution: classified.resolution,
+      kind: classified.kind
+    });
   }
 
-  // Send email alert ONLY when one or more services fail
+  saveDnsStrikes(dnsStrikes);
+
   if (failedServices.length > 0) {
     sendHealthFailureAlertEmail(failedServices, timestamp, alertRecipients);
   } else {
-    Logger.log("[" + timestamp + "] ✅ All services healthy. No alert email sent.");
+    Logger.log("[" + timestamp + "] ✅ No alert email sent.");
   }
 }
 
 function sendHealthFailureAlertEmail(failures, timestamp, recipients) {
-  var subject = "🚨 [CRITICAL ALERT] Playground API Health Check Failed (" + failures.length + " Service" + (failures.length > 1 ? "s" : "") + " Down) — " + timestamp + " IST";
+  var allDns = true;
+  for (var k = 0; k < failures.length; k++) {
+    if (failures[k].kind !== "dns") allDns = false;
+  }
+  var noun = failures.length > 1 ? "services" : "service";
+  var subject = allDns
+    ? "🚨 [ALERT] Playground API Health Check — DNS lookup failed (" + failures.length + " " + noun + ") — " + timestamp + " IST"
+    : "🚨 [CRITICAL ALERT] Playground API Health Check Failed (" + failures.length + " " + noun + " unreachable) — " + timestamp + " IST";
 
   var rowsHtml = [];
   for (var j = 0; j < failures.length; j++) {
@@ -144,7 +239,7 @@ function sendHealthFailureAlertEmail(failures, timestamp, recipients) {
       "<div style=\"max-width:680px;margin:0 auto;background:#1e293b;border-radius:12px;padding:24px;border:1px solid #ef4444;\">",
         "<h2 style=\"color:#ef4444;margin-top:0;font-size:20px;\">🚨 Playground Microservice Health Failure Alert</h2>",
         "<p style=\"color:#94a3b8;font-size:13px;margin-bottom:18px;\">",
-          "The automated 15-minute API health monitor detected that one or more critical Playground microservices are currently degraded, returning error status codes, or unreachable.",
+          "The automated 15-minute API health monitor confirmed this after 3 attempts. A one-off DNS miss is not mailed. DNS is mailed only when the same hostname fails on two checks in a row.",
         "</p>",
         "<p style=\"font-size:12px;color:#cbd5e1;margin-bottom:16px;\"><strong>Timestamp:</strong> " + timestamp + " IST</p>",
         "<table style=\"width:100%;border-collapse:collapse;margin-bottom:20px;background:#0f172a;border-radius:8px;overflow:hidden;\">",
@@ -171,6 +266,7 @@ function sendHealthFailureAlertEmail(failures, timestamp, recipients) {
 
   MailApp.sendEmail({
     to: recipients,
+    replyTo: "saira@shunyalabs.ai",
     subject: subject,
     htmlBody: htmlBody
   });

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.shunyalabs.playground-health</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>/bin/bash</string>
+        <string>REPLACE_PROJECT_DIR/scripts/run-health-check.sh</string>
+    </array>
+
+    <key>WorkingDirectory</key>
+    <string>REPLACE_PROJECT_DIR</string>
+
+    <!-- Every 15 minutes -->
+    <key>StartInterval</key>
+    <integer>900</integer>
+
+    <key>StandardOutPath</key>
+    <string>REPLACE_PROJECT_DIR/logs/health-check-launchd.log</string>
+    <key>StandardErrorPath</key>
+    <string>REPLACE_PROJECT_DIR/logs/health-check-launchd-error.log</string>
+
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>PATH</key>
+        <string>/usr/local/bin:/usr/bin:/bin:/opt/homebrew/bin</string>
+        <key>HOME</key>
+        <string>REPLACE_HOME</string>
+    </dict>
+
+    <key>KeepAlive</key>
+    <false/>
+    <key>RunAtLoad</key>
+    <false/>
+</dict>
+</plist>

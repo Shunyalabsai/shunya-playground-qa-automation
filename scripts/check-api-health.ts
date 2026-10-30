@@ -57,14 +57,63 @@ const HEALTH_ALERT_RECIPIENTS = [
   'saira@shunyalabs.ai',
 ];
 
+/** Sender mailbox for health alerts. Recipients stay the list above. */
+const HEALTH_ALERT_FROM = 'saira@shunyalabs.ai';
+
+type FailureKind = 'dns' | 'timeout' | 'connection' | 'http' | 'unknown';
+
+interface FailureClassification {
+  kind: FailureKind;
+  statusLabel: string;
+  resolution?: string;
+}
+
+function classifyFailure(status: number, error?: string): FailureClassification {
+  const message = error || '';
+  if (/ENOTFOUND|ENODATA|EAI_AGAIN|getaddrinfo|Address unavailable|unable to resolve/i.test(message)) {
+    return {
+      kind: 'dns',
+      statusLabel: 'DNS lookup failed',
+      resolution:
+        'The hostname did not resolve, so this check never reached the server. Check the DNS record for this host. Do not restart the container until the name resolves.',
+    };
+  }
+  if (/timeout|ETIMEDOUT|ESOCKETTIMEDOUT/i.test(message)) {
+    return {
+      kind: 'timeout',
+      statusLabel: 'Connection timeout',
+      resolution:
+        'The host resolved, but the connection did not complete in time. Check instance health, the network path, and whether the process is listening.',
+    };
+  }
+  if (/ECONNREFUSED|ECONNRESET|EHOSTUNREACH|ENETUNREACH/i.test(message)) {
+    return {
+      kind: 'connection',
+      statusLabel: 'Connection refused',
+      resolution:
+        'The host is reachable but refused the connection. Check that the service process is running and the port is open.',
+    };
+  }
+  if (status > 0) {
+    return { kind: 'http', statusLabel: `HTTP ${status}` };
+  }
+  return {
+    kind: 'unknown',
+    statusLabel: 'Unreachable',
+    resolution:
+      'The health check failed before an HTTP status was returned. Check DNS, network, and whether the service process is running.',
+  };
+}
+
 interface FailedServicePayload {
   name: string;
   url: string;
-  status: number | string;
+  status: string;
   latencyMs: number;
   error?: string;
   impact: string;
   resolution: string;
+  kind: FailureKind;
 }
 
 async function sendFailureEmail(failedServices: FailedServicePayload[], timestamp: string) {
@@ -75,6 +124,12 @@ async function sendFailureEmail(failedServices: FailedServicePayload[], timestam
   if (!user || !pass) {
     console.warn('⚠️ SMTP credentials not found in .env; skipping failure email alert.');
     return;
+  }
+
+  if (user.toLowerCase() !== HEALTH_ALERT_FROM.toLowerCase()) {
+    console.warn(
+      `[HealthCheck] SMTP is authenticated as ${user}. Gmail delivers From ${HEALTH_ALERT_FROM} only when that address is the SMTP account or a verified "Send mail as" alias. Set SMTP_USER and SMTP_PASS to ${HEALTH_ALERT_FROM} on the machine that runs this check.`
+    );
   }
 
   const smtpPort = parseInt(process.env.SMTP_PORT || '465', 10);
@@ -109,7 +164,7 @@ async function sendFailureEmail(failedServices: FailedServicePayload[], timestam
       <div style="max-width:680px;margin:0 auto;background:#1e293b;border-radius:12px;padding:24px;border:1px solid #ef4444;">
         <h2 style="color:#ef4444;margin-top:0;font-size:20px;">🚨 Playground Microservice Health Failure Alert</h2>
         <p style="color:#94a3b8;font-size:13px;margin-bottom:18px;">
-          The automated 15-minute API health monitor detected that one or more critical Playground microservices are currently degraded, returning error status codes, or unreachable.
+          The automated 15-minute API health monitor confirmed this after 3 attempts. A one-off DNS miss is not mailed. DNS is mailed only when the same hostname fails on two checks in a row.
         </p>
         <p style="font-size:12px;color:#cbd5e1;margin-bottom:16px;"><strong>Timestamp:</strong> ${timestamp}</p>
 
@@ -137,13 +192,21 @@ async function sendFailureEmail(failedServices: FailedServicePayload[], timestam
     </div>`;
 
   try {
+    const count = failedServices.length;
+    const noun = count > 1 ? 'services' : 'service';
+    const allDns = failedServices.every((f) => f.kind === 'dns');
+    const subject = allDns
+      ? `🚨 [ALERT] Playground API Health Check — DNS lookup failed (${count} ${noun}) — ${timestamp}`
+      : `🚨 [CRITICAL ALERT] Playground API Health Check Failed (${count} ${noun} unreachable) — ${timestamp}`;
+
     const info = await transporter.sendMail({
-      from: process.env.REPORT_EMAIL_FROM || user,
+      from: HEALTH_ALERT_FROM,
+      replyTo: HEALTH_ALERT_FROM,
       to: recipientList,
-      subject: `🚨 [CRITICAL ALERT] Playground API Health Check Failed (${failedServices.length} Service${failedServices.length > 1 ? 's' : ''} Down) — ${timestamp}`,
+      subject,
       html,
     });
-    console.log(`[HealthCheck] 🚨 Failure alert email sent to ${HEALTH_ALERT_RECIPIENTS.length} recipients (MessageId: ${info.messageId})`);
+    console.log(`[HealthCheck] 🚨 Failure alert email sent from ${HEALTH_ALERT_FROM} to ${recipientList} (MessageId: ${info.messageId})`);
   } catch (err: any) {
     console.error(`[HealthCheck] Could not send failure alert email: ${err.message}`);
   }
@@ -185,34 +248,117 @@ function pingUrl(urlStr: string): Promise<{ status: number; latencyMs: number; o
   });
 }
 
+const CHECK_ATTEMPTS = 3;
+const RETRY_DELAY_MS = 4000;
+const ALERT_STATE_PATH = path.resolve(__dirname, '../logs/health-alert-state.json');
+
+function isExpectedStatus(service: ServiceCheck, status: number): boolean {
+  return service.expectedStatuses.includes(status) || (status >= 200 && status < 400);
+}
+
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+interface DnsStrikeState {
+  dnsStrikes: Record<string, number>;
+}
+
+function loadDnsStrikes(): Record<string, number> {
+  try {
+    const parsed = JSON.parse(fs.readFileSync(ALERT_STATE_PATH, 'utf8')) as DnsStrikeState;
+    if (parsed && parsed.dnsStrikes && typeof parsed.dnsStrikes === 'object') return parsed.dnsStrikes;
+  } catch {
+    // First run, or the state file is not readable yet.
+  }
+  return {};
+}
+
+function saveDnsStrikes(dnsStrikes: Record<string, number>) {
+  const logDir = path.dirname(ALERT_STATE_PATH);
+  if (!fs.existsSync(logDir)) fs.mkdirSync(logDir, { recursive: true });
+  const state: DnsStrikeState = { dnsStrikes };
+  fs.writeFileSync(ALERT_STATE_PATH, JSON.stringify(state, null, 2));
+}
+
+/** Mail a DNS failure only after the same service fails DNS on two checks in a row. */
+function shouldAlert(kind: FailureKind, previousDnsStrikes: number): boolean {
+  if (kind !== 'dns') return true;
+  return previousDnsStrikes >= 1;
+}
+
+async function probeWithRetries(service: ServiceCheck) {
+  let res = await pingUrl(service.url);
+  for (let attempt = 1; attempt < CHECK_ATTEMPTS && !isExpectedStatus(service, res.status); attempt++) {
+    const reason = res.error || `HTTP ${res.status}`;
+    console.log(`   ↻ ${service.name} failed (${reason}). Retry ${attempt} of ${CHECK_ATTEMPTS - 1} in ${RETRY_DELAY_MS / 1000}s...`);
+    await sleep(RETRY_DELAY_MS);
+    res = await pingUrl(service.url);
+  }
+  return res;
+}
+
 async function runHealthChecks() {
   const timestamp = new Date().toISOString();
   console.log(`\n🔍 [${timestamp}] Starting 15-Minute API Health Check...`);
 
   let allHealthy = true;
   const results: any[] = [];
+  const dnsStrikes = loadDnsStrikes();
+  const alertable: any[] = [];
 
   for (const s of SERVICES) {
-    const res = await pingUrl(s.url);
-    const isExpected = s.expectedStatuses.includes(res.status) || (res.status >= 200 && res.status < 400);
-    if (!isExpected) allHealthy = false;
+    const res = await probeWithRetries(s);
+    const isExpected = isExpectedStatus(s, res.status);
+    const classification = classifyFailure(res.status, res.error);
 
-    console.log(
-      `   ${isExpected ? '✅' : '❌'} ${s.name.padEnd(22)} | Status: ${res.status || 'ERR'} | Latency: ${res.latencyMs}ms ${
-        res.error ? `(${res.error})` : ''
-      }`
-    );
+    if (isExpected) {
+      if (dnsStrikes[s.name]) delete dnsStrikes[s.name];
+      console.log(`   ✅ ${s.name.padEnd(22)} | Status: ${res.status} | Latency: ${res.latencyMs}ms`);
+    } else {
+      allHealthy = false;
+      const previousDnsStrikes = dnsStrikes[s.name] || 0;
+      const alert = shouldAlert(classification.kind, previousDnsStrikes);
+      if (classification.kind === 'dns') dnsStrikes[s.name] = previousDnsStrikes + 1;
+      else delete dnsStrikes[s.name];
+      console.log(
+        `   ❌ ${s.name.padEnd(22)} | Status: ${classification.statusLabel} | Latency: ${res.latencyMs}ms ${
+          res.error ? `(${res.error})` : ''
+        }${alert ? '' : ' | suppressed (one-off DNS miss)'}`
+      );
+
+      const row = {
+        service: s.name,
+        url: s.url,
+        status: res.status,
+        statusLabel: classification.statusLabel,
+        kind: classification.kind,
+        failureResolution: classification.resolution,
+        latencyMs: res.latencyMs,
+        ok: false,
+        error: res.error || null,
+        timestamp,
+      };
+      results.push(row);
+      if (alert) alertable.push(row);
+      continue;
+    }
 
     results.push({
       service: s.name,
       url: s.url,
       status: res.status,
+      statusLabel: classification.statusLabel,
+      kind: classification.kind,
+      failureResolution: classification.resolution,
       latencyMs: res.latencyMs,
-      ok: isExpected,
+      ok: true,
       error: res.error || null,
       timestamp,
     });
   }
+
+  saveDnsStrikes(dnsStrikes);
 
   // Save lightweight rolling log
   const logDir = path.resolve(__dirname, '../logs');
@@ -225,19 +371,18 @@ async function runHealthChecks() {
 
   fs.appendFileSync(logFile, logLine, 'utf8');
 
-  // Trigger alert email if any service failed
-  const failedServices = results.filter((r) => !r.ok);
-  if (failedServices.length > 0) {
-    console.log(`[HealthCheck] ⚠️ ${failedServices.length} service(s) failed. Triggering immediate alert email...`);
+  if (alertable.length > 0) {
+    console.log(`[HealthCheck] ⚠️ ${alertable.length} service(s) still failing after retries. Triggering alert email...`);
     const servicesMap = new Map(SERVICES.map(s => [s.name, s]));
-    const failurePayload = failedServices.map(f => ({
+    const failurePayload = alertable.map(f => ({
       name: f.service,
       url: f.url,
-      status: f.status || 'Unreachable / Timeout',
+      status: f.statusLabel,
       latencyMs: f.latencyMs || 0,
       error: f.error || `HTTP ${f.status}`,
       impact: servicesMap.get(f.service)?.impact || 'Service degraded.',
-      resolution: servicesMap.get(f.service)?.resolution || 'Check server logs.',
+      resolution: f.failureResolution || servicesMap.get(f.service)?.resolution || 'Check server logs.',
+      kind: f.kind,
     }));
     await sendFailureEmail(failurePayload, timestamp);
   }
